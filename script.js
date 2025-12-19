@@ -4,10 +4,13 @@ import {
   addDoc,
   getDocs,
   deleteDoc,
-  doc
+  doc,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-// SIMPAN DATA
+let editId = null;
+
+// SIMPAN / UPDATE DATA
 document.getElementById("usahaForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -15,14 +18,24 @@ document.getElementById("usahaForm").addEventListener("submit", async (e) => {
   const bidang = document.getElementById("bidang").value;
   const deskripsi = document.getElementById("deskripsi").value;
 
-  await addDoc(collection(db, "usaha"), {
-    nama,
-    bidang,
-    deskripsi,
-    createdAt: new Date()
-  });
+  if (editId) {
+    await updateDoc(doc(db, "usaha", editId), {
+      nama,
+      bidang,
+      deskripsi
+    });
+    editId = null;
+    alert("Data berhasil diperbarui ✏️");
+  } else {
+    await addDoc(collection(db, "usaha"), {
+      nama,
+      bidang,
+      deskripsi,
+      createdAt: new Date()
+    });
+    alert("Data tersimpan 🎉");
+  }
 
-  alert("Data tersimpan 🎉");
   document.getElementById("usahaForm").reset();
   tampilkanData();
 });
@@ -42,4 +55,27 @@ async function tampilkanData() {
       <strong>${data.nama}</strong><br>
       Bidang: ${data.bidang}<br>
       Deskripsi: ${data.deskripsi}<br>
-      <button data-id="${docSnap.id}">H
+      <button class="edit">Edit</button>
+      <button class="hapus">Hapus</button>
+      <hr>
+    `;
+
+    // EDIT
+    li.querySelector(".edit").addEventListener("click", () => {
+      document.getElementById("nama").value = data.nama;
+      document.getElementById("bidang").value = data.bidang;
+      document.getElementById("deskripsi").value = data.deskripsi;
+      editId = docSnap.id;
+    });
+
+    // DELETE
+    li.querySelector(".hapus").addEventListener("click", async () => {
+      await deleteDoc(doc(db, "usaha", docSnap.id));
+      tampilkanData();
+    });
+
+    daftar.appendChild(li);
+  });
+}
+
+tampilkanData();
