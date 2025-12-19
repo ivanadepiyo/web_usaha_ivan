@@ -1,12 +1,22 @@
-document.getElementById("usahaForm").addEventListener("submit", function(e){
+document.getElementById("usahaForm").addEventListener("submit", async function(e){
   e.preventDefault();
 
-  const usaha = {
-    nama: document.getElementById("nama").value,
-    bidang: document.getElementById("bidang").value,
-    deskripsi: document.getElementById("deskripsi").value
-  };
+  const nama = document.getElementById("nama").value;
+  const bidang = document.getElementById("bidang").value;
+  const deskripsi = document.getElementById("deskripsi").value;
 
-  console.log("Data usaha:", usaha);
-  alert("Data berhasil diisi (belum tersimpan ke database)");
+  try {
+    await addDoc(collection(db, "usaha"), {
+      nama,
+      bidang,
+      deskripsi,
+      createdAt: new Date()
+    });
+
+    alert("Data usaha berhasil tersimpan 🎉");
+    document.getElementById("usahaForm").reset();
+  } catch (error) {
+    alert("Gagal menyimpan data ❌");
+    console.error(error);
+  }
 });
