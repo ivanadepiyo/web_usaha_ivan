@@ -2,12 +2,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebas
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "ISI_API_KEY_KAMU",
-  authDomain: "ISI_AUTH_DOMAIN",
-  projectId: "ISI_PROJECT_ID",
-  storageBucket: "ISI_STORAGE_BUCKET",
-  messagingSenderId: "ISI_MESSAGING_SENDER_ID",
-  appId: "ISI_APP_ID"
+  apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
+  authDomain: "web-usaha-ivan.firebaseapp.com",
+  projectId: "web-usaha-ivan",
+  storageBucket: "web-usaha-ivan.firebasestorage.app",
+  messagingSenderId: "588839561784",
+  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
 };
 
 const app = initializeApp(firebaseConfig);
