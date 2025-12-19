@@ -1,7 +1,8 @@
-import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { db } from "./firebase.js";
+import { collection, addDoc } from
+  "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-document.getElementById("usahaForm").addEventListener("submit", async function(e) {
+document.getElementById("usahaForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const nama = document.getElementById("nama").value;
@@ -10,16 +11,16 @@ document.getElementById("usahaForm").addEventListener("submit", async function(e
 
   try {
     await addDoc(collection(db, "usaha"), {
-      nama,
-      bidang,
-      deskripsi,
+      nama: nama,
+      bidang: bidang,
+      deskripsi: deskripsi,
       createdAt: new Date()
     });
 
     alert("Data usaha berhasil tersimpan 🎉");
     document.getElementById("usahaForm").reset();
   } catch (error) {
-    console.error(error);
     alert("Gagal menyimpan data ❌");
+    console.error("Firestore error:", error);
   }
 });
