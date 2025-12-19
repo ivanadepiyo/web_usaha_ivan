@@ -2,7 +2,9 @@ import { db } from "./firebase.js";
 import {
   collection,
   addDoc,
-  getDocs
+  getDocs,
+  deleteDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 // SIMPAN DATA
@@ -13,21 +15,16 @@ document.getElementById("usahaForm").addEventListener("submit", async (e) => {
   const bidang = document.getElementById("bidang").value;
   const deskripsi = document.getElementById("deskripsi").value;
 
-  try {
-    await addDoc(collection(db, "usaha"), {
-      nama,
-      bidang,
-      deskripsi,
-      createdAt: new Date()
-    });
+  await addDoc(collection(db, "usaha"), {
+    nama,
+    bidang,
+    deskripsi,
+    createdAt: new Date()
+  });
 
-    alert("Data usaha berhasil tersimpan 🎉");
-    document.getElementById("usahaForm").reset();
-    tampilkanData(); // refresh list
-  } catch (error) {
-    alert("Gagal menyimpan data ❌");
-    console.error(error);
-  }
+  alert("Data tersimpan 🎉");
+  document.getElementById("usahaForm").reset();
+  tampilkanData();
 });
 
 // TAMPILKAN DATA
@@ -37,19 +34,12 @@ async function tampilkanData() {
 
   const querySnapshot = await getDocs(collection(db, "usaha"));
 
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
+  querySnapshot.forEach((docSnap) => {
+    const data = docSnap.data();
 
     const li = document.createElement("li");
     li.innerHTML = `
       <strong>${data.nama}</strong><br>
       Bidang: ${data.bidang}<br>
-      Deskripsi: ${data.deskripsi}
-      <hr>
-    `;
-    daftar.appendChild(li);
-  });
-}
-
-// LOAD SAAT HALAMAN DIBUKA
-tampilkanData();
+      Deskripsi: ${data.deskripsi}<br>
+      <button data-id="${docSnap.id}">H
