@@ -1,4 +1,7 @@
-document.getElementById("usahaForm").addEventListener("submit", async function(e){
+import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { db } from "./firebase.js";
+
+document.getElementById("usahaForm").addEventListener("submit", async function(e) {
   e.preventDefault();
 
   const nama = document.getElementById("nama").value;
@@ -16,7 +19,7 @@ document.getElementById("usahaForm").addEventListener("submit", async function(e
     alert("Data usaha berhasil tersimpan 🎉");
     document.getElementById("usahaForm").reset();
   } catch (error) {
-    alert("Gagal menyimpan data ❌");
     console.error(error);
+    alert("Gagal menyimpan data ❌");
   }
 });
