@@ -6,15 +6,78 @@
   <style>
     body.dashboard { background-color: #f0f8ff; font-family: Arial, sans-serif; padding: 20px; }
     nav { margin-bottom: 20px; }
-    nav a { text-decoration: none; margin-right: 10px; color: #333; font-weight: bold; }
-    nav button { background-color: #e74c3c; color: white; border: none; padding: 5px 10px; cursor: pointer; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    table, th, td { border: 1px solid #ccc; }
-    th, td { padding: 8px; text-align: left; }
-    button { padding: 5px 10px; cursor: pointer; margin: 2px; }
+    nav a { text-decoration: none; margin-right: 10px; font-weight: bold; padding:5px; border-radius:5px; color:#333; }
+    nav a.active { background-color: #2980b9; color:white; }
+    nav a:hover { background-color:#dcdcdc; }
+    nav button { background-color: #e74c3c; color: white; border: none; padding: 5px 10px; cursor:pointer; border-radius:5px; }
+    nav button:hover { background-color:#c0392b; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    table, th, td { border:1px solid #ccc; }
+    th, td { padding:8px; text-align:left; }
+    table tr:hover { background-color:#f2f2f2; }
+    button { padding:5px 10px; cursor:pointer; border-radius:5px; transition:0.2s; }
+    button:hover { background-color:#2980b9; color:white; }
   </style>
 </head>
 <body class="dashboard">
   <nav>
-    <a href="dashboard.html">Dashboard</a> | 
-    <a href="tambah.html">Tambah Data<
+    <a href="dashboard.html" class="active">Dashboard</a> | 
+    <a href="tambah.html">Tambah Data</a> | 
+    <a href="lihat.html">Lihat Data</a> | 
+    <button id="logoutBtn">Logout</button>
+  </nav>
+  <hr>
+
+  <h2>Dashboard Admin</h2>
+  <button onclick="window.location.href='tambah.html'">Tambah Data</button>
+
+  <h3>Data Usaha</h3>
+  <table border="1" id="dataTable">
+    <tr>
+      <th>Nama</th>
+      <th>Produk</th>
+      <th>Aksi</th>
+    </tr>
+  </table>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+  <script>
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    auth.onAuthStateChanged((user)=>{
+      if(!user){ alert('Harus login!'); window.location.href='login.html'; } 
+      else{ loadData(); }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{
+      auth.signOut().then(()=> window.location.href='login.html');
+    });
+
+    function loadData(){
+      db.collection('usaha').get().then(snapshot=>{
+        const table = document.getElementById('dataTable');
+        snapshot.forEach(doc=>{
+          const data = doc.data();
+          const row = table.insertRow();
+          row.insertCell(0).innerText = data.nama;
+          row.insertCell(1).innerText = data.produk;
+          const aksiCell = row.insertCell(2);
+          aksiCell.innerHTML=`<button onclick="editData('${doc.id}')">Edit</button>
+                              <button onclick="deleteData('${doc.id}')">Hapus</button>`;
+        });
+      });
+    }
+
+    function editData(id){ window.location.href=`edit.html?id=${id}`; }
+    function deleteData(id){
+      if(confirm('Yakin hapus data ini?')){
+        db.collection('usaha').doc(id).delete().then(()=>{ alert('Data dihapus!'); location.reload(); });
+      }
+    }
+  </script>
+</body>
+</html>
