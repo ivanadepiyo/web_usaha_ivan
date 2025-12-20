@@ -3,9 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <title>Lihat Data Usaha</title>
+  <style>
+    body.lihat { background-color: #fffff0; font-family: Arial, sans-serif; padding: 20px; }
+    nav { margin-bottom: 20px; }
+    nav a { text-decoration: none; margin-right: 10px; color: #333; font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    table, th, td { border: 1px solid #ccc; }
+    th, td { padding: 8px; text-align: left; }
+  </style>
 </head>
-<body>
-  <h2>Data Usaha</h2>
+<body class="lihat">
+  <nav>
+    <a href="dashboard.html">Dashboard</a> | 
+    <a href="tambah.html">Tambah Data</a> | 
+    <a href="lihat.html">Lihat Data</a>
+  </nav>
+  <hr>
+
+  <h2>Data Usaha (Publik)</h2>
 
   <table border="1" id="dataTable">
     <tr>
@@ -20,9 +35,9 @@
     const app = firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const table = document.getElementById('dataTable');
-
+    // Load data publik
     db.collection('usaha').get().then(snapshot => {
+      const table = document.getElementById('dataTable');
       snapshot.forEach(doc => {
         const data = doc.data();
         const row = table.insertRow();
