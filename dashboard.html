@@ -1,40 +1,59 @@
-<h2>Data Usaha</h2>
-<table id="dataTable">
-  <tr>
-    <th>Nama</th>
-    <th>Produk</th>
-    <th>Aksi</th>
-  </tr>
-  <tr>
-    <td>Aldi</td>
-    <td>Minuman</td>
-    <td>
-      <button class="editBtn" style="display:none;">Edit</button>
-      <button class="deleteBtn" style="display:none;">Hapus</button>
-    </td>
-  </tr>
-</table>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Admin</title>
+</head>
+<body>
+  <h2>Dashboard Admin</h2>
+  <button id="logoutBtn">Logout</button>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-<script>
-  // Firebase config (sama seperti login.html)
-  const app = firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
+  <h3>Data Usaha</h3>
+  <table id="dataTable" border="1">
+    <tr>
+      <th>Nama</th>
+      <th>Produk</th>
+      <th>Aksi</th>
+    </tr>
+    <tr>
+      <td>Aldi</td>
+      <td>Minuman</td>
+      <td>
+        <button class="editBtn" style="display:none;">Edit</button>
+        <button class="deleteBtn" style="display:none;">Hapus</button>
+      </td>
+    </tr>
+  </table>
 
-  // Cek user login
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      // Kalau admin login → tampilkan tombol
-      document.querySelectorAll('.editBtn, .deleteBtn').forEach(btn => {
-        btn.style.display = 'inline-block';
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+  <script>
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Proteksi tombol Edit & Hapus
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        document.querySelectorAll('.editBtn, .deleteBtn').forEach(btn => {
+          btn.style.display = 'inline-block';
+        });
+      } else {
+        document.querySelectorAll('.editBtn, .deleteBtn').forEach(btn => {
+          btn.style.display = 'none';
+        });
+        alert('Harus login untuk akses admin!');
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    logoutBtn.addEventListener('click', () => {
+      auth.signOut().then(() => {
+        alert('Logout berhasil 👋');
+        window.location.href = 'login.html';
       });
-    } else {
-      // Kalau tidak login → sembunyikan tombol
-      document.querySelectorAll('.editBtn, .deleteBtn').forEach(btn => {
-        btn.style.display = 'none';
-      });
-    }
-  });
-</script>
-
+    });
+  </script>
+</body>
+</html>
