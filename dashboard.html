@@ -1,0 +1,39 @@
+<h2>Data Usaha</h2>
+<table id="dataTable">
+  <tr>
+    <th>Nama</th>
+    <th>Produk</th>
+    <th>Aksi</th>
+  </tr>
+  <tr>
+    <td>Aldi</td>
+    <td>Minuman</td>
+    <td>
+      <button class="editBtn" style="display:none;">Edit</button>
+      <button class="deleteBtn" style="display:none;">Hapus</button>
+    </td>
+  </tr>
+</table>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+<script>
+  // Firebase config (sama seperti login.html)
+  const app = firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  // Cek user login
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      // Kalau admin login → tampilkan tombol
+      document.querySelectorAll('.editBtn, .deleteBtn').forEach(btn => {
+        btn.style.display = 'inline-block';
+      });
+    } else {
+      // Kalau tidak login → sembunyikan tombol
+      document.querySelectorAll('.editBtn, .deleteBtn').forEach(btn => {
+        btn.style.display = 'none';
+      });
+    }
+  });
+</script>
