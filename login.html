@@ -1,0 +1,41 @@
+<!-- login.html -->
+<h2>Login Admin</h2>
+<form id="loginForm">
+  <input type="email" id="email" placeholder="Email" required />
+  <input type="password" id="password" placeholder="Password" required />
+  <button type="submit">Login</button>
+</form>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+<script>
+  // Firebase config (ganti dengan milikmu)
+  const firebaseConfig = {
+    apiKey: "API_KEY",
+    authDomain: "web-usaha-ivan.firebaseapp.com",
+    projectId: "web-usaha-ivan",
+    storageBucket: "web-usaha-ivan.appspot.com",
+    messagingSenderId: "SENDER_ID",
+    appId: "APP_ID"
+  };
+
+  // Inisialisasi Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  const loginForm = document.getElementById('loginForm');
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    auth.signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        alert('Login berhasil! 👏');
+        window.location.href = 'dashboard.html'; // halaman admin
+      })
+      .catch((error) => {
+        alert('Error: ' + error.message);
+      });
+  });
+</script>
