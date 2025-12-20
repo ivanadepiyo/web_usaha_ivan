@@ -29,6 +29,14 @@
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+// Logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    logoutBtn.addEventListener('click', () => {
+    auth.signOut().then(() => {
+    alert('Logout berhasil 👋');
+    window.location.href = 'login.html';
+  });
+});
 
     // Proteksi halaman admin
     auth.onAuthStateChanged((user) => {
