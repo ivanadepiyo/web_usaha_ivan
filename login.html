@@ -6,8 +6,9 @@
   <style>
     body.login { background-color: #f0f0f0; font-family: Arial, sans-serif; padding: 20px; }
     h2 { color: #2c3e50; }
-    input, button { padding: 5px 10px; margin: 5px 0; }
-    button { cursor: pointer; }
+    input, button { padding: 5px 10px; margin: 5px 0; border-radius: 5px; }
+    button { cursor: pointer; background-color: #2980b9; color: white; border: none; }
+    button:hover { background-color: #1c5980; }
   </style>
 </head>
 <body class="login">
@@ -23,8 +24,8 @@
   <script>
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-
     const form = document.getElementById('loginForm');
+
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const email = document.getElementById('email').value;
@@ -35,7 +36,7 @@
           alert('Login berhasil 👌');
           window.location.href = 'dashboard.html';
         })
-        .catch((err) => alert('Error: ' + err.message));
+        .catch(err => alert('Error: ' + err.message));
     });
   </script>
 </body>
