@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Lihat Data Usaha</title>
+</head>
+<body>
+  <h2>Data Usaha</h2>
+
+  <table border="1" id="dataTable">
+    <tr>
+      <th>Nama</th>
+      <th>Produk</th>
+    </tr>
+  </table>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+  <script>
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const table = document.getElementById('dataTable');
+
+    db.collection('usaha').get().then(snapshot => {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const row = table.insertRow();
+        row.insertCell(0).innerText = data.nama;
+        row.insertCell(1).innerText = data.produk;
+      });
+    });
+  </script>
+</body>
+</html>
