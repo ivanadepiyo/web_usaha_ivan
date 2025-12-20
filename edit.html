@@ -3,22 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <title>Edit Data Usaha</title>
+  <style>
+    body.edit { background-color: #f5fff0; font-family: Arial, sans-serif; padding: 20px; }
+    nav { margin-bottom: 20px; }
+    nav a { text-decoration: none; margin-right: 10px; color: #333; font-weight: bold; }
+    nav button { background-color: #e74c3c; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+    h2 { color: #2c3e50; }
+    input, button { padding: 5px 10px; margin: 5px 0; }
+  </style>
 </head>
-<body>
- <nav>
-  <a href="dashboard.html">Dashboard</a> | 
-  <a href="tambah.html">Tambah Data</a> | 
-  <a href="lihat.html">Lihat Data</a> | 
-  <button id="logoutBtn">Logout</button>
-</nav>
-<hr>
+<body class="edit">
+  <nav>
+    <a href="dashboard.html">Dashboard</a> | 
+    <a href="tambah.html">Tambah Data</a> | 
+    <a href="lihat.html">Lihat Data</a> | 
+    <button id="logoutBtn">Logout</button>
+  </nav>
+  <hr>
 
   <h2>Edit Data Usaha</h2>
   <button onclick="window.location.href='dashboard.html'">Kembali ke Dashboard</button>
 
   <form id="editForm">
-    <input type="text" id="nama" placeholder="Nama" required /><br><br>
-    <input type="text" id="produk" placeholder="Produk" required /><br><br>
+    <input type="text" id="nama" placeholder="Nama" required /><br>
+    <input type="text" id="produk" placeholder="Produk" required /><br>
     <button type="submit">Update</button>
   </form>
 
@@ -26,90 +34,51 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
   <script>
-   const app = firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-// Proteksi halaman admin
-auth.onAuthStateChanged((user) => {
-  if (!user) {
-    alert('Harus login!');
-    window.location.href = 'login.html';
-  }
-});
-
-// Logout
-const logoutBtn = document.getElementById('logoutBtn');
-logoutBtn.addEventListener('click', () => {
-  auth.signOut().then(() => {
-    alert('Logout berhasil 👋');
-    window.location.href = 'login.html';
-  });
-});
-
-// Event listener form tambah
-const form = document.getElementById('tambahForm');
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const nama = document.getElementById('nama').value;
-  const produk = document.getElementById('produk').value;
-
-  db.collection('usaha').add({ nama, produk })
-    .then(() => {
-      alert('Data berhasil ditambahkan! 🎉');
-      window.location.href = 'dashboard.html';
-    })
-    .catch((error) => {
-      alert('Error: ' + error.message);
-    });
-});
-
-    // Proteksi halaman admin
+    // Proteksi admin
     auth.onAuthStateChanged((user) => {
       if (!user) {
         alert('Harus login!');
-        window.location.href = 'login.html';
+        window.location.href='login.html';
       } else {
         loadData();
       }
     });
 
-    // Ambil ID dari query string
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      auth.signOut().then(() => window.location.href='login.html');
+    });
+
+    // Ambil ID dari URL
     const urlParams = new URLSearchParams(window.location.search);
-    const docId = urlParams.get('id');
+    const id = urlParams.get('id');
 
     function loadData() {
-      if (!docId) {
-        alert('ID data tidak ditemukan!');
-        window.location.href = 'dashboard.html';
-        return;
-      }
-
-      db.collection('usaha').doc(docId).get().then(doc => {
-        if(doc.exists) {
-          document.getElementById('nama').value = doc.data().nama;
-          document.getElementById('produk').value = doc.data().produk;
-        } else {
-          alert('Data tidak ditemukan!');
-          window.location.href = 'dashboard.html';
-        }
+      if (!id) return;
+      db.collection('usaha').doc(id).get().then(doc => {
+        const data = doc.data();
+        document.getElementById('nama').value = data.nama;
+        document.getElementById('produk').value = data.produk;
       });
     }
 
+    // Update data
     const form = document.getElementById('editForm');
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const nama = document.getElementById('nama').value;
       const produk = document.getElementById('produk').value;
 
-      db.collection('usaha').doc(docId).update({ nama, produk })
+      db.collection('usaha').doc(id).update({ nama, produk })
         .then(() => {
           alert('Data berhasil diupdate! 🎉');
-          window.location.href = 'dashboard.html';
+          window.location.href='dashboard.html';
         })
-        .catch((error) => {
-          alert('Error: ' + error.message);
-        });
+        .catch(err => alert('Error: ' + err.message));
     });
   </script>
 </body>
