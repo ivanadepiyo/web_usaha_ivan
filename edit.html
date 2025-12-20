@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Data Usaha</title>
+</head>
+<body>
+  <h2>Edit Data Usaha</h2>
+  <button onclick="window.location.href='dashboard.html'">Kembali ke Dashboard</button>
+
+  <form id="editForm">
+    <input type="text" id="nama" placeholder="Nama" required /><br><br>
+    <input type="text" id="produk" placeholder="Produk" required /><br><br>
+    <button type="submit">Update</button>
+  </form>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+  <script>
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Proteksi halaman admin
+    auth.onAuthStateChanged((user) => {
+      if (!user) {
+        alert('Harus login!');
+        window.location.href = 'login.html';
+      } else {
+        loadData();
+      }
+    });
+
+    // Ambil ID dari query string
+    const urlParams = new URLSearchParams(window.location.search);
+    const docId = urlParams.get('id');
+
+    function loadData() {
+      if (!docId) {
+        alert('ID data tidak ditemukan!');
+        window.location.href = 'dashboard.html';
+        return;
+      }
+
+      db.collection('usaha').doc(docId).get().then(doc => {
+        if(doc.exists) {
+          document.getElementById('nama').value = doc.data().nama;
+          document.getElementById('produk').value = doc.data().produk;
+        } else {
+          alert('Data tidak ditemukan!');
+          window.location.href = 'dashboard.html';
+        }
+      });
+    }
+
+    const form = document.getElementById('editForm');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nama = document.getElementById('nama').value;
+      const produk = document.getElementById('produk').value;
+
+      db.collection('usaha').doc(docId).update({ nama, produk })
+        .then(() => {
+          alert('Data berhasil diupdate! 🎉');
+          window.location.href = 'dashboard.html';
+        })
+        .catch((error) => {
+          alert('Error: ' + error.message);
+        });
+    });
+  </script>
+</body>
+</html>
