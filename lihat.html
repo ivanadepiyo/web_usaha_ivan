@@ -15,7 +15,9 @@
     table tr:hover { background-color:#f2f2f2; }
   </style>
 </head>
+
 <body class="lihat">
+
   <nav>
     <a href="dashboard.html">Dashboard</a> | 
     <a href="tambah.html">Tambah Data</a> | 
@@ -23,31 +25,38 @@
   </nav>
   <hr>
 
-  <h2>Data Usaha (Publik)</h2>
+  <h2>Data Usaha</h2>
 
-  <table border="1" id="dataTable">
+  <table id="dataTable">
     <tr>
       <th>Nama</th>
       <th>Produk</th>
     </tr>
   </table>
-  
+
+  <!-- 🔽 FIREBASE SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
- 
-<script>
-  const app = firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
 
-  auth.onAuthStateChanged(user => {
-    if (!user) {
-      window.location.href = "login.html";
-    }
-  });
-</script>
-    db.collection('usaha').get().then(snapshot=>{
+  <script>
+    // 🔑 INIT SEKALI
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // 🔒 LOGIN GUARD
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+
+    // 📥 LOAD DATA
+    db.collection('usaha').get().then(snapshot => {
       const table = document.getElementById('dataTable');
-      snapshot.forEach(doc=>{
+
+      snapshot.forEach(doc => {
         const data = doc.data();
         const row = table.insertRow();
         row.insertCell(0).innerText = data.nama;
@@ -55,5 +64,6 @@
       });
     });
   </script>
+
 </body>
 </html>
