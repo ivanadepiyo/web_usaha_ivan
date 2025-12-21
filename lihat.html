@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html>
 <body>
-<h2>Data Usaha Publik</h2>
+
+<h2>Data Usaha</h2>
 <ul id="list"></ul>
 
-<script type="module">
-import { db } from "./firebase.js";
-import { getDocs,collection }
-from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+<script src="firebase.js"></script>
+<script src="auth-guard.js"></script>
 
-const q=await getDocs(collection(db,"usaha"));
-q.forEach(d=>{
-  list.innerHTML+=`<li>${d.data().nama} - ${d.data().bidang}</li>`;
+<script>
+db.collection("usaha").get().then(s=>{
+  s.forEach(d=>{
+    list.innerHTML+=`<li>${d.data().nama}</li>`;
+  });
 });
 </script>
+
 </body>
 </html>
