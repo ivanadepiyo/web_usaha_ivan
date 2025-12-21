@@ -5,29 +5,20 @@
   <title>Platform Usaha</title>
 </head>
 <body>
+  <h2>Loading...</h2>
 
-  <h1>Platform Pendaftaran Usaha</h1>
-  
-  <form id="usahaForm">
-    <label>Nama Usaha</label><br>
-    <input type="text" id="nama" required><br><br>
+  <script type="module">
+    import { auth } from "./firebase.js";
+    import { onAuthStateChanged } from
+      "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-    <label>Bidang Usaha</label><br>
-    <input type="text" id="bidang"><br><br>
-
-    <label>Deskripsi</label><br>
-    <textarea id="deskripsi"></textarea><br><br>
-
-    <button type="submit">Simpan</button>
-  </form>
-  
- <h2>Daftar Usaha</h2>
-  <ul id="daftarUsaha"></ul>
-  
-  <script type="module" src="firebase.js"></script>
-<script type="module" src="script.js"></script>
-
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        window.location.href = "dashboard.html";
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+  </script>
 </body>
 </html>
-
-
