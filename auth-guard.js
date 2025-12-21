@@ -1,6 +1,7 @@
-auth.onAuthStateChanged(user => {
-  if (!user) {
-    location.href = "index.html";
-  }
-});
-
+<script>
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      window.location.href = "login.html";
+    }
+  });
+</script>
