@@ -2,87 +2,57 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard Admin</title>
-  <style>
-    body.dashboard { background-color: #f0f8ff; font-family: Arial, sans-serif; padding: 20px; }
-    nav { margin-bottom: 20px; }
-    nav a { text-decoration: none; margin-right: 10px; font-weight: bold; padding:5px; border-radius:5px; color:#333; }
-    nav a.active { background-color: #2980b9; color:white; }
-    nav a:hover { background-color:#dcdcdc; }
-    nav button { background-color: #e74c3c; color: white; border: none; padding: 5px 10px; cursor:pointer; border-radius:5px; }
-    nav button:hover { background-color:#c0392b; }
-    table { width:100%; border-collapse:collapse; margin-top:10px; }
-    table, th, td { border:1px solid #ccc; }
-    th, td { padding:8px; text-align:left; }
-    table tr:hover { background-color:#f2f2f2; }
-    button { padding:5px 10px; cursor:pointer; border-radius:5px; }
-  </style>
+  <title>Dashboard</title>
 </head>
 
-<body class="dashboard">
+<body>
+  <h2>Dashboard Admin</h2>
+
   <nav>
-    <a href="dashboard.html" class="active">Dashboard</a> | 
-    <a href="tambah.html">Tambah Data</a> | 
-    <a href="lihat.html">Lihat Data</a> | 
+    <a href="tambah.html">Tambah</a> |
+    <a href="lihat.html">Lihat</a> |
     <button id="logoutBtn">Logout</button>
   </nav>
-  <hr>
 
-  <h2>Dashboard Admin</h2>
-  <button onclick="window.location.href='tambah.html'">Tambah Data</button>
-
-  <h3>Data Usaha</h3>
-  <table id="dataTable">
+  <table border="1" id="dataTable">
     <tr>
       <th>Nama</th>
-      <th>Produk</th>
+      <th>Bidang</th>
       <th>Aksi</th>
     </tr>
   </table>
 
-  <!-- FIREBASE SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+  <script type="module">
+    import { auth, db } from "./firebase.js";
+    import { onAuthStateChanged, signOut }
+      from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { collection, getDocs, deleteDoc, doc }
+      from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-  <!-- CONFIG -->
-  <script src="firebase.js"></script>
-  <script src="auth-guard.js"></script>
-
-  <!-- DASHBOARD LOGIC -->
-  <script>
-    auth.onAuthStateChanged(user => {
-      if (!user) return;
-      loadData();
+    onAuthStateChanged(auth, user => {
+      if (!user) location.href = "login.html";
+      else loadData();
     });
 
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      auth.signOut().then(() => window.location.href = 'login.html');
-    });
+    logoutBtn.onclick = () => signOut(auth).then(()=>location.href="login.html");
 
-    function loadData(){
-      const table = document.getElementById('dataTable');
-
-      db.collection('usaha').get().then(snapshot => {
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const row = table.insertRow();
-          row.insertCell(0).innerText = data.nama;
-          row.insertCell(1).innerText = data.produk;
-          row.insertCell(2).innerHTML =
-            `<button onclick="editData('${doc.id}')">Edit</button>
-             <button onclick="deleteData('${doc.id}')">Hapus</button>`;
-        });
+    async function loadData(){
+      const q = await getDocs(collection(db,"usaha"));
+      q.forEach(d=>{
+        const r=dataTable.insertRow();
+        r.insertCell(0).innerText=d.data().nama;
+        r.insertCell(1).innerText=d.data().bidang;
+        r.insertCell(2).innerHTML=
+          `<button onclick="edit('${d.id}')">Edit</button>
+           <button onclick="hapus('${d.id}')">Hapus</button>`;
       });
     }
 
-    function editData(id){
-      window.location.href = `edit.html?id=${id}`;
-    }
-
-    function deleteData(id){
-      if(confirm('Yakin hapus data ini?')){
-        db.collection('usaha').doc(id).delete().then(() => location.reload());
+    window.edit=id=>location.href=`edit.html?id=${id}`;
+    window.hapus=async id=>{
+      if(confirm("Hapus?")){
+        await deleteDoc(doc(db,"usaha",id));
+        location.reload();
       }
     }
   </script>
