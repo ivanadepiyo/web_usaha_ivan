@@ -4,36 +4,33 @@
 
 <h2>Dashboard</h2>
 <button onclick="location.href='tambah.html'">Tambah</button>
-<button id="logout">Logout</button>
+<button onclick="logout()">Logout</button>
 
-<table border="1" id="dataTable">
+<table id="table" border="1">
 <tr><th>Nama</th><th>Produk</th><th>Aksi</th></tr>
 </table>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
 
 <script src="firebase.js"></script>
 <script src="auth-guard.js"></script>
 
 <script>
-db.collection('usaha').get().then(snap => {
-  snap.forEach(doc => {
-    const d = doc.data();
-    const row = dataTable.insertRow();
-    row.insertCell(0).innerText = d.nama;
-    row.insertCell(1).innerText = d.produk;
-    row.insertCell(2).innerHTML =
-      `<button onclick="edit('${doc.id}')">Edit</button>`;
-  });
-});
-
-function edit(id){
-  location.href = `edit.html?id=${id}`;
+function logout(){
+  auth.signOut().then(()=>location.href="login.html");
 }
 
-logout.onclick = () => auth.signOut().then(()=>location.href='index.html');
+db.collection("usaha").get().then(snap=>{
+  snap.forEach(doc=>{
+    const d=doc.data();
+    table.innerHTML+=`
+    <tr>
+      <td>${d.nama}</td>
+      <td>${d.produk}</td>
+      <td>
+        <a href="edit.html?id=${doc.id}">Edit</a>
+      </td>
+    </tr>`;
+  });
+});
 </script>
 
 </body>
