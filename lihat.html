@@ -1,69 +1,18 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>Lihat Data Usaha</title>
-  <style>
-    body.lihat { background-color: #fffff0; font-family: Arial, sans-serif; padding: 20px; }
-    nav { margin-bottom: 20px; }
-    nav a { text-decoration: none; margin-right: 10px; font-weight: bold; padding:5px; border-radius:5px; color:#333; }
-    nav a.active { background-color:#2980b9; color:white; }
-    nav a:hover { background-color:#dcdcdc; }
-    table { width:100%; border-collapse:collapse; margin-top:10px; }
-    table, th, td { border:1px solid #ccc; }
-    th, td { padding:8px; text-align:left; }
-    table tr:hover { background-color:#f2f2f2; }
-  </style>
-</head>
+<html>
+<body>
+<h2>Data Usaha Publik</h2>
+<ul id="list"></ul>
 
-<body class="lihat">
+<script type="module">
+import { db } from "./firebase.js";
+import { getDocs,collection }
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-  <nav>
-    <a href="dashboard.html">Dashboard</a> | 
-    <a href="tambah.html">Tambah Data</a> | 
-    <a href="lihat.html" class="active">Lihat Data</a>
-  </nav>
-  <hr>
-
-  <h2>Data Usaha</h2>
-
-  <table id="dataTable">
-    <tr>
-      <th>Nama</th>
-      <th>Produk</th>
-    </tr>
-  </table>
-
-  <!-- 🔽 FIREBASE SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
-
-  <script>
-    // 🔑 INIT SEKALI
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // 🔒 LOGIN GUARD
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = "login.html";
-      }
-    });
-
-    // 📥 LOAD DATA
-    db.collection('usaha').get().then(snapshot => {
-      const table = document.getElementById('dataTable');
-
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const row = table.insertRow();
-        row.insertCell(0).innerText = data.nama;
-        row.insertCell(1).innerText = data.produk;
-      });
-    });
-  </script>
-
+const q=await getDocs(collection(db,"usaha"));
+q.forEach(d=>{
+  list.innerHTML+=`<li>${d.data().nama} - ${d.data().bidang}</li>`;
+});
+</script>
 </body>
 </html>
