@@ -1,82 +1,24 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>Tambah Data Usaha</title>
-  <style>
-    body.tambah { background-color: #fff0f5; font-family: Arial, sans-serif; padding: 20px; }
-    nav { margin-bottom: 20px; }
-    nav a { text-decoration: none; margin-right: 10px; font-weight: bold; padding:5px; border-radius:5px; color:#333; }
-    nav a.active { background-color:#2980b9; color:white; }
-    nav a:hover { background-color:#dcdcdc; }
-    nav button { background-color:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; }
-    nav button:hover { background-color:#c0392b; }
-    h2 { color:#2c3e50; }
-    input, button { padding:5px 10px; margin:5px 0; border-radius:5px; }
-    button { cursor:pointer; background-color:#2980b9; color:white; border:none; }
-    button:hover { background-color:#1c5980; }
-  </style>
-</head>
+<html>
+<body>
+<h2>Tambah Usaha</h2>
 
-<body class="tambah">
+<input id="nama" placeholder="Nama"><br>
+<input id="bidang" placeholder="Bidang"><br>
+<button>Simpan</button>
 
-  <nav>
-    <a href="dashboard.html">Dashboard</a> | 
-    <a href="tambah.html" class="active">Tambah Data</a> | 
-    <a href="lihat.html">Lihat Data</a> | 
-    <button id="logoutBtn">Logout</button>
-  </nav>
-  <hr>
+<script type="module">
+import { db } from "./firebase.js";
+import { addDoc, collection }
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-  <h2>Tambah Data Usaha</h2>
-  <button onclick="window.location.href='dashboard.html'">Kembali ke Dashboard</button>
-
-  <form id="tambahForm">
-    <input type="text" id="nama" placeholder="Nama" required /><br>
-    <input type="text" id="produk" placeholder="Produk" required /><br>
-    <button type="submit">Tambah</button>
-  </form>
-
-  <!-- 🔽 SEMUA SCRIPT DI BAWAH 🔽 -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
-
-  <script>
-    // 🔑 firebaseConfig HARUS SUDAH ADA
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // 🔒 LOGIN GUARD
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = "login.html";
-      }
-    });
-
-    // 🚪 LOGOUT
-    document.getElementById('logoutBtn')
-      .addEventListener('click', () => {
-        auth.signOut().then(() => window.location.href = 'login.html');
-      });
-
-    // ➕ TAMBAH DATA
-    document.getElementById('tambahForm')
-      .addEventListener('submit', e => {
-        e.preventDefault();
-
-        const nama = document.getElementById('nama').value;
-        const produk = document.getElementById('produk').value;
-
-        db.collection('usaha').add({ nama, produk })
-          .then(() => {
-            alert('Data berhasil ditambahkan 🎉');
-            window.location.href = 'dashboard.html';
-          })
-          .catch(err => alert(err.message));
-      });
-  </script>
-
+document.querySelector("button").onclick=async()=>{
+  await addDoc(collection(db,"usaha"),{
+    nama:nama.value,
+    bidang:bidang.value
+  });
+  location.href="dashboard.html";
+}
+</script>
 </body>
 </html>
