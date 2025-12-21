@@ -1,24 +1,23 @@
 <!DOCTYPE html>
 <html>
 <body>
+
 <h2>Tambah Usaha</h2>
-
 <input id="nama" placeholder="Nama"><br>
-<input id="bidang" placeholder="Bidang"><br>
-<button>Simpan</button>
+<input id="produk" placeholder="Produk"><br>
+<button onclick="simpan()">Simpan</button>
 
-<script type="module">
-import { db } from "./firebase.js";
-import { addDoc, collection }
-from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+<script src="firebase.js"></script>
+<script src="auth-guard.js"></script>
 
-document.querySelector("button").onclick=async()=>{
-  await addDoc(collection(db,"usaha"),{
+<script>
+function simpan(){
+  db.collection("usaha").add({
     nama:nama.value,
-    bidang:bidang.value
-  });
-  location.href="dashboard.html";
+    produk:produk.value
+  }).then(()=>location.href="dashboard.html");
 }
 </script>
+
 </body>
 </html>
