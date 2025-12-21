@@ -1,87 +1,31 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>Edit Data Usaha</title>
-  <style>
-    body.edit { background-color: #f5fff0; font-family: Arial, sans-serif; padding: 20px; }
-    nav { margin-bottom: 20px; }
-    nav a { text-decoration: none; margin-right: 10px; font-weight: bold; padding:5px; border-radius:5px; color:#333; }
-    nav a:hover { background-color:#dcdcdc; }
-    nav button { background-color:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; }
-    nav button:hover { background-color:#c0392b; }
-    input, button { padding:5px 10px; margin:5px 0; border-radius:5px; }
-    button { cursor:pointer; background-color:#2980b9; color:white; border:none; }
-    button:hover { background-color:#1c5980; }
-  </style>
-</head>
+<html>
+<body>
+<h2>Edit Usaha</h2>
 
-<body class="edit">
+<input id="nama"><br>
+<input id="bidang"><br>
+<button>Update</button>
 
-  <nav>
-    <a href="dashboard.html">Dashboard</a> | 
-    <a href="tambah.html">Tambah Data</a> | 
-    <a href="lihat.html">Lihat Data</a> | 
-    <button id="logoutBtn">Logout</button>
-  </nav>
-  <hr>
+<script type="module">
+import { db } from "./firebase.js";
+import { doc,getDoc,updateDoc }
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-  <h2>Edit Data Usaha</h2>
+const id=new URLSearchParams(location.search).get("id");
+const ref=doc(db,"usaha",id);
+const snap=await getDoc(ref);
 
-  <form id="editForm">
-    <input type="text" id="nama" placeholder="Nama" required><br>
-    <input type="text" id="produk" placeholder="Produk" required><br>
-    <button type="submit">Update</button>
-  </form>
+nama.value=snap.data().nama;
+bidang.value=snap.data().bidang;
 
-  <!-- 🔽 SEMUA SCRIPT DI SINI 🔽 -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
-
-  <script>
-    // 🔑 INIT SEKALI
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // 🔒 LOGIN GUARD
-    auth.onAuthStateChanged(user => {
-      if (!user) window.location.href = "login.html";
-    });
-
-    // 🚪 LOGOUT
-    document.getElementById('logoutBtn')
-      .addEventListener('click', () =>
-        auth.signOut().then(() => window.location.href='login.html')
-      );
-
-    // 📌 AMBIL ID
-    const id = new URLSearchParams(window.location.search).get('id');
-
-    // 📥 LOAD DATA
-    if (id) {
-      db.collection('usaha').doc(id).get().then(doc => {
-        const data = doc.data();
-        document.getElementById('nama').value = data.nama;
-        document.getElementById('produk').value = data.produk;
-      });
-    }
-
-    // 💾 UPDATE DATA
-    document.getElementById('editForm')
-      .addEventListener('submit', e => {
-        e.preventDefault();
-
-        db.collection('usaha').doc(id).update({
-          nama: document.getElementById('nama').value,
-          produk: document.getElementById('produk').value
-        }).then(() => {
-          alert('Data berhasil diupdate 🎉');
-          window.location.href='dashboard.html';
-        });
-      });
-  </script>
-
+document.querySelector("button").onclick=async()=>{
+  await updateDoc(ref,{
+    nama:nama.value,
+    bidang:bidang.value
+  });
+  location.href="dashboard.html";
+}
+</script>
 </body>
 </html>
