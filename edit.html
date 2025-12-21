@@ -1,31 +1,30 @@
 <!DOCTYPE html>
 <html>
 <body>
+
 <h2>Edit Usaha</h2>
-
 <input id="nama"><br>
-<input id="bidang"><br>
-<button>Update</button>
+<input id="produk"><br>
+<button onclick="update()">Update</button>
 
-<script type="module">
-import { db } from "./firebase.js";
-import { doc,getDoc,updateDoc }
-from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+<script src="firebase.js"></script>
+<script src="auth-guard.js"></script>
 
+<script>
 const id=new URLSearchParams(location.search).get("id");
-const ref=doc(db,"usaha",id);
-const snap=await getDoc(ref);
 
-nama.value=snap.data().nama;
-bidang.value=snap.data().bidang;
+db.collection("usaha").doc(id).get().then(d=>{
+  nama.value=d.data().nama;
+  produk.value=d.data().produk;
+});
 
-document.querySelector("button").onclick=async()=>{
-  await updateDoc(ref,{
+function update(){
+  db.collection("usaha").doc(id).update({
     nama:nama.value,
-    bidang:bidang.value
-  });
-  location.href="dashboard.html";
+    produk:produk.value
+  }).then(()=>location.href="dashboard.html");
 }
 </script>
+
 </body>
 </html>
