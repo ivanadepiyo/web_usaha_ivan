@@ -1,60 +1,40 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>Dashboard</title>
-</head>
-
+<html>
 <body>
-  <h2>Dashboard Admin</h2>
 
-  <nav>
-    <a href="tambah.html">Tambah</a> |
-    <a href="lihat.html">Lihat</a> |
-    <button id="logoutBtn">Logout</button>
-  </nav>
+<h2>Dashboard</h2>
+<button onclick="location.href='tambah.html'">Tambah</button>
+<button id="logout">Logout</button>
 
-  <table border="1" id="dataTable">
-    <tr>
-      <th>Nama</th>
-      <th>Bidang</th>
-      <th>Aksi</th>
-    </tr>
-  </table>
+<table border="1" id="dataTable">
+<tr><th>Nama</th><th>Produk</th><th>Aksi</th></tr>
+</table>
 
-  <script type="module">
-    import { auth, db } from "./firebase.js";
-    import { onAuthStateChanged, signOut }
-      from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { collection, getDocs, deleteDoc, doc }
-      from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
 
-    onAuthStateChanged(auth, user => {
-      if (!user) location.href = "login.html";
-      else loadData();
-    });
+<script src="firebase.js"></script>
+<script src="auth-guard.js"></script>
 
-    logoutBtn.onclick = () => signOut(auth).then(()=>location.href="login.html");
+<script>
+db.collection('usaha').get().then(snap => {
+  snap.forEach(doc => {
+    const d = doc.data();
+    const row = dataTable.insertRow();
+    row.insertCell(0).innerText = d.nama;
+    row.insertCell(1).innerText = d.produk;
+    row.insertCell(2).innerHTML =
+      `<button onclick="edit('${doc.id}')">Edit</button>`;
+  });
+});
 
-    async function loadData(){
-      const q = await getDocs(collection(db,"usaha"));
-      q.forEach(d=>{
-        const r=dataTable.insertRow();
-        r.insertCell(0).innerText=d.data().nama;
-        r.insertCell(1).innerText=d.data().bidang;
-        r.insertCell(2).innerHTML=
-          `<button onclick="edit('${d.id}')">Edit</button>
-           <button onclick="hapus('${d.id}')">Hapus</button>`;
-      });
-    }
+function edit(id){
+  location.href = `edit.html?id=${id}`;
+}
 
-    window.edit=id=>location.href=`edit.html?id=${id}`;
-    window.hapus=async id=>{
-      if(confirm("Hapus?")){
-        await deleteDoc(doc(db,"usaha",id));
-        location.reload();
-      }
-    }
-  </script>
+logout.onclick = () => auth.signOut().then(()=>location.href='index.html');
+</script>
+
 </body>
 </html>
