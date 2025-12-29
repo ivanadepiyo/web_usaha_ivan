@@ -1,5 +1,5 @@
 
-/* RESET DASAR */
+/* login */
 * {
   box-sizing: border-box;
   font-family: "Segoe UI", Arial, sans-serif;
@@ -96,26 +96,4 @@ button:hover {
     margin: 20px;
     padding: 24px;
   }
-}
-
-.page-login .card {
-  max-width: 380px;
-}
-
-.page-login button {
-  font-size: 16px;
-}
-
-/* ADMIN */
-.page-admin {
-  background: linear-gradient(120deg, #8e0e00, #1f1c18);
-}
-
-.page-admin button {
-  background: #8e0e00;
-}
-
-/* REGISTER */
-.page-register {
-  background: linear-gradient(120deg, #11998e, #38ef7d);
 }
