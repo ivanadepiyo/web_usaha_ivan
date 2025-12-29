@@ -1,11 +1,98 @@
-body {
-  font-family: Arial;
-  padding: 30px;
+/* RESET DASAR */
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", Arial, sans-serif;
 }
 
-input, button {
-  display: block;
-  width: 260px;
-  padding: 10px;
-  margin: 10px 0;
+/* BODY */
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #333;
+}
+
+/* CARD LOGIN / FORM */
+.card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 380px;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+/* JUDUL */
+.card h1,
+.card h2 {
+  margin-bottom: 20px;
+  color: #1e3c72;
+}
+
+/* INPUT */
+input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #2a5298;
+  box-shadow: 0 0 0 2px rgba(42,82,152,0.2);
+}
+
+/* BUTTON */
+button {
+  width: 100%;
+  padding: 12px;
+  background: #1e3c72;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #2a5298;
+}
+
+/* LINK AREA */
+.links {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.links a {
+  color: #2a5298;
+  text-decoration: none;
+}
+
+.links a:hover {
+  text-decoration: underline;
+}
+
+/* PESAN ERROR / INFO */
+#msg {
+  margin-top: 10px;
+  font-size: 14px;
+  color: red;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  .card {
+    margin: 20px;
+    padding: 24px;
+  }
 }
