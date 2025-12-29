@@ -1,98 +1,64 @@
-/* RESET DASAR */
-* {
-  box-sizing: border-box;
-  font-family: "Segoe UI", Arial, sans-serif;
-}
-
-/* BODY */
-body {
-  margin: 0;
+/* BACKGROUND HALAMAN */
+.bg-login {
   background: linear-gradient(135deg, #1e3c72, #2a5298);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #333;
 }
 
-/* CARD LOGIN / FORM */
+.bg-admin {
+  background: linear-gradient(135deg, #8e0e00, #1f1c18);
+}
+
+.bg-register {
+  background: linear-gradient(135deg, #11998e, #38ef7d);
+}
+
+.bg-reset {
+  background: linear-gradient(135deg, #8360c3, #2ebf91);
+}
+
+/* CARD UMUM */
 .card {
-  background: #ffffff;
+  background: #fff;
   width: 100%;
   max-width: 380px;
   padding: 30px;
   border-radius: 14px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
   text-align: center;
 }
 
 /* JUDUL */
-.card h1,
-.card h2 {
-  margin-bottom: 20px;
-  color: #1e3c72;
-}
+.title-login { color: #1e3c72; }
+.title-admin { color: #8e0e00; }
+.title-register { color: #11998e; }
+.title-reset { color: #8360c3; }
 
 /* INPUT */
-input {
+.input-text {
   width: 100%;
-  padding: 12px 14px;
+  padding: 12px;
   margin-bottom: 14px;
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 15px;
 }
 
-input:focus {
-  outline: none;
-  border-color: #2a5298;
-  box-shadow: 0 0 0 2px rgba(42,82,152,0.2);
-}
-
 /* BUTTON */
+.btn-login { background: #1e3c72; }
+.btn-admin { background: #8e0e00; }
+.btn-register { background: #11998e; }
+.btn-reset { background: #8360c3; }
+
 button {
-  width: 100%;
-  padding: 12px;
-  background: #1e3c72;
-  color: white;
+  color: #fff;
   border: none;
+  padding: 12px;
   border-radius: 8px;
-  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  transition: 0.3s;
 }
 
-button:hover {
-  background: #2a5298;
-}
-
-/* LINK AREA */
-.links {
-  margin-top: 15px;
-  font-size: 14px;
-}
-
+/* LINK */
 .links a {
-  color: #2a5298;
   text-decoration: none;
-}
-
-.links a:hover {
-  text-decoration: underline;
-}
-
-/* PESAN ERROR / INFO */
-#msg {
-  margin-top: 10px;
   font-size: 14px;
-  color: red;
-}
-
-/* RESPONSIVE */
-@media (max-width: 480px) {
-  .card {
-    margin: 20px;
-    padding: 24px;
-  }
 }
