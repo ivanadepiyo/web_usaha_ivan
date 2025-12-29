@@ -1,99 +1,71 @@
-
-/* login */
-* {
-  box-sizing: border-box;
-  font-family: "Segoe UI", Arial, sans-serif;
-}
-
-/* BODY */
+/* =========================
+   GLOBAL (SEMUA HALAMAN)
+========================= */
 body {
   margin: 0;
-  background: linear-gradient(135deg, #1e3c72, #2a5298);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  font-family: Arial, sans-serif;
+}
+
+/* =========================
+   LOGIN USER
+========================= */
+.body-login {
+  background: linear-gradient(120deg, #2980b9, #6dd5fa);
+}
+
+.login-box h2 {
+  font-size: 24px;
   color: #333;
 }
 
-/* CARD LOGIN / FORM */
-.card {
-  background: #ffffff;
-  width: 100%;
-  max-width: 380px;
-  padding: 30px;
-  border-radius: 14px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-  text-align: center;
+/* =========================
+   REGISTER
+========================= */
+.body-register {
+  background: linear-gradient(120deg, #8e44ad, #c39bd3);
 }
 
-/* JUDUL */
-.card h1,
-.card h2 {
-  margin-bottom: 20px;
-  color: #1e3c72;
+.register-box h2 {
+  font-size: 22px;
+  color: #fff;
 }
 
-/* INPUT */
-input {
-  width: 100%;
-  padding: 12px 14px;
-  margin-bottom: 14px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 15px;
+/* =========================
+   LUPA PASSWORD
+========================= */
+.body-forgot {
+  background: linear-gradient(120deg, #16a085, #48c9b0);
 }
 
-input:focus {
-  outline: none;
-  border-color: #2a5298;
-  box-shadow: 0 0 0 2px rgba(42,82,152,0.2);
-}
-
-/* BUTTON */
-button {
-  width: 100%;
-  padding: 12px;
-  background: #1e3c72;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button:hover {
-  background: #2a5298;
-}
-
-/* LINK AREA */
-.links {
-  margin-top: 15px;
+.forgot-box p {
   font-size: 14px;
 }
 
-.links a {
-  color: #2a5298;
-  text-decoration: none;
+/* =========================
+   RESET PASSWORD
+========================= */
+.body-reset {
+  background: linear-gradient(120deg, #d35400, #f39c12);
 }
 
-.links a:hover {
-  text-decoration: underline;
+/* =========================
+   ADMIN LOGIN
+========================= */
+.body-admin {
+  background: linear-gradient(120deg, #2c3e50, #34495e);
 }
 
-/* PESAN ERROR / INFO */
-#msg {
-  margin-top: 10px;
-  font-size: 14px;
-  color: red;
+.admin-box h2 {
+  color: #fff;
 }
 
-/* RESPONSIVE */
-@media (max-width: 480px) {
-  .card {
-    margin: 20px;
-    padding: 24px;
-  }
+/* =========================
+   DASHBOARD
+========================= */
+.body-dashboard {
+  background: #f4f6f7;
+}
+
+.dashboard h1 {
+  font-size: 26px;
 }
