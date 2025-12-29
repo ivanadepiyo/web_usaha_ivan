@@ -1,3 +1,24 @@
-function validPassword(pw) {
-  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&])[A-Za-z\d@#$!%*?&]{8,}$/.test(pw);
-}
+<!DOCTYPE html>
+<html>
+<head>
+<title>Register</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>Daftar Akun</h2>
+
+<input id="nama" placeholder="Nama">
+<input id="email" placeholder="Email">
+<input id="telp" placeholder="Nomor Telepon">
+<input id="alamat" placeholder="Alamat">
+<input id="password" type="password" placeholder="Password">
+<input id="confirm" type="password" placeholder="Konfirmasi Password">
+
+<button onclick="register()">Simpan</button>
+<p id="msg"></p>
+
+<script src="firebase-init.js"></script>
+<script src="auth.js"></script>
+</body>
+</html>
