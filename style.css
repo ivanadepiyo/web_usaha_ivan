@@ -1,20 +1,3 @@
-/* =========================
-   GLOBAL (SEMUA HALAMAN)
-========================= */
-/* BODY */
-body {
-  margin: 0;
-  background: linear-gradient(135deg, #1e3c72, #2a5298);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #333;
-}
-
-/* =========================
-   LOGIN USER
-========================= */
 /* RESET DASAR */
 * {
   box-sizing: border-box;
@@ -99,54 +82,17 @@ button:hover {
   text-decoration: underline;
 }
 
-/* =========================
-   REGISTER
-========================= */
-.body-register {
-  background: linear-gradient(120deg, #8e44ad, #c39bd3);
-}
-
-.register-box h2 {
-  font-size: 22px;
-  color: #fff;
-}
-
-/* =========================
-   LUPA PASSWORD
-========================= */
-.body-forgot {
-  background: linear-gradient(120deg, #16a085, #48c9b0);
-}
-
-.forgot-box p {
+/* PESAN ERROR / INFO */
+#msg {
+  margin-top: 10px;
   font-size: 14px;
+  color: red;
 }
 
-/* =========================
-   RESET PASSWORD
-========================= */
-.body-reset {
-  background: linear-gradient(120deg, #d35400, #f39c12);
-}
-
-/* =========================
-   ADMIN LOGIN
-========================= */
-.body-admin {
-  background: linear-gradient(120deg, #2c3e50, #34495e);
-}
-
-.admin-box h2 {
-  color: #fff;
-}
-
-/* =========================
-   DASHBOARD
-========================= */
-.body-dashboard {
-  background: #f4f6f7;
-}
-
-.dashboard h1 {
-  font-size: 26px;
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  .card {
+    margin: 20px;
+    padding: 24px;
+  }
 }
