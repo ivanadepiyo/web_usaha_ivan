@@ -32,6 +32,19 @@
       100% { transform: rotate(360deg); }
     }
 
+    /* ==================== Show Password ==================== */
+    .show-pass {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .show-pass label {
+      font-size: 14px;
+      color: #333;
+      cursor: pointer;
+    }
+
     /* ==================== Global ==================== */
     * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
     body.page-login.auth {
@@ -57,7 +70,7 @@
     .card h2 { margin-bottom: 20px; color: #1e3c72; }
 
     /* ==================== Inputs ==================== */
-    .input-group { position: relative; margin-bottom: 8px; text-align: left; }
+    .input-group { position: relative; margin-bottom: 10px; text-align: left; }
     input {
       width: 100%;
       padding: 12px 14px;
@@ -82,7 +95,7 @@
     }
     .green { background-color: green; }
     .red { background-color: red; }
-    .note { font-size: 12px; color: #555; margin-top: 2px; margin-bottom: 6px; }
+    .note { font-size: 12px; color: #555; margin-top: 2px; margin-bottom: 8px; }
 
     /* ==================== Button ==================== */
     button {
@@ -125,12 +138,12 @@
       <span id="alamatCheck" class="check"></span>
     </div>
 
-     <div class="input-group">
+    <div class="input-group">
       <input id="email" placeholder="Email">
       <span id="emailCheck" class="check"></span>
       <div class="note">Gunakan email Gmail valid</div>
     </div>
-    
+
     <div class="input-group">
       <input id="password" type="password" placeholder="Password">
       <span id="passwordCheck" class="check"></span>
@@ -142,8 +155,9 @@
       <span id="confirmCheck" class="check"></span>
     </div>
 
-    <div style="text-align:left;margin-bottom:10px;margin-top:1px;">
-      <input type="checkbox" id="showPass"> Show Password
+    <div class="show-pass">
+      <input type="checkbox" id="showPass">
+      <label for="showPass">Show Password</label>
     </div>
 
     <div class="loader" id="loader"></div>
@@ -161,9 +175,9 @@
   <script>
     // ==================== Elements ====================
     const namaInput = document.getElementById("nama");
+    const emailInput = document.getElementById("email");
     const telpInput = document.getElementById("telp");
     const alamatInput = document.getElementById("alamat");
-    const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
     const confirmInput = document.getElementById("confirm");
     const msg = document.getElementById("msg");
@@ -202,7 +216,7 @@
     });
     telpInput.addEventListener("input", ()=>{ setCheck(document.getElementById("telpCheck"), telpInput.value.trim() !== ""); enableButton(); });
     alamatInput.addEventListener("input", ()=>{ setCheck(document.getElementById("alamatCheck"), alamatInput.value.trim() !== ""); enableButton(); });
-    passwordInput.addEventListener("input", ()=> {
+    passwordInput.addEventListener("input", ()=>{
       const pass = passwordInput.value;
       const valid = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9!@#$%^&*]).{8,}$/.test(pass) && /^[A-Z]/.test(pass);
       setCheck(document.getElementById("passwordCheck"), valid);
@@ -230,7 +244,7 @@
     emailInput.addEventListener("input", ()=>{ validateEmail(); });
 
     // ==================== Register ====================
-    registerBtn.addEventListener("click", async ()=> {
+    registerBtn.addEventListener("click", async ()=>{
       msg.textContent = "";
       msg.style.color = "red";
       registerBtn.disabled = true;
@@ -244,24 +258,20 @@
       const password = passwordInput.value;
 
       try {
-        // Double-check email
         const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
         if(methods.length > 0){
           msg.textContent = "Email sudah terdaftar!";
           return;
         }
 
-        // Create user
         const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
         const user = userCredential.user;
 
-        // Save Firestore
         await firebase.firestore().collection("users").doc(user.uid).set({
           nama, email, telp, alamat,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        // Send verification email
         await user.sendEmailVerification();
 
         msg.style.color = "green";
