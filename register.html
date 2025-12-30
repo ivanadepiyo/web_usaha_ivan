@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Daftar Akun | Web Perusahaan</title>
 <style>
-/* Loader */
+/* ---------------------- Loader ---------------------- */
 .btn-loader {
   display: inline-block;
   width: 20px;
@@ -26,9 +26,12 @@
   animation: spin 1s linear infinite;
   margin: 10px auto;
 }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
-/* Global */
+/* ---------------------- Global ---------------------- */
 * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
 body.page-login.auth {
   margin: 0;
@@ -40,7 +43,7 @@ body.page-login.auth {
   color: #333;
 }
 
-/* Card */
+/* ---------------------- Card ---------------------- */
 .card {
   background: #ffffff;
   width: 90%;
@@ -49,11 +52,11 @@ body.page-login.auth {
   border-radius: 14px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.2);
   text-align: center;
-  margin-top: 40px; /* lebih lega dari atas */
+  margin-top: 40px;
 }
 .card h2 { margin-bottom: 20px; color: #1e3c72; }
 
-/* Input */
+/* ---------------------- Input ---------------------- */
 .input-group { position: relative; margin-bottom: 14px; text-align: left; }
 input {
   width: 100%;
@@ -81,7 +84,7 @@ input:focus {
 .red { background-color: red; }
 .note { font-size: 12px; color: #555; margin: 4px 0; }
 
-/* Button */
+/* ---------------------- Button ---------------------- */
 button {
   width: 100%;
   padding: 12px;
@@ -97,62 +100,73 @@ button {
 }
 button:disabled { background: #888; cursor: not-allowed; }
 button:hover:not(:disabled) { background: #2a5298; }
+
 #msg { margin-top: 10px; font-size: 14px; text-align: center; }
 
-@media (max-width: 480px) { .card { margin: 20px; padding: 24px; } }
+/* ---------------------- Responsive ---------------------- */
+@media (max-width: 480px) { 
+  .card { margin: 20px; padding: 24px; } 
+}
 </style>
 </head>
+
 <body class="page-login auth">
 
 <div class="card">
-<h2>Daftar Akun</h2>
+  <h2>Daftar Akun</h2>
 
-<div class="input-group">
-  <input id="nama" placeholder="Nama">
-  <span id="namaCheck" class="check"></span>
-</div>
+  <!-- Nama -->
+  <div class="input-group">
+    <input id="nama" placeholder="Nama">
+    <span id="namaCheck" class="check"></span>
+  </div>
 
-<div class="input-group">
-  <input id="telp" placeholder="Nomor Telepon">
-  <span id="telpCheck" class="check"></span>
-</div>
+  <!-- Nomor Telepon -->
+  <div class="input-group">
+    <input id="telp" placeholder="Nomor Telepon">
+    <span id="telpCheck" class="check"></span>
+  </div>
 
-<div class="input-group">
-  <input id="alamat" placeholder="Alamat">
-  <span id="alamatCheck" class="check"></span>
-</div>
+  <!-- Alamat -->
+  <div class="input-group">
+    <input id="alamat" placeholder="Alamat">
+    <span id="alamatCheck" class="check"></span>
+  </div>
 
-<div class="input-group">
-  <input id="email" placeholder="Email">
-  <span id="emailCheck" class="check"></span>
-  <div class="note">Gunakan email Gmail valid</div>
-</div>
+  <!-- Email -->
+  <div class="input-group">
+    <input id="email" placeholder="Email">
+    <span id="emailCheck" class="check"></span>
+    <div class="note">Gunakan email Gmail valid</div>
+  </div>
 
-<div class="input-group">
-  <input id="password" type="password" placeholder="Password">
-  <span id="passwordCheck" class="check"></span>
-</div>
+  <!-- Password -->
+  <div class="input-group">
+    <input id="password" type="password" placeholder="Password">
+    <span id="passwordCheck" class="check"></span>
+  </div>
 
-<div class="input-group">
-  <input id="confirm" type="password" placeholder="Konfirmasi Password">
-  <span id="confirmCheck" class="check"></span>
-   <div class="note">Minimal 8 karakter, huruf besar di awal, angka/karakter khusus</div>
-</div>
+  <!-- Konfirmasi Password -->
+  <div class="input-group">
+    <input id="confirm" type="password" placeholder="Konfirmasi Password">
+    <span id="confirmCheck" class="check"></span>
+    <div class="note">Minimal 8 karakter, huruf besar di awal, angka/karakter khusus</div>
+  </div>
 
-<!-- Show Password -->
-<div class="show-pass">
-  <label for="showPass">Show Password<label>
-  <input type="checkbox" id="showPass">
-</div>
+  <!-- Show Password -->
+  <div class="show-pass">
+    <input type="checkbox" id="showPass">
+    <label for="showPass">Show Password</label>
+  </div>
 
-<div class="loader" id="loader"></div>
+  <div class="loader" id="loader"></div>
 
-<button id="registerBtn" disabled>
-  Simpan
-  <span id="btnLoader" class="btn-loader" style="display:none;"></span>
-</button>
+  <button id="registerBtn" disabled>
+    Simpan
+    <span id="btnLoader" class="btn-loader" style="display:none;"></span>
+  </button>
 
-<p id="msg"></p>
+  <p id="msg"></p>
 </div>
 
 <script src="firebase.js"></script>
@@ -171,13 +185,19 @@ const btnLoader = document.getElementById("btnLoader");
 const showPass = document.getElementById("showPass");
 let emailValid = false;
 
-showPass.addEventListener("change", ()=>{
+// Toggle Show Password
+showPass.addEventListener("change", () => {
   const type = showPass.checked ? "text" : "password";
   passwordInput.type = type;
   confirmInput.type = type;
 });
 
-function setCheck(element, condition){ element.className = condition ? "check green" : "check red"; }
+// Set check mark
+function setCheck(element, condition) {
+  element.className = condition ? "check green" : "check red";
+}
+
+// Enable button if all fields valid
 function enableButton() {
   const allValid =
     namaInput.value.trim().length > 0 && namaInput.value.trim().length <= 15 &&
@@ -191,74 +211,92 @@ function enableButton() {
 }
 
 // Input listeners
-namaInput.addEventListener("input", ()=>{ setCheck(document.getElementById("namaCheck"), namaInput.value.length>0 && namaInput.value.length<=15); enableButton(); });
-telpInput.addEventListener("input", ()=>{ setCheck(document.getElementById("telpCheck"), telpInput.value.trim()!==""); enableButton(); });
-alamatInput.addEventListener("input", ()=>{ setCheck(document.getElementById("alamatCheck"), alamatInput.value.trim()!==""); enableButton(); });
-passwordInput.addEventListener("input", ()=> {
+namaInput.addEventListener("input", () => { 
+  setCheck(document.getElementById("namaCheck"), namaInput.value.length > 0 && namaInput.value.length <= 15); 
+  enableButton(); 
+});
+telpInput.addEventListener("input", () => { 
+  setCheck(document.getElementById("telpCheck"), telpInput.value.trim() !== ""); 
+  enableButton(); 
+});
+alamatInput.addEventListener("input", () => { 
+  setCheck(document.getElementById("alamatCheck"), alamatInput.value.trim() !== ""); 
+  enableButton(); 
+});
+passwordInput.addEventListener("input", () => {
   const pass = passwordInput.value;
   const valid = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9!@#$%^&*]).{8,}$/.test(pass) && /^[A-Z]/.test(pass);
   setCheck(document.getElementById("passwordCheck"), valid);
   setCheck(document.getElementById("confirmCheck"), confirmInput.value === pass && confirmInput.value !== "");
   enableButton();
 });
-confirmInput.addEventListener("input", ()=>{ setCheck(document.getElementById("confirmCheck"), confirmInput.value===passwordInput.value && confirmInput.value!==""); enableButton(); });
+confirmInput.addEventListener("input", () => { 
+  setCheck(document.getElementById("confirmCheck"), confirmInput.value === passwordInput.value && confirmInput.value !== ""); 
+  enableButton(); 
+});
 
+// Validate email
 async function validateEmail() {
   loader.style.display = "block";
   const email = emailInput.value.trim();
   const validFormat = /^[\w.+-]+@gmail\.com$/.test(email);
   let notTaken = false;
-  if(validFormat){
-    try{
+  if (validFormat) {
+    try {
       const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
-      notTaken = methods.length===0;
-    } catch(e){ notTaken=false; }
+      notTaken = methods.length === 0;
+    } catch (e) { notTaken = false; }
   }
   emailValid = validFormat && notTaken;
   setCheck(document.getElementById("emailCheck"), emailValid);
   enableButton();
-  loader.style.display="none";
+  loader.style.display = "none";
 }
-emailInput.addEventListener("input", ()=>{ validateEmail(); });
+emailInput.addEventListener("input", validateEmail);
 
-// Register
-registerBtn.addEventListener("click", async ()=>{
-  msg.textContent="";
-  msg.style.color="red";
-  registerBtn.disabled=true;
-  loader.style.display="block";
-  btnLoader.style.display="inline-block";
+// Register user
+registerBtn.addEventListener("click", async () => {
+  msg.textContent = "";
+  msg.style.color = "red";
+  registerBtn.disabled = true;
+  loader.style.display = "block";
+  btnLoader.style.display = "inline-block";
+
   const nama = namaInput.value.trim();
   const email = emailInput.value.trim();
   const telp = telpInput.value.trim();
   const alamat = alamatInput.value.trim();
   const password = passwordInput.value;
 
-  try{
+  try {
     const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
-    if(methods.length>0){ msg.textContent="Email sudah terdaftar!"; return; }
+    if (methods.length > 0) { 
+      msg.textContent = "Email sudah terdaftar!"; 
+      return; 
+    }
 
-    const userCredential = await firebase.auth().createUserWithEmailAndPassword(email,password);
+    const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
     await firebase.firestore().collection("users").doc(user.uid).set({
-      nama,email,telp,alamat,
+      nama, email, telp, alamat,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
     await user.sendEmailVerification();
-    msg.style.color="green";
-    msg.textContent="Akun berhasil dibuat! Silahkan cek email untuk verifikasi.";
-    setTimeout(()=>window.location.href="login.html",3000);
+    msg.style.color = "green";
+    msg.textContent = "Akun berhasil dibuat! Silahkan cek email untuk verifikasi.";
+    setTimeout(() => window.location.href = "login.html", 3000);
 
-  } catch(err){
-    msg.textContent="Gagal mendaftar: "+err.message;
-  } finally{
-    loader.style.display="none";
-    btnLoader.style.display="none";
-    registerBtn.disabled=false;
+  } catch (err) {
+    msg.textContent = "Gagal mendaftar: " + err.message;
+  } finally {
+    loader.style.display = "none";
+    btnLoader.style.display = "none";
+    registerBtn.disabled = false;
   }
 });
 </script>
+
 </body>
 </html>
