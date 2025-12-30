@@ -57,7 +57,11 @@ body.page-login.auth {
 .card h2 { margin-bottom: 20px; color: #1e3c72; }
 
 /* ---------------------- Input ---------------------- */
-.input-group { position: relative; margin-bottom: 14px; text-align: left; }
+.input-group { 
+  position: relative; 
+  margin-bottom: 14px; 
+  text-align: left; 
+}
 input {
   width: 100%;
   padding: 12px 14px;
@@ -70,10 +74,12 @@ input:focus {
   border-color: #2a5298;
   box-shadow: 0 0 0 2px rgba(42,82,152,0.2);
 }
+
+/* ---------------------- Check Indicator ---------------------- */
 .check {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
+  display: none; /* default sembunyi */
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   position: absolute;
   right: 10px;
@@ -82,6 +88,8 @@ input:focus {
 }
 .green { background-color: green; }
 .red { background-color: red; }
+
+/* ---------------------- Notes ---------------------- */
 .note { font-size: 12px; color: #555; margin: 4px 0; }
 
 /* ---------------------- Show Password ---------------------- */
@@ -204,9 +212,14 @@ showPass.addEventListener("change", () => {
   confirmInput.type = type;
 });
 
-// Set check mark
-function setCheck(element, condition) {
-  element.className = condition ? "check green" : "check red";
+// Set check mark only if input not empty
+function setCheck(element, condition, value) {
+  if (!value || value.trim() === "") {
+    element.style.display = "none"; // sembunyikan jika kosong
+  } else {
+    element.style.display = "inline-block";
+    element.className = condition ? "check green" : "check red";
+  }
 }
 
 // Enable button if all fields valid
@@ -224,28 +237,29 @@ function enableButton() {
 
 // Input listeners
 namaInput.addEventListener("input", () => { 
-  setCheck(document.getElementById("namaCheck"), namaInput.value.length > 0 && namaInput.value.length <= 15); 
+  setCheck(document.getElementById("namaCheck"), namaInput.value.length > 0 && namaInput.value.length <= 15, namaInput.value); 
   enableButton(); 
 });
 telpInput.addEventListener("input", () => { 
-  setCheck(document.getElementById("telpCheck"), telpInput.value.trim() !== ""); 
+  setCheck(document.getElementById("telpCheck"), telpInput.value.trim() !== "", telpInput.value); 
   enableButton(); 
 });
 alamatInput.addEventListener("input", () => { 
-  setCheck(document.getElementById("alamatCheck"), alamatInput.value.trim() !== ""); 
+  setCheck(document.getElementById("alamatCheck"), alamatInput.value.trim() !== "", alamatInput.value); 
   enableButton(); 
 });
 passwordInput.addEventListener("input", () => {
   const pass = passwordInput.value;
   const valid = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9!@#$%^&*]).{8,}$/.test(pass) && /^[A-Z]/.test(pass);
-  setCheck(document.getElementById("passwordCheck"), valid);
-  setCheck(document.getElementById("confirmCheck"), confirmInput.value === pass && confirmInput.value !== "");
+  setCheck(document.getElementById("passwordCheck"), valid, pass);
+  setCheck(document.getElementById("confirmCheck"), confirmInput.value === pass && confirmInput.value !== "", confirmInput.value);
   enableButton();
 });
 confirmInput.addEventListener("input", () => { 
-  setCheck(document.getElementById("confirmCheck"), confirmInput.value === passwordInput.value && confirmInput.value !== ""); 
+  setCheck(document.getElementById("confirmCheck"), confirmInput.value === passwordInput.value && confirmInput.value !== "", confirmInput.value); 
   enableButton(); 
 });
+emailInput.addEventListener("input", validateEmail);
 
 // Validate email
 async function validateEmail() {
@@ -260,11 +274,10 @@ async function validateEmail() {
     } catch (e) { notTaken = false; }
   }
   emailValid = validFormat && notTaken;
-  setCheck(document.getElementById("emailCheck"), emailValid);
+  setCheck(document.getElementById("emailCheck"), emailValid, email);
   enableButton();
   loader.style.display = "none";
 }
-emailInput.addEventListener("input", validateEmail);
 
 // Register user
 registerBtn.addEventListener("click", async () => {
