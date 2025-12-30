@@ -57,7 +57,7 @@
     .card h2 { margin-bottom: 20px; color: #1e3c72; }
 
     /* ==================== Inputs ==================== */
-    .input-group { position: relative; margin-bottom: 14px; text-align: left; }
+    .input-group { position: relative; margin-bottom: 8px; text-align: left; }
     input {
       width: 100%;
       padding: 12px 14px;
@@ -82,7 +82,7 @@
     }
     .green { background-color: green; }
     .red { background-color: red; }
-    .note { font-size: 12px; color: #555; margin-top: -10px; margin-bottom: 8px; }
+    .note { font-size: 12px; color: #555; margin-top: 2px; margin-bottom: 6px; }
 
     /* ==================== Button ==================== */
     button {
@@ -142,7 +142,7 @@
       <span id="confirmCheck" class="check"></span>
     </div>
 
-    <div style="text-align:left;margin-bottom:10px;">
+    <div style="text-align:left;margin-bottom:10px;margin-top:2px;">
       <input type="checkbox" id="showPass"> Show Password
     </div>
 
@@ -202,7 +202,7 @@
     });
     telpInput.addEventListener("input", ()=>{ setCheck(document.getElementById("telpCheck"), telpInput.value.trim() !== ""); enableButton(); });
     alamatInput.addEventListener("input", ()=>{ setCheck(document.getElementById("alamatCheck"), alamatInput.value.trim() !== ""); enableButton(); });
-    passwordInput.addEventListener("input", ()=>{
+    passwordInput.addEventListener("input", ()=> {
       const pass = passwordInput.value;
       const valid = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9!@#$%^&*]).{8,}$/.test(pass) && /^[A-Z]/.test(pass);
       setCheck(document.getElementById("passwordCheck"), valid);
@@ -230,7 +230,7 @@
     emailInput.addEventListener("input", ()=>{ validateEmail(); });
 
     // ==================== Register ====================
-    registerBtn.addEventListener("click", async ()=>{
+    registerBtn.addEventListener("click", async ()=> {
       msg.textContent = "";
       msg.style.color = "red";
       registerBtn.disabled = true;
