@@ -25,25 +25,11 @@
       width: 24px;
       height: 24px;
       animation: spin 1s linear infinite;
-      margin: 12px auto;
+      margin: 10px auto;
     }
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
-    }
-
-    /* ==================== Show Password ==================== */
-    .show-pass {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 6px 0 16px 0;
-    }
-    .show-pass label {
-      font-size: 14px;
-      color: #333;
-      cursor: pointer;
-      margin: 0;
     }
 
     /* ==================== Global ==================== */
@@ -56,27 +42,30 @@
       justify-content: center;
       align-items: center;
       color: #333;
-      padding: 20px 0;
     }
 
     /* ==================== Card ==================== */
     .card {
       background: #ffffff;
       width: 90%;
-      max-width: 380px;
-      padding: 24px 20px;
+      max-width: 400px;
+      padding: 30px 25px;
       border-radius: 14px;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
       text-align: center;
-      margin-top: 20px; /* beri jarak dari atas */
+      margin-top: 20px; /* memberi ruang dari atas */
     }
-    .card h2 { margin-bottom: 18px; color: #1e3c72; }
+    .card h2 { margin-bottom: 20px; color: #1e3c72; }
 
     /* ==================== Inputs ==================== */
-    .input-group { position: relative; margin-bottom: 10px; text-align: left; }
+    .input-group {
+      position: relative;
+      margin-bottom: 12px;
+      text-align: left;
+    }
     input {
       width: 100%;
-      padding: 10px 12px;
+      padding: 12px 14px;
       border-radius: 8px;
       border: 1px solid #ccc;
       font-size: 15px;
@@ -98,7 +87,21 @@
     }
     .green { background-color: green; }
     .red { background-color: red; }
-    .note { font-size: 12px; color: #555; margin: 2px 0 6px 0; }
+    .note { font-size: 12px; color: #555; margin: 4px 0 6px 0; }
+
+    /* ==================== Show Password ==================== */
+    .show-pass {
+      display: flex;
+      align-items: center;
+      gap: 8px; /* jarak kotak dan label */
+      margin: 6px 0 16px 0;
+    }
+    .show-pass label {
+      font-size: 14px;
+      color: #333;
+      cursor: pointer;
+      margin: 0;
+    }
 
     /* ==================== Button ==================== */
     button {
@@ -116,11 +119,9 @@
     }
     button:disabled { background: #888; cursor: not-allowed; }
     button:hover:not(:disabled) { background: #2a5298; }
-    #msg { margin-top: 12px; font-size: 14px; text-align: center; }
+    #msg { margin-top: 10px; font-size: 14px; text-align: center; }
 
-    @media (max-width: 480px) { 
-      .card { margin: 16px; padding: 20px; }
-    }
+    @media (max-width: 480px) { .card { margin: 20px; padding: 24px; } }
   </style>
 </head>
 <body class="page-login auth">
@@ -160,6 +161,7 @@
       <span id="confirmCheck" class="check"></span>
     </div>
 
+    <!-- Show Password -->
     <div class="show-pass">
       <input type="checkbox" id="showPass">
       <label for="showPass">Show Password</label>
@@ -193,12 +195,14 @@
 
     let emailValid = false;
 
+    // ==================== Show/Hide Password ====================
     showPass.addEventListener("change", () => {
       const type = showPass.checked ? "text" : "password";
       passwordInput.type = type;
       confirmInput.type = type;
     });
 
+    // ==================== Validasi Real-time ====================
     function setCheck(element, condition){ element.className = condition ? "check green" : "check red"; }
 
     function enableButton() {
@@ -219,7 +223,7 @@
     });
     telpInput.addEventListener("input", ()=>{ setCheck(document.getElementById("telpCheck"), telpInput.value.trim() !== ""); enableButton(); });
     alamatInput.addEventListener("input", ()=>{ setCheck(document.getElementById("alamatCheck"), alamatInput.value.trim() !== ""); enableButton(); });
-    passwordInput.addEventListener("input", ()=>{
+    passwordInput.addEventListener("input", ()=> {
       const pass = passwordInput.value;
       const valid = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9!@#$%^&*]).{8,}$/.test(pass) && /^[A-Z]/.test(pass);
       setCheck(document.getElementById("passwordCheck"), valid);
@@ -246,7 +250,8 @@
     }
     emailInput.addEventListener("input", ()=>{ validateEmail(); });
 
-    registerBtn.addEventListener("click", async ()=>{
+    // ==================== Register ====================
+    registerBtn.addEventListener("click", async ()=> {
       msg.textContent = "";
       msg.style.color = "red";
       registerBtn.disabled = true;
@@ -260,20 +265,24 @@
       const password = passwordInput.value;
 
       try {
+        // Double-check email
         const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
         if(methods.length > 0){
           msg.textContent = "Email sudah terdaftar!";
           return;
         }
 
+        // Create user
         const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
         const user = userCredential.user;
 
+        // Save Firestore
         await firebase.firestore().collection("users").doc(user.uid).set({
           nama, email, telp, alamat,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
+        // Send verification email
         await user.sendEmailVerification();
 
         msg.style.color = "green";
