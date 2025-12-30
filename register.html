@@ -103,7 +103,7 @@
     <p id="msg"></p>
   </div>
 
-  <script src="firebase-init.js"></script>
+  <script src="firebase.js"></script>
   <script src="auth.js"></script>
   <script>
     const namaInput = document.getElementById("nama");
@@ -117,43 +117,30 @@
 
     function setCheck(element, condition){ element.className = condition ? "check green" : "check red"; }
 
-    // DEBOUNCE FUNCTION
-    function debounce(fn, delay){
-      let timer;
-      return function(...args){
-        clearTimeout(timer);
-        timer = setTimeout(()=> fn.apply(this, args), delay);
-      }
-    }
-
     // VALIDASI REAL-TIME
     namaInput.addEventListener("input", ()=>setCheck(document.getElementById("namaCheck"), namaInput.value.length > 0 && namaInput.value.length <= 15));
 
-    emailInput.addEventListener("input", debounce(async ()=>{
+    emailInput.addEventListener("input", async ()=>{
       const email = emailInput.value.trim();
-      const emailCheck = document.getElementById("emailCheck");
       const validFormat = /^[\w.+-]+@gmail\.com$/.test(email);
       let notTaken = true;
-
       if(validFormat){
         try{
           const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
           if(methods.length > 0) notTaken = false;
         } catch(e){ notTaken = false; }
       }
-      setCheck(emailCheck, validFormat && notTaken);
-    }, 700));
+      setCheck(document.getElementById("emailCheck"), validFormat && notTaken);
+    });
 
     telpInput.addEventListener("input", ()=>setCheck(document.getElementById("telpCheck"), telpInput.value.trim() !== ""));
     alamatInput.addEventListener("input", ()=>setCheck(document.getElementById("alamatCheck"), alamatInput.value.trim() !== ""));
-
     passwordInput.addEventListener("input", ()=>{
       const pass = passwordInput.value;
       const valid = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9!@#$%^&*]).{8,}$/.test(pass) && /^[A-Z]/.test(pass);
       setCheck(document.getElementById("passwordCheck"), valid);
       setCheck(document.getElementById("confirmCheck"), confirmInput.value === pass && confirmInput.value !== "");
     });
-
     confirmInput.addEventListener("input", ()=>setCheck(document.getElementById("confirmCheck"), confirmInput.value === passwordInput.value && confirmInput.value !== ""));
 
     // REGISTER
@@ -173,16 +160,20 @@
       const password = passwordInput.value;
 
       try{
+        const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
+        if(methods.length > 0){
+          msg.textContent = "Email sudah terdaftar!";
+          return;
+        }
+
         const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
         const user = userCredential.user;
 
-        // Simpan data tambahan di Firestore
         await firebase.firestore().collection("users").doc(user.uid).set({
           nama, email, telp, alamat,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        // Kirim email verifikasi
         await user.sendEmailVerification();
 
         msg.style.color = "green";
@@ -190,7 +181,7 @@
         setTimeout(()=> window.location.href="login.html", 3000);
 
       } catch(err){
-        msg.textContent = "Gagal mendaftar: "+err.message;
+        msg.textContent = "Gagal mendaftar: " + err.message;
       }
     });
   </script>
