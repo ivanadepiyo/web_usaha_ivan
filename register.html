@@ -5,12 +5,7 @@
   <title>Daftar Akun | Web Perusahaan</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* RESET DASAR */
-    .page-login * {
-      box-sizing: border-box;
-      font-family: "Segoe UI", Arial, sans-serif;
-    }
-
+    .page-login * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
     body.page-login {
       margin: 0;
       background: linear-gradient(135deg, #1e3c72, #2a5298);
@@ -20,7 +15,6 @@
       align-items: center;
       color: #333;
     }
-
     .page-login .card {
       background: #ffffff;
       width: 100%;
@@ -30,17 +24,8 @@
       box-shadow: 0 20px 40px rgba(0,0,0,0.2);
       text-align: center;
     }
-
-    .page-login .card h2 {
-      margin-bottom: 20px;
-      color: #1e3c72;
-    }
-
-    .input-group {
-      position: relative;
-      margin-bottom: 14px;
-    }
-
+    .page-login .card h2 { margin-bottom: 20px; color: #1e3c72; }
+    .input-group { position: relative; margin-bottom: 14px; }
     .page-login input {
       width: 100%;
       padding: 12px 14px;
@@ -48,13 +33,11 @@
       border: 1px solid #ccc;
       font-size: 15px;
     }
-
     .page-login input:focus {
       outline: none;
       border-color: #2a5298;
       box-shadow: 0 0 0 2px rgba(42,82,152,0.2);
     }
-
     .check {
       display: inline-block;
       width: 12px;
@@ -67,7 +50,6 @@
     }
     .green { background-color: green; }
     .red { background-color: red; }
-
     .page-login button {
       width: 100%;
       padding: 12px;
@@ -80,22 +62,10 @@
       cursor: pointer;
       transition: 0.3s;
     }
-
-    .page-login button:hover {
-      background: #2a5298;
-    }
-
-    #msg {
-      margin-top: 10px;
-      font-size: 14px;
-      color: red;
-    }
-
+    .page-login button:hover { background: #2a5298; }
+    #msg { margin-top: 10px; font-size: 14px; color: red; }
     @media (max-width: 480px) {
-      body.page-login .card {
-        margin: 20px;
-        padding: 24px;
-      }
+      body.page-login .card { margin: 20px; padding: 24px; }
     }
   </style>
 </head>
@@ -129,11 +99,12 @@
       <span id="confirmCheck" class="check"></span>
     </div>
 
-    <button onclick="register()">Simpan</button>
+    <button id="registerBtn">Simpan</button>
     <p id="msg"></p>
   </div>
 
   <script src="firebase-init.js"></script>
+  <script src="auth.js"></script>
   <script>
     const namaInput = document.getElementById("nama");
     const emailInput = document.getElementById("email");
@@ -142,25 +113,44 @@
     const passwordInput = document.getElementById("password");
     const confirmInput = document.getElementById("confirm");
     const msg = document.getElementById("msg");
+    const registerBtn = document.getElementById("registerBtn");
 
-    // Fungsi validasi real-time
-    function setCheck(element, condition){
-      element.className = condition ? "check green" : "check red";
-    }
+    function setCheck(element, condition){ element.className = condition ? "check green" : "check red"; }
 
+    // VALIDASI REAL-TIME
     namaInput.addEventListener("input", ()=>setCheck(document.getElementById("namaCheck"), namaInput.value.length > 0 && namaInput.value.length <= 15));
-    emailInput.addEventListener("input", ()=>setCheck(document.getElementById("emailCheck"), /^[\w.+-]+@gmail\.com$/.test(emailInput.value)));
+
+    emailInput.addEventListener("input", async ()=>{
+      const email = emailInput.value;
+      const validFormat = /^[\w.+-]+@gmail\.com$/.test(email);
+      let notTaken = true;
+
+      if(validFormat){
+        try{
+          const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
+          if(methods.length > 0) notTaken = false;
+        } catch(e){ notTaken = false; }
+      }
+      setCheck(document.getElementById("emailCheck"), validFormat && notTaken);
+    });
+
     telpInput.addEventListener("input", ()=>setCheck(document.getElementById("telpCheck"), telpInput.value.trim() !== ""));
     alamatInput.addEventListener("input", ()=>setCheck(document.getElementById("alamatCheck"), alamatInput.value.trim() !== ""));
-    passwordInput.addEventListener("input", ()=>setCheck(document.getElementById("passwordCheck"), /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9!@#$%^&*]).{6,}$/.test(passwordInput.value)));
+
+    passwordInput.addEventListener("input", ()=>{
+      const pass = passwordInput.value;
+      const valid = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9!@#$%^&*]).{8,}$/.test(pass) && /^[A-Z]/.test(pass);
+      setCheck(document.getElementById("passwordCheck"), valid);
+      setCheck(document.getElementById("confirmCheck"), confirmInput.value === pass && confirmInput.value !== "");
+    });
+
     confirmInput.addEventListener("input", ()=>setCheck(document.getElementById("confirmCheck"), confirmInput.value === passwordInput.value && confirmInput.value !== ""));
 
-    // Fungsi register
-    function register(){
+    // REGISTER
+    registerBtn.addEventListener("click", async ()=>{
       msg.textContent = "";
       msg.style.color = "red";
 
-      // Pastikan semua check hijau
       if(document.querySelectorAll(".check.green").length !== 6){
         msg.textContent = "Periksa semua field, pastikan benar!";
         return;
@@ -172,26 +162,28 @@
       const alamat = alamatInput.value;
       const password = passwordInput.value;
 
-      // Firebase Auth
-      firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then(userCredential => {
-          const user = userCredential.user;
-          // Simpan data tambahan
-          firebase.firestore().collection("users").doc(user.uid).set({
-            nama, email, telp, alamat,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          })
-          .then(()=>{
-            msg.style.color = "green";
-            msg.textContent = "Akun berhasil dibuat! Silahkan login.";
-            setTimeout(()=> window.location.href="login.html",2000);
-          })
-          .catch(err=>{ msg.textContent="Gagal menyimpan data: "+err.message });
-        })
-        .catch(err=>{
-          msg.textContent="Gagal mendaftar: "+err.message;
+      try{
+        const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // Simpan data tambahan di Firestore
+        await firebase.firestore().collection("users").doc(user.uid).set({
+          nama, email, telp, alamat,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-    }
+
+        // Kirim email verifikasi
+        await user.sendEmailVerification();
+
+        msg.style.color = "green";
+        msg.textContent = "Akun berhasil dibuat! Silahkan cek email untuk verifikasi.";
+        setTimeout(()=> window.location.href="login.html", 3000);
+
+      } catch(err){
+        msg.textContent = "Gagal mendaftar: "+err.message;
+      }
+    });
   </script>
+
 </body>
 </html>
