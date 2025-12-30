@@ -47,7 +47,7 @@
     /* ==================== Card ==================== */
     .card {
       background: #ffffff;
-      width: 100%;
+      width: 90%;
       max-width: 400px;
       padding: 30px;
       border-radius: 14px;
@@ -116,12 +116,6 @@
     </div>
 
     <div class="input-group">
-      <input id="email" placeholder="Email">
-      <span id="emailCheck" class="check"></span>
-      <div class="note">Gunakan email Gmail valid</div>
-    </div>
-
-    <div class="input-group">
       <input id="telp" placeholder="Nomor Telepon">
       <span id="telpCheck" class="check"></span>
     </div>
@@ -131,6 +125,12 @@
       <span id="alamatCheck" class="check"></span>
     </div>
 
+     <div class="input-group">
+      <input id="email" placeholder="Email">
+      <span id="emailCheck" class="check"></span>
+      <div class="note">Gunakan email Gmail valid</div>
+    </div>
+    
     <div class="input-group">
       <input id="password" type="password" placeholder="Password">
       <span id="passwordCheck" class="check"></span>
@@ -142,7 +142,7 @@
       <span id="confirmCheck" class="check"></span>
     </div>
 
-    <div style="text-align:left;margin-bottom:10px;margin-top:2px;">
+    <div style="text-align:left;margin-bottom:10px;margin-top:1px;">
       <input type="checkbox" id="showPass"> Show Password
     </div>
 
@@ -161,9 +161,9 @@
   <script>
     // ==================== Elements ====================
     const namaInput = document.getElementById("nama");
-    const emailInput = document.getElementById("email");
     const telpInput = document.getElementById("telp");
     const alamatInput = document.getElementById("alamat");
+    const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
     const confirmInput = document.getElementById("confirm");
     const msg = document.getElementById("msg");
