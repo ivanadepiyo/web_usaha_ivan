@@ -1,21 +1,150 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-<title>Dashboard</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Dashboard | Web Perusahaan</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #1e3c72;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #1e3c72;
+      margin-bottom: 20px;
+    }
+
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .data-label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .data-value {
+      color: #333;
+    }
+
+    #logoutBtn {
+      display: block;
+      width: 150px;
+      margin: 30px auto 0;
+      padding: 12px;
+      background: #d9534f;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    #logoutBtn:hover {
+      background: #c9302c;
+    }
+
+    @media (max-width: 600px) {
+      .data-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .data-value {
+        margin-top: 5px;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<h2>Dashboard User</h2>
+  <header>Dashboard Web Perusahaan</header>
 
-<p><b>Nama:</b> <span id="nama"></span></p>
-<p><b>Email:</b> <span id="email"></span></p>
-<p><b>No HP:</b> <span id="telp"></span></p>
-<p><b>Alamat:</b> <span id="alamat"></span></p>
+  <div class="container">
+    <h2>Data Diri & Perusahaan</h2>
+    <div class="data-row">
+      <div class="data-label">Nama:</div>
+      <div class="data-value" id="userNama"></div>
+    </div>
+    <div class="data-row">
+      <div class="data-label">Email:</div>
+      <div class="data-value" id="userEmail"></div>
+    </div>
+    <div class="data-row">
+      <div class="data-label">Nomor Telepon:</div>
+      <div class="data-value" id="userTelp"></div>
+    </div>
+    <div class="data-row">
+      <div class="data-label">Alamat:</div>
+      <div class="data-value" id="userAlamat"></div>
+    </div>
 
-<button onclick="logout()">Logout</button>
+    <button id="logoutBtn">Logout</button>
+  </div>
 
-<script src="firebase-init.js"></script>
-<script src="auth.js"></script>
+  <script src="firebase-init.js"></script>
+  <script>
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const userNama = document.getElementById("userNama");
+    const userEmail = document.getElementById("userEmail");
+    const userTelp = document.getElementById("userTelp");
+    const userAlamat = document.getElementById("userAlamat");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    // Proteksi halaman
+    auth.onAuthStateChanged(async user => {
+      if(!user){
+        window.location.href = "login.html";
+        return;
+      }
+
+      // Ambil data user dari Firestore
+      try {
+        const doc = await db.collection("users").doc(user.uid).get();
+        if(doc.exists){
+          const data = doc.data();
+          userNama.textContent = data.nama || "-";
+          userEmail.textContent = data.email || "-";
+          userTelp.textContent = data.telp || "-";
+          userAlamat.textContent = data.alamat || "-";
+        }
+      } catch(err){
+        alert("Gagal mengambil data user: " + err.message);
+      }
+    });
+
+    // Logout
+    logoutBtn.addEventListener("click", ()=>{
+      auth.signOut().then(()=> window.location.href="login.html");
+    });
+  </script>
+
 </body>
 </html>
