@@ -117,11 +117,21 @@
 
     function setCheck(element, condition){ element.className = condition ? "check green" : "check red"; }
 
+    // DEBOUNCE FUNCTION
+    function debounce(fn, delay){
+      let timer;
+      return function(...args){
+        clearTimeout(timer);
+        timer = setTimeout(()=> fn.apply(this, args), delay);
+      }
+    }
+
     // VALIDASI REAL-TIME
     namaInput.addEventListener("input", ()=>setCheck(document.getElementById("namaCheck"), namaInput.value.length > 0 && namaInput.value.length <= 15));
 
-    emailInput.addEventListener("input", async ()=>{
-      const email = emailInput.value;
+    emailInput.addEventListener("input", debounce(async ()=>{
+      const email = emailInput.value.trim();
+      const emailCheck = document.getElementById("emailCheck");
       const validFormat = /^[\w.+-]+@gmail\.com$/.test(email);
       let notTaken = true;
 
@@ -131,8 +141,8 @@
           if(methods.length > 0) notTaken = false;
         } catch(e){ notTaken = false; }
       }
-      setCheck(document.getElementById("emailCheck"), validFormat && notTaken);
-    });
+      setCheck(emailCheck, validFormat && notTaken);
+    }, 700));
 
     telpInput.addEventListener("input", ()=>setCheck(document.getElementById("telpCheck"), telpInput.value.trim() !== ""));
     alamatInput.addEventListener("input", ()=>setCheck(document.getElementById("alamatCheck"), alamatInput.value.trim() !== ""));
@@ -156,10 +166,10 @@
         return;
       }
 
-      const nama = namaInput.value;
-      const email = emailInput.value;
-      const telp = telpInput.value;
-      const alamat = alamatInput.value;
+      const nama = namaInput.value.trim();
+      const email = emailInput.value.trim();
+      const telp = telpInput.value.trim();
+      const alamat = alamatInput.value.trim();
       const password = passwordInput.value;
 
       try{
