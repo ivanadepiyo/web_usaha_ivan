@@ -84,6 +84,15 @@ input:focus {
 .red { background-color: red; }
 .note { font-size: 12px; color: #555; margin: 4px 0; }
 
+/* ---------------------- Show Password ---------------------- */
+.show-pass {
+  text-align: center;
+  margin-bottom: 14px;
+}
+.show-pass input {
+  margin-bottom: 4px;
+}
+
 /* ---------------------- Button ---------------------- */
 button {
   width: 100%;
@@ -137,7 +146,7 @@ button:hover:not(:disabled) { background: #2a5298; }
   <div class="input-group">
     <input id="email" placeholder="Email">
     <span id="emailCheck" class="check"></span>
-    <div class="note">Gunakan gmail valid</div>
+    <div class="note">Gunakan Gmail valid</div>
   </div>
 
   <!-- Password -->
@@ -154,18 +163,21 @@ button:hover:not(:disabled) { background: #2a5298; }
   </div>
 
   <!-- Show Password -->
-<div class="show-pass" style="text-align:center; margin-bottom:14px;">
-  <input type="checkbox" id="showPass" style="margin-bottom:4px;">
-  <div><label for="showPass">Show Password</label></div>
-</div>
+  <div class="show-pass">
+    <input type="checkbox" id="showPass">
+    <div><label for="showPass">Show Password</label></div>
+  </div>
 
+  <!-- Loader -->
   <div class="loader" id="loader"></div>
 
+  <!-- Tombol Simpan -->
   <button id="registerBtn" disabled>
     Simpan
     <span id="btnLoader" class="btn-loader" style="display:none;"></span>
   </button>
 
+  <!-- Pesan -->
   <p id="msg"></p>
 </div>
 
@@ -270,9 +282,9 @@ registerBtn.addEventListener("click", async () => {
 
   try {
     const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
-    if (methods.length > 0) { 
-      msg.textContent = "Email sudah terdaftar!"; 
-      return; 
+    if (methods.length > 0){ 
+      msg.textContent = "Email sudah terdaftar!";
+      return; // tetap ke finally
     }
 
     const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
