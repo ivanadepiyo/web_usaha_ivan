@@ -99,7 +99,62 @@
   </div>
 
   <script src="firebase-init.js"></script>
-  <script src="auth.js"></script>
+  <script>
+    function register() {
+      const nama = document.getElementById("nama").value;
+      const email = document.getElementById("email").value;
+      const telp = document.getElementById("telp").value;
+      const alamat = document.getElementById("alamat").value;
+      const password = document.getElementById("password").value;
+      const confirm = document.getElementById("confirm").value;
+      const msg = document.getElementById("msg");
+
+      // Reset pesan
+      msg.textContent = "";
+      msg.style.color = "red";
+
+      // Validasi
+      if (!nama || !email || !telp || !alamat || !password || !confirm) {
+        msg.textContent = "Semua field harus diisi!";
+        return;
+      }
+
+      if (password !== confirm) {
+        msg.textContent = "Password dan Konfirmasi Password tidak sama!";
+        return;
+      }
+
+      // Firebase Authentication
+      firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+
+          // Simpan data tambahan di Firestore
+          firebase.firestore().collection("users").doc(user.uid).set({
+            nama: nama,
+            email: email,
+            telp: telp,
+            alamat: alamat,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          })
+          .then(() => {
+            msg.style.color = "green";
+            msg.textContent = "Akun berhasil dibuat!";
+            // Redirect ke login setelah 2 detik
+            setTimeout(() => {
+              window.location.href = "login.html";
+            }, 2000);
+          })
+          .catch((error) => {
+            msg.textContent = "Gagal menyimpan data: " + error.message;
+          });
+
+        })
+        .catch((error) => {
+          msg.textContent = "Gagal mendaftar: " + error.message;
+        });
+    }
+  </script>
 
 </body>
 </html>
