@@ -36,10 +36,14 @@
       color: #1e3c72;
     }
 
+    .input-group {
+      position: relative;
+      margin-bottom: 14px;
+    }
+
     .page-login input {
       width: 100%;
       padding: 12px 14px;
-      margin-bottom: 14px;
       border-radius: 8px;
       border: 1px solid #ccc;
       font-size: 15px;
@@ -50,6 +54,19 @@
       border-color: #2a5298;
       box-shadow: 0 0 0 2px rgba(42,82,152,0.2);
     }
+
+    .check {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .green { background-color: green; }
+    .red { background-color: red; }
 
     .page-login button {
       width: 100%;
@@ -87,12 +104,30 @@
   <div class="card">
     <h2>Daftar Akun</h2>
 
-    <input id="nama" placeholder="Nama">
-    <input id="email" placeholder="Email">
-    <input id="telp" placeholder="Nomor Telepon">
-    <input id="alamat" placeholder="Alamat">
-    <input id="password" type="password" placeholder="Password">
-    <input id="confirm" type="password" placeholder="Konfirmasi Password">
+    <div class="input-group">
+      <input id="nama" placeholder="Nama">
+      <span id="namaCheck" class="check"></span>
+    </div>
+    <div class="input-group">
+      <input id="email" placeholder="Email">
+      <span id="emailCheck" class="check"></span>
+    </div>
+    <div class="input-group">
+      <input id="telp" placeholder="Nomor Telepon">
+      <span id="telpCheck" class="check"></span>
+    </div>
+    <div class="input-group">
+      <input id="alamat" placeholder="Alamat">
+      <span id="alamatCheck" class="check"></span>
+    </div>
+    <div class="input-group">
+      <input id="password" type="password" placeholder="Password">
+      <span id="passwordCheck" class="check"></span>
+    </div>
+    <div class="input-group">
+      <input id="confirm" type="password" placeholder="Konfirmasi Password">
+      <span id="confirmCheck" class="check"></span>
+    </div>
 
     <button onclick="register()">Simpan</button>
     <p id="msg"></p>
@@ -100,61 +135,63 @@
 
   <script src="firebase-init.js"></script>
   <script>
-    function register() {
-      const nama = document.getElementById("nama").value;
-      const email = document.getElementById("email").value;
-      const telp = document.getElementById("telp").value;
-      const alamat = document.getElementById("alamat").value;
-      const password = document.getElementById("password").value;
-      const confirm = document.getElementById("confirm").value;
-      const msg = document.getElementById("msg");
+    const namaInput = document.getElementById("nama");
+    const emailInput = document.getElementById("email");
+    const telpInput = document.getElementById("telp");
+    const alamatInput = document.getElementById("alamat");
+    const passwordInput = document.getElementById("password");
+    const confirmInput = document.getElementById("confirm");
+    const msg = document.getElementById("msg");
 
-      // Reset pesan
+    // Fungsi validasi real-time
+    function setCheck(element, condition){
+      element.className = condition ? "check green" : "check red";
+    }
+
+    namaInput.addEventListener("input", ()=>setCheck(document.getElementById("namaCheck"), namaInput.value.length > 0 && namaInput.value.length <= 15));
+    emailInput.addEventListener("input", ()=>setCheck(document.getElementById("emailCheck"), /^[\w.+-]+@gmail\.com$/.test(emailInput.value)));
+    telpInput.addEventListener("input", ()=>setCheck(document.getElementById("telpCheck"), telpInput.value.trim() !== ""));
+    alamatInput.addEventListener("input", ()=>setCheck(document.getElementById("alamatCheck"), alamatInput.value.trim() !== ""));
+    passwordInput.addEventListener("input", ()=>setCheck(document.getElementById("passwordCheck"), /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9!@#$%^&*]).{6,}$/.test(passwordInput.value)));
+    confirmInput.addEventListener("input", ()=>setCheck(document.getElementById("confirmCheck"), confirmInput.value === passwordInput.value && confirmInput.value !== ""));
+
+    // Fungsi register
+    function register(){
       msg.textContent = "";
       msg.style.color = "red";
 
-      // Validasi
-      if (!nama || !email || !telp || !alamat || !password || !confirm) {
-        msg.textContent = "Semua field harus diisi!";
+      // Pastikan semua check hijau
+      if(document.querySelectorAll(".check.green").length !== 6){
+        msg.textContent = "Periksa semua field, pastikan benar!";
         return;
       }
 
-      if (password !== confirm) {
-        msg.textContent = "Password dan Konfirmasi Password tidak sama!";
-        return;
-      }
+      const nama = namaInput.value;
+      const email = emailInput.value;
+      const telp = telpInput.value;
+      const alamat = alamatInput.value;
+      const password = passwordInput.value;
 
-      // Firebase Authentication
+      // Firebase Auth
       firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
+        .then(userCredential => {
           const user = userCredential.user;
-
-          // Simpan data tambahan di Firestore
+          // Simpan data tambahan
           firebase.firestore().collection("users").doc(user.uid).set({
-            nama: nama,
-            email: email,
-            telp: telp,
-            alamat: alamat,
+            nama, email, telp, alamat,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           })
-          .then(() => {
+          .then(()=>{
             msg.style.color = "green";
-            msg.textContent = "Akun berhasil dibuat!";
-            // Redirect ke login setelah 2 detik
-            setTimeout(() => {
-              window.location.href = "login.html";
-            }, 2000);
+            msg.textContent = "Akun berhasil dibuat! Silahkan login.";
+            setTimeout(()=> window.location.href="login.html",2000);
           })
-          .catch((error) => {
-            msg.textContent = "Gagal menyimpan data: " + error.message;
-          });
-
+          .catch(err=>{ msg.textContent="Gagal menyimpan data: "+err.message });
         })
-        .catch((error) => {
-          msg.textContent = "Gagal mendaftar: " + error.message;
+        .catch(err=>{
+          msg.textContent="Gagal mendaftar: "+err.message;
         });
     }
   </script>
-
 </body>
 </html>
