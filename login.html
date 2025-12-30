@@ -1,24 +1,21 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Login | Web Perusahaan</title>
-  <link rel="stylesheet" href="style.css">
+<title>Login</title>
+<link rel="stylesheet" href="style.css">
 </head>
+<body>
 
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <a href="lupa-password.html">Lupa Password?</a><br>
-    <button id="loginBtn">Masuk</button>
+<h2>Login User</h2>
 
-    <div class="links">
-      <a href="register.html">Daftar Akun</a><br>
-      <a href="admin-login.html">Login Admin</a>
-    </div>
-  </div>
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="password" placeholder="Password">
+<button onclick="login()">Login</button>
 
-  <script src="firebase.js"></script>
-  <script src="auth.js"></script>
+<p id="msg"></p>
 
+<a href="lupa-password.html">Lupa Password?</a>
+
+<script type="module" src="auth.js"></script>
 </body>
 </html>
