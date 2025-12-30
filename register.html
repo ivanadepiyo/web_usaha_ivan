@@ -5,6 +5,24 @@
   <title>Daftar Akun | Web Perusahaan</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    
+    .btn-loader {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
     * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
     body.page-login.auth {
       margin: 0;
@@ -114,7 +132,10 @@
 
     <div class="loader" id="loader"></div>
 
-    <button id="registerBtn" disabled>Simpan</button>
+   <button id="registerBtn" disabled>
+  Simpan
+  <span id="btnLoader" class="btn-loader" style="display:none;"></span>
+  </button>
     <p id="msg"></p>
   </div>
 
@@ -189,6 +210,27 @@
     confirmInput.addEventListener("input", ()=>{ setCheck(document.getElementById("confirmCheck"), confirmInput.value === passwordInput.value && confirmInput.value !== ""); enableButton(); });
 
     // REGISTER
+    const btnLoader = document.getElementById("btnLoader");
+
+registerBtn.addEventListener("click", async () => {
+  // Tampilkan loader di tombol
+  btnLoader.style.display = "inline-block";
+  registerBtn.disabled = true;
+
+  try {
+    // Proses register, misal Firebase
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Proses selesai
+    alert("Registrasi berhasil!");
+  } catch (err) {
+    alert("Terjadi error: " + err.message);
+  } finally {
+    btnLoader.style.display = "none";
+    registerBtn.disabled = false;
+  }
+});
+
     registerBtn.addEventListener("click", async ()=>{
       msg.textContent = "";
       msg.style.color = "red";
