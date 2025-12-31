@@ -1,160 +1,105 @@
 <!DOCTYPE html>
 <html lang="id">
-
-<!-- ================================================= -->
-<!-- =============== HEAD / META ===================== -->
-<!-- ================================================= -->
 <head>
 <meta charset="UTF-8">
 <title>Login Admin | Web Perusahaan</title>
-
-<!-- ================================================= -->
-<!-- ======================= CSS ===================== -->
-<!-- ================================================= -->
 <style>
-
-  /* ================= GLOBAL ================= */
-  * {
-    box-sizing: border-box;
-    font-family: "Segoe UI", Arial, sans-serif;
-  }
-
-  /* Background halaman */
-  body.page-login.auth {
-    margin: 0;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #333;
-  }
-
-  /* ================= CARD ================= */
-  .card {
-    background: #ffffff;
-    width: 100%;
-    max-width: 380px;
-    padding: 30px;
-    border-radius: 14px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    text-align: center;
-  }
-
-  .card h2 {
-    margin-bottom: 20px;
-    color: #1e3c72;
-  }
-
-  /* ================= INPUT ================= */
-  .input-group {
-    margin-bottom: 14px;
-    text-align: left;
-  }
-
-  input {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 15px;
-  }
-
-  input:focus {
-    outline: none;
-    border-color: #2a5298;
-    box-shadow: 0 0 0 2px rgba(42,82,152,0.2);
-  }
-
-  /* ================= BUTTON ================= */
-  button {
-    width: 100%;
-    padding: 12px;
-    background: #1e3c72;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-
-  button:hover {
-    background: #2a5298;
-  }
-
-  /* ================= LINK ================= */
-  a {
-    display: inline-block;
-    margin-top: 10px;
-    color: #2a5298;
-    text-decoration: none;
-    font-size: 14px;
-  }
-
-  a:hover {
-    text-decoration: underline;
-  }
-
-  /* ================= MESSAGE ================= */
-  #msg {
-    margin-top: 10px;
-    font-size: 14px;
-    color: red;
-  }
-
-  /* ================= RESPONSIVE ================= */
-  @media (max-width: 480px) {
-    .card {
-      margin: 20px;
-      padding: 24px;
-    }
-  }
-
+* { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+body.page-login.auth { margin:0; min-height:100vh; background: linear-gradient(135deg, #1e3c72, #2a5298); display:flex; justify-content:center; align-items:center; color:#333; }
+.card { background:#fff; width:100%; max-width:380px; padding:30px; border-radius:14px; box-shadow:0 20px 40px rgba(0,0,0,0.2); text-align:center; }
+.card h2 { margin-bottom:20px; color:#1e3c72; }
+.input-group { margin-bottom:14px; text-align:left; }
+input { width:100%; padding:12px 14px; border-radius:8px; border:1px solid #ccc; font-size:15px; }
+input:focus { outline:none; border-color:#2a5298; box-shadow:0 0 0 2px rgba(42,82,152,0.2); }
+button { width:100%; padding:12px; background:#1e3c72; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; transition:0.3s; }
+button:hover { background:#2a5298; }
+a { display:inline-block; margin-top:10px; color:#2a5298; text-decoration:none; font-size:14px; }
+a:hover { text-decoration:underline; }
+#msg { margin-top:10px; font-size:14px; color:red; }
+@media (max-width:480px) { .card { margin:20px; padding:24px; } }
 </style>
 </head>
-
-<!-- ================================================= -->
-<!-- ======================= HTML ==================== -->
-<!-- ================================================= -->
 <body class="page-login auth">
 
-<!-- Card Login Admin -->
 <div class="card">
-
   <h2>Login Admin</h2>
 
-  <!-- Input Email Admin -->
   <div class="input-group">
     <input id="email" placeholder="Email">
   </div>
 
-  <!-- Input Password Admin -->
   <div class="input-group">
     <input id="password" type="password" placeholder="Password">
   </div>
 
-  <!-- Tombol Login -->
-  <button onclick="adminLogin()">Login</button>
-
-  <!-- Link Lupa Password -->
+  <button id="loginBtn">Login</button>
   <a href="lupa-password.html">Lupa Password?</a>
-
-  <!-- Pesan Status -->
   <p id="msg"></p>
-
 </div>
 
-<!-- ================================================= -->
-<!-- ======================= JS ====================== -->
-<!-- ================================================= -->
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-<!-- Firebase Init -->
-<script src="firebase-init.js"></script>
+<script>
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
+  authDomain: "web-usaha-ivan.firebaseapp.com",
+  projectId: "web-usaha-ivan",
+  storageBucket: "web-usaha-ivan.appspot.com",
+  messagingSenderId: "588839561784",
+  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-<!-- Auth Logic -->
-<script src="auth.js"></script>
+// ELEMENTS
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const loginBtn = document.getElementById("loginBtn");
+const msg = document.getElementById("msg");
+
+// LOGIN ADMIN
+loginBtn.addEventListener("click", async () => {
+  msg.textContent = "";
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+
+  if (!email || !password) {
+    msg.textContent = "Email dan password harus diisi!";
+    return;
+  }
+
+  try {
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+
+    // Cek apakah email sudah diverifikasi
+    if (!user.emailVerified) {
+      msg.textContent = "Silahkan verifikasi email terlebih dahulu!";
+      await auth.signOut();
+      return;
+    }
+
+    // Ambil data user dari Firestore untuk cek role
+    const doc = await db.collection("users").doc(user.uid).get();
+    if (!doc.exists || doc.data().role !== "admin") {
+      msg.textContent = "Akses ditolak: bukan akun admin!";
+      await auth.signOut();
+      return;
+    }
+
+    // Login sukses → redirect admin dashboard
+    window.location.href = "dashboard.html";
+
+  } catch (err) {
+    msg.textContent = err.message;
+  }
+});
+</script>
 
 </body>
 </html>
