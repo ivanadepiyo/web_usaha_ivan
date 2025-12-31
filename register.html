@@ -5,122 +5,23 @@
 <title>Daftar Akun</title>
 
 <style>
-* {
-  box-sizing: border-box;
-  font-family: "Segoe UI", Arial, sans-serif;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1e3c72, #2a5298);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
-
-/* ===== CARD ===== */
-.card {
-  background: #fff;
-  width: 100%;
-  max-width: 460px;
-  padding: 26px 22px;
-  border-radius: 14px;
-  box-shadow: 0 20px 40px rgba(0,0,0,.25);
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-/* ===== INPUT ===== */
-.input-group {
-  position: relative;
-  margin-bottom: 16px;
-}
-
-.input-group input {
-  width: 100%;
-  height: 44px;
-  padding: 0 48px 0 14px; /* padding kanan ditambah supaya icon tidak nabrak */
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
-
-.input-group input:focus {
-  outline: none;
-  border-color: #2a5298;
-  box-shadow: 0 0 0 2px rgba(42,82,152,.15);
-}
-
-/* ===== INDIKATOR (TENGAH SEMPURNA) ===== */
-.check {
-  position: absolute;
-  right: 12px;
-  top: 0;
-  height: 44px;   /* sama dengan tinggi input */
-  width: 32px;
-
-  display: none;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1;
-  pointer-events: none;
-}
-
+* { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+body { margin: 0; min-height: 100vh; background: linear-gradient(135deg, #1e3c72, #2a5298); display: flex; justify-content: center; align-items: center; padding: 20px; }
+.card { background: #fff; width: 100%; max-width: 460px; padding: 26px 22px; border-radius: 14px; box-shadow: 0 20px 40px rgba(0,0,0,.25); }
+h2 { text-align: center; margin-bottom: 20px; }
+.input-group { position: relative; margin-bottom: 16px; }
+.input-group input { width: 100%; height: 44px; padding: 0 48px 0 14px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; }
+.input-group input:focus { outline: none; border-color: #2a5298; box-shadow: 0 0 0 2px rgba(42,82,152,.15); }
+.check { position: absolute; right: 12px; top: 0; height: 44px; width: 32px; display: none; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; line-height: 1; pointer-events: none; }
 .check.valid { color: #2ecc71; }
 .check.invalid { color: #e74c3c; }
-
-/* ===== NOTE ===== */
-.note {
-  font-size: 12px;
-  color: #666;
-  margin-top: 6px;
-}
-
-/* ===== CHECKBOX ===== */
-.show-pass {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 6px 0 14px;
-  font-size: 14px;
-}
-
-/* ===== BUTTON ===== */
-button {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background: #1e3c72;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-button:disabled {
-  background: #9aa0a6;
-  cursor: not-allowed;
-}
-
-/* ===== HILANGKAN ICON MATA ===== */
-input[type="password"]::-webkit-textfield-decoration-container {
-  display: none !important;
-}
-input[type="password"]::-ms-reveal,
-input[type="password"]::-ms-clear {
-  display: none;
-}
-input[type="password"] {
-  appearance: none;
-}
+.note { font-size: 12px; color: #666; margin-top: 6px; }
+.show-pass { display: flex; align-items: center; gap: 8px; margin: 6px 0 14px; font-size: 14px; }
+button { width: 100%; padding: 12px; border: none; border-radius: 8px; background: #1e3c72; color: #fff; font-weight: bold; cursor: pointer; }
+button:disabled { background: #9aa0a6; cursor: not-allowed; }
+input[type="password"]::-webkit-textfield-decoration-container { display: none !important; }
+input[type="password"]::-ms-reveal, input[type="password"]::-ms-clear { display: none; }
+input[type="password"] { appearance: none; }
 </style>
 </head>
 
@@ -158,9 +59,7 @@ input[type="password"] {
   <div class="input-group">
     <input id="confirm" type="password" placeholder="Konfirmasi Password">
     <span class="check" id="confirmCheck"></span>
-     <div class="note">
-      Min 8 karakter, huruf besar, huruf kecil, angka & simbol
-    </div>
+    <div class="note">Min 8 karakter, huruf besar, huruf kecil, angka & simbol</div>
   </div>
 
   <div class="show-pass">
@@ -171,7 +70,26 @@ input[type="password"] {
   <button id="btn" disabled>Simpan</button>
 </div>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script>
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
+  authDomain: "web-usaha-ivan.firebaseapp.com",
+  projectId: "web-usaha-ivan",
+  storageBucket: "web-usaha-ivan.appspot.com",
+  messagingSenderId: "588839561784",
+  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+/* FORM ELEMENTS */
 const nama = document.getElementById("nama");
 const telp = document.getElementById("telp");
 const alamat = document.getElementById("alamat");
@@ -181,69 +99,53 @@ const confirm = document.getElementById("confirm");
 const btn = document.getElementById("btn");
 const showPass = document.getElementById("showPass");
 
-/* ===== ONLY NUMBER (TELP) ===== */
-telp.addEventListener("input", () => {
-  telp.value = telp.value.replace(/[^0-9]/g, "");
-});
+/* ONLY NUMBER TELP */
+telp.addEventListener("input", ()=>{ telp.value = telp.value.replace(/[^0-9]/g,''); });
 
-/* ===== HELPER ===== */
-function show(el, ok) {
-  el.style.display = "flex";
-  el.textContent = ok ? "✔" : "✖";
-  el.className = "check " + (ok ? "valid" : "invalid");
+/* HELPER CHECK ICON */
+function show(el, ok){ el.style.display="flex"; el.textContent=ok?"✔":"✖"; el.className="check "+(ok?"valid":"invalid"); }
+function hide(el){ el.style.display="none"; }
+function validPassword(v){ return v.length>=8 && /[A-Z]/.test(v) && /[a-z]/.test(v) && /[0-9]/.test(v) && /[^A-Za-z0-9]/.test(v); }
+
+/* VALIDASI INPUT */
+function validate(){
+  nama.value ? show(namaCheck,nama.value.length>=3):hide(namaCheck);
+  telp.value ? show(telpCheck,telp.value.length>=10):hide(telpCheck);
+  alamat.value ? show(alamatCheck,alamat.value.length>=5):hide(alamatCheck);
+  email.value ? show(emailCheck,/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)):hide(emailCheck);
+  password.value ? show(passwordCheck,validPassword(password.value)):hide(passwordCheck);
+  confirm.value ? show(confirmCheck,confirm.value===password.value):hide(confirmCheck);
+  btn.disabled = !(nama.value.length>=3 && telp.value.length>=10 && alamat.value.length>=5 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value) && validPassword(password.value) && confirm.value===password.value);
 }
+document.querySelectorAll("input").forEach(i=>i.addEventListener("input",validate));
 
-function hide(el) {
-  el.style.display = "none";
-}
-
-function validPassword(v) {
-  return (
-    v.length >= 8 &&
-    /[A-Z]/.test(v) &&
-    /[a-z]/.test(v) &&
-    /[0-9]/.test(v) &&
-    /[^A-Za-z0-9]/.test(v)
-  );
-}
-
-/* ===== VALIDASI ===== */
-function validate() {
-  nama.value ? show(namaCheck, nama.value.length >= 3) : hide(namaCheck);
-  telp.value ? show(telpCheck, telp.value.length >= 10) : hide(telpCheck);
-  alamat.value ? show(alamatCheck, alamat.value.length >= 5) : hide(alamatCheck);
-
-  email.value
-    ? show(emailCheck, /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value))
-    : hide(emailCheck);
-
-  password.value
-    ? show(passwordCheck, validPassword(password.value))
-    : hide(passwordCheck);
-
-  confirm.value
-    ? show(confirmCheck, confirm.value === password.value)
-    : hide(confirmCheck);
-
-  btn.disabled = !(
-    nama.value.length >= 3 &&
-    telp.value.length >= 10 &&
-    alamat.value.length >= 5 &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value) &&
-    validPassword(password.value) &&
-    confirm.value === password.value
-  );
-}
-
-document.querySelectorAll("input").forEach(i =>
-  i.addEventListener("input", validate)
-);
-
-/* ===== SHOW PASSWORD ===== */
+/* SHOW PASSWORD TOGGLE */
 showPass.onchange = e => {
-  const t = e.target.checked ? "text" : "password";
+  const t = e.target.checked?"text":"password";
   password.type = confirm.type = t;
 };
+
+/* FIREBASE REGISTER */
+btn.addEventListener("click", ()=>{
+  const emailVal = email.value;
+  const passVal = password.value;
+  auth.createUserWithEmailAndPassword(emailVal, passVal)
+    .then(userCredential=>{
+      const user = userCredential.user;
+      // simpan data tambahan di Firestore
+      db.collection("users").doc(user.uid).set({
+        nama: nama.value,
+        telp: telp.value,
+        alamat: alamat.value,
+        email: email.value
+      });
+      alert("Akun berhasil dibuat! Silahkan login.");
+      window.location.href = "login.html"; // redirect ke login
+    })
+    .catch(error=>{
+      alert(error.message);
+    });
+});
 </script>
 
 </body>
