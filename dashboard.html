@@ -7,46 +7,26 @@
 body { font-family:"Segoe UI",Arial,sans-serif; margin:0; background:#f0f2f5; min-height:100vh; }
 header { background:#1e3c72; color:white; padding:20px; text-align:center; font-size:24px; }
 .container { max-width:600px; margin:30px auto; background:white; border-radius:10px; padding:20px; box-shadow:0 10px 20px rgba(0,0,0,0.1); text-align:center; }
-button { display:block; width:80%; margin:12px auto; padding:12px 20px; border:none; border-radius:8px; background:#1e3c72; color:white; font-weight:bold; cursor:pointer; font-size:16px; transition:0.3s; }
+button { display:block; width:80%; margin:12px auto; padding:12px 20px; border:none; border-radius:8px; background:#1e3c72; color:white; font-weight:bold; cursor:pointer; font-size:16px; }
 button:hover { background:#15509c; }
 #logoutBtn { background:#d9534f; }
 #logoutBtn:hover { background:#c9302c; }
-.code-container { display:none; flex-direction:column; align-items:center; margin:10px auto; }
-.code-container input { padding:10px; font-size:16px; width:60%; border-radius:6px; border:1px solid #ccc; }
-.code-container span { color:red; font-size:14px; margin-top:5px; }
+#codeNotif { display:none; background:#fff3cd; color:#856404; padding:10px 15px; border-radius:6px; margin:10px auto; width:80%; border:1px solid #ffeeba; }
+input.code-input { display:none; padding:10px; font-size:16px; width:60%; margin:10px auto; border-radius:6px; border:1px solid #ccc; }
 </style>
 </head>
 <body>
-
 <header>Dashboard Web Perusahaan</header>
-
 <div class="container">
   <h2>Menu Akses</h2>
   <button id="btnDataDiri">Data Diri</button>
+  <button id="btnPerusahaan">Perusahaan</button>
+  <button id="btnGaji">Gaji</button>
+  <button id="btnPekerjaan">Pekerjaan</button>
+  <button id="btnKalkulator">Kalkulator</button>
 
-  <div style="position:relative;">
-    <button id="btnPerusahaan">Perusahaan</button>
-    <div id="codePerusahaan" class="code-container">
-      <input type="password" placeholder="Masukkan Kode Akses">
-      <span></span>
-    </div>
-  </div>
-
-  <div style="position:relative;">
-    <button id="btnGaji">Gaji</button>
-    <div id="codeGaji" class="code-container">
-      <input type="password" placeholder="Masukkan Kode Akses">
-      <span></span>
-    </div>
-  </div>
-
-  <div style="position:relative;">
-    <button id="btnPekerjaan">Pekerjaan</button>
-    <div id="codePekerjaan" class="code-container">
-      <input type="password" placeholder="Masukkan Kode Akses">
-      <span></span>
-    </div>
-  </div>
+  <div id="codeNotif">Masukkan kode akses untuk membuka halaman ini</div>
+  <input type="password" id="accessCode" class="code-input" placeholder="Masukkan Kode Akses">
 
   <button id="logoutBtn">Logout</button>
 </div>
@@ -74,44 +54,38 @@ auth.onAuthStateChanged(user=>{
 // Logout
 document.getElementById("logoutBtn").addEventListener("click", ()=>auth.signOut().then(()=>window.location.href="login.html"));
 
-// Data Diri langsung akses
-document.getElementById("btnDataDiri").addEventListener("click", ()=>{
-  window.location.href="DataDiri.html";
-});
+// Tombol Data Diri & Kalkulator tanpa kode
+document.getElementById("btnDataDiri").addEventListener("click", ()=> window.location.href="DataDiri.html");
+document.getElementById("btnKalkulator").addEventListener("click", ()=> window.location.href="kalkulator.html");
 
-// Fungsi kode akses untuk tombol lain
-function setupCode(buttonId, containerId, targetPage){
-  const btn = document.getElementById(buttonId);
-  const container = document.getElementById(containerId);
-  const input = container.querySelector("input");
-  const notif = container.querySelector("span");
+// Tombol lain pakai kode akses
+const accessCodeInput = document.getElementById("accessCode");
+const codeNotif = document.getElementById("codeNotif");
+let targetPage = "";
 
-  btn.addEventListener("click", ()=>{
-    // sembunyikan semua container lain
-    document.querySelectorAll(".code-container").forEach(c=>c.style.display="none");
-    container.style.display="flex";
-    input.value = "";
-    notif.textContent = "";
-    input.focus();
-  });
-
-  input.addEventListener("keyup", e=>{
-    if(e.key==="Enter"){
-      if(input.value === "1234"){ // kode akses default
-        window.location.href = targetPage;
-      } else {
-        notif.textContent = "Kode akses salah!";
-        input.value = "";
-        input.focus();
-      }
-    }
-  });
+function requestCode(page){
+  targetPage = page;
+  accessCodeInput.value = "";
+  codeNotif.style.display="block";
+  accessCodeInput.style.display="block";
+  accessCodeInput.focus();
 }
 
-// Pasang kode akses
-setupCode("btnPerusahaan", "codePerusahaan", "Perusahaan.html");
-setupCode("btnGaji", "codeGaji", "Gaji.html");
-setupCode("btnPekerjaan", "codePekerjaan", "Pekerjaan.html");
+document.getElementById("btnPerusahaan").addEventListener("click", ()=>requestCode("Perusahaan.html"));
+document.getElementById("btnGaji").addEventListener("click", ()=>requestCode("Gaji.html"));
+document.getElementById("btnPekerjaan").addEventListener("click", ()=>requestCode("Pekerjaan.html"));
+
+// Submit kode akses dengan Enter
+accessCodeInput.addEventListener("keyup", function(e){
+  if(e.key==="Enter"){
+    if(accessCodeInput.value === "1234"){ // kode akses default
+      window.location.href = targetPage;
+    } else {
+      alert("Kode akses salah!");
+      accessCodeInput.value = "";
+    }
+  }
+});
 </script>
 </body>
 </html>
