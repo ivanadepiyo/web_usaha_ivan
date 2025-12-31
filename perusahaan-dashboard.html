@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Perusahaan | Dashboard</title>
+<style>
+body{font-family:"Segoe UI",Arial,sans-serif;margin:0;background:#f0f2f5;min-height:100vh;}
+header{background:#1e3c72;color:white;padding:20px;text-align:center;font-size:24px;}
+.container{max-width:800px;margin:30px auto;background:white;border-radius:10px;padding:20px;box-shadow:0 10px 20px rgba(0,0,0,0.1);}
+input,button{padding:10px; border-radius:8px; border:1px solid #ccc; font-size:14px;}
+button{background:#1e3c72;color:white;border:none;cursor:pointer; transition:0.3s;}
+button:hover{background:#15509c;}
+#content{margin-top:20px;}
+#backBtn,#logoutBtn{margin:20px 10px;}
+</style>
+</head>
+<body>
+
+<header>Perusahaan</header>
+<div class="container">
+  <p>Masukkan kode untuk melihat info perusahaan:</p>
+  <input type="password" id="kodePerusahaan" placeholder="Kode Perusahaan">
+  <button id="cekPerusahaan">Cek</button>
+  <div id="content"></div>
+
+  <button id="backBtn">Kembali ke Dashboard</button>
+  <button id="logoutBtn">Logout</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
+  authDomain: "web-usaha-ivan.firebaseapp.com",
+  projectId: "web-usaha-ivan",
+  storageBucket: "web-usaha-ivan.appspot.com",
+  messagingSenderId: "588839561784",
+  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const kodeAkses = "PER123"; // kode akses perusahaan
+const content = document.getElementById("content");
+
+// Cek login
+auth.onAuthStateChanged(user=>{
+  if(!user){ window.location.href="login.html"; }
+});
+
+// Cek kode
+document.getElementById("cekPerusahaan").addEventListener("click",()=>{
+  const val=document.getElementById("kodePerusahaan").value;
+  if(val===kodeAkses){
+    content.innerHTML="<h3>Informasi Perusahaan</h3><ul><li>Nama Perusahaan: PT. Contoh</li><li>Alamat: Jakarta</li><li>Bidang: IT</li></ul>";
+  } else {
+    content.innerHTML="<p style='color:red'>Kode salah!</p>";
+  }
+});
+
+// Tombol navigasi
+document.getElementById("backBtn").addEventListener("click",()=>window.location.href="dashboard.html");
+document.getElementById("logoutBtn").addEventListener("click",()=>auth.signOut().then(()=>window.location.href="login.html"));
+</script>
+</body>
+</html>
