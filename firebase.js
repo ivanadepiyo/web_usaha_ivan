@@ -1,8 +1,22 @@
+<!-- ================================================= -->
+<!-- ============ FIREBASE SDK (COMPAT) ============== -->
+<!-- ================================================= -->
+<!-- Firebase core -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+
+<!-- Firebase authentication -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<!-- Firebase firestore database -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+
+<!-- ================================================= -->
+<!-- ============ FIREBASE CONFIG ==================== -->
+<!-- ================================================= -->
 <script>
+
+  /* Konfigurasi project Firebase */
   const firebaseConfig = {
     apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
     authDomain: "web-usaha-ivan.firebaseapp.com",
@@ -12,8 +26,13 @@
     appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
   };
 
+  /* Inisialisasi Firebase */
   firebase.initializeApp(firebaseConfig);
 
+  /* Aktifkan Firebase Auth */
   const auth = firebase.auth();
+
+  /* Aktifkan Firestore Database */
   const db = firebase.firestore();
+
 </script>
