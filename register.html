@@ -138,18 +138,18 @@ button:disabled {
     <span id="confirmCheck" class="check"></span>
     <div class="note">Minimal 8 karakter, huruf besar di awal, angka/simbol</div>
   </div>
-  
-<!-- ================= SHOW PASSWORD ================= -->
-<div style="margin:10px 0; text-align:center;">
-  <input type="checkbox" id="showAllPass">
-  <label for="showAllPass" style="font-size:14px;">Lihat semua kata sandi</label>
-</div>
+
+  <!-- ================= SHOW PASSWORD ================= -->
+  <div style="margin:10px 0; text-align:center;">
+    <input type="checkbox" id="showAllPass">
+    <label for="showAllPass">Lihat semua kata sandi</label>
+  </div>
 
   <button id="registerBtn" disabled>Simpan</button>
 </div>
 
 <script>
-/* ================= VALIDATION ================= */
+/* ================= ELEMENT ================= */
 
 const inputs = {
   nama: document.getElementById("nama"),
@@ -161,15 +161,17 @@ const inputs = {
 };
 
 const checks = {
-  nama: namaCheck,
-  telp: telpCheck,
-  alamat: alamatCheck,
-  email: emailCheck,
-  password: passwordCheck,
-  confirm: confirmCheck,
+  nama: document.getElementById("namaCheck"),
+  telp: document.getElementById("telpCheck"),
+  alamat: document.getElementById("alamatCheck"),
+  email: document.getElementById("emailCheck"),
+  password: document.getElementById("passwordCheck"),
+  confirm: document.getElementById("confirmCheck"),
 };
 
-const btn = registerBtn;
+const btn = document.getElementById("registerBtn");
+
+/* ================= HELPER ================= */
 
 function setCheck(el, valid, value) {
   if (!value.trim()) {
@@ -191,20 +193,47 @@ function enableBtn() {
   );
 }
 
-inputs.nama.oninput = () => { setCheck(checks.nama, inputs.nama.value.length>=3, inputs.nama.value); enableBtn(); };
-inputs.telp.oninput = () => { setCheck(checks.telp, inputs.telp.value.length>=10, inputs.telp.value); enableBtn(); };
-inputs.alamat.oninput = () => { setCheck(checks.alamat, inputs.alamat.value.length>=5, inputs.alamat.value); enableBtn(); };
-inputs.email.oninput = () => { setCheck(checks.email, /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputs.email.value), inputs.email.value); enableBtn(); };
-inputs.password.oninput = () => { setCheck(checks.password, inputs.password.value.length>=8, inputs.password.value); enableBtn(); };
-inputs.confirm.oninput = () => { setCheck(checks.confirm, inputs.confirm.value===inputs.password.value, inputs.confirm.value); enableBtn(); };
-</script>
+/* ================= REAL-TIME VALIDATION ================= */
+
+inputs.nama.oninput = () => {
+  setCheck(checks.nama, inputs.nama.value.length >= 3, inputs.nama.value);
+  enableBtn();
+};
+
+inputs.telp.oninput = () => {
+  setCheck(checks.telp, inputs.telp.value.length >= 10, inputs.telp.value);
+  enableBtn();
+};
+
+inputs.alamat.oninput = () => {
+  setCheck(checks.alamat, inputs.alamat.value.length >= 5, inputs.alamat.value);
+  enableBtn();
+};
+
+inputs.email.oninput = () => {
+  setCheck(
+    checks.email,
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputs.email.value),
+    inputs.email.value
+  );
+  enableBtn();
+};
+
+inputs.password.oninput = () => {
+  setCheck(checks.password, inputs.password.value.length >= 8, inputs.password.value);
+  setCheck(checks.confirm, inputs.confirm.value === inputs.password.value, inputs.confirm.value);
+  enableBtn();
+};
+
+inputs.confirm.oninput = () => {
+  setCheck(checks.confirm, inputs.confirm.value === inputs.password.value, inputs.confirm.value);
+  enableBtn();
+};
 
 /* ================= SHOW ALL PASSWORD ================= */
 
-const showAllPass = document.getElementById("showAllPass");
-
-showAllPass.addEventListener("change", () => {
-  const type = showAllPass.checked ? "text" : "password";
+document.getElementById("showAllPass").addEventListener("change", function () {
+  const type = this.checked ? "text" : "password";
   inputs.password.type = type;
   inputs.confirm.type  = type;
 });
