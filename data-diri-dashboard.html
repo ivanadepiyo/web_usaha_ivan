@@ -20,12 +20,10 @@ button:hover { background:#15509c; }
 <header>Data Diri</header>
 <div class="container">
 <h2>Informasi Data Diri</h2>
-
 <div class="data-row"><div class="data-label">Nama:</div><div class="data-value" id="userNama"></div></div>
 <div class="data-row"><div class="data-label">Email:</div><div class="data-value" id="userEmail"></div></div>
 <div class="data-row"><div class="data-label">Nomor Telepon:</div><div class="data-value" id="userTelp"></div></div>
 <div class="data-row"><div class="data-label">Alamat:</div><div class="data-value" id="userAlamat"></div></div>
-
 <button onclick="window.location.href='dashboard.html'">Kembali ke Dashboard</button>
 </div>
 
@@ -45,11 +43,11 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-const userNama = document.getElementById("userNama");
-const userEmail = document.getElementById("userEmail");
-const userTelp = document.getElementById("userTelp");
-const userAlamat = document.getElementById("userAlamat");
+// Proteksi kode
+let kode = prompt("Masukkan kode akses untuk Data Diri:");
+if(kode !== "1234"){ alert("Kode salah!"); window.location.href="dashboard.html"; }
 
+// Ambil data user
 auth.onAuthStateChanged(async user=>{
   if(!user){ window.location.href="login.html"; return; }
   try{
