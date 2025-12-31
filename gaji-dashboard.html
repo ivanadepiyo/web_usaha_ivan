@@ -2,64 +2,34 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Daftar Gaji | Dashboard</title>
+<title>Daftar Gaji</title>
 <style>
 body{font-family:"Segoe UI",Arial,sans-serif;margin:0;background:#f0f2f5;min-height:100vh;}
 header{background:#1e3c72;color:white;padding:20px;text-align:center;font-size:24px;}
 .container{max-width:800px;margin:30px auto;background:white;border-radius:10px;padding:20px;box-shadow:0 10px 20px rgba(0,0,0,0.1);}
-input,button{padding:10px; border-radius:8px; border:1px solid #ccc; font-size:14px;}
-button{background:#1e3c72;color:white;border:none;cursor:pointer; transition:0.3s;}
+h2{text-align:center;color:#1e3c72;margin-bottom:20px;}
+.content{font-size:16px;color:#333;line-height:1.5;}
+button{display:block;margin:20px auto 0;padding:12px 20px;border:none;border-radius:8px;background:#1e3c72;color:white;font-weight:bold;cursor:pointer;}
 button:hover{background:#15509c;}
-#gajiContent{margin-top:20px;}
-#backBtn,#logoutBtn{margin:20px 10px;}
 </style>
 </head>
 <body>
-
 <header>Daftar Gaji</header>
 <div class="container">
-  <p>Masukkan kode untuk melihat gaji:</p>
-  <input type="password" id="kodeGaji" placeholder="Kode Gaji">
-  <button id="cekGaji">Cek</button>
-  <div id="gajiContent"></div>
-
-  <button id="backBtn">Kembali ke Dashboard</button>
-  <button id="logoutBtn">Logout</button>
+<h2>Informasi Gaji</h2>
+<div class="content">
+<p>Halaman daftar gaji karyawan. Hanya bisa diakses setelah login dan memasukkan kode di dashboard.</p>
+</div>
+<button onclick="window.location.href='dashboard.html'">Kembali ke Dashboard</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
-  authDomain: "web-usaha-ivan.firebaseapp.com",
-  projectId: "web-usaha-ivan",
-  storageBucket: "web-usaha-ivan.appspot.com",
-  messagingSenderId: "588839561784",
-  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
-};
+const firebaseConfig={apiKey:"AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",authDomain:"web-usaha-ivan.firebaseapp.com",projectId:"web-usaha-ivan",storageBucket:"web-usaha-ivan.appspot.com",messagingSenderId:"588839561784",appId:"1:588839561784:web:4accd7d9316a5a0ec5d4cd"};
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-
-const kodeAkses = "GAJI123";
-const gajiContent = document.getElementById("gajiContent");
-
-auth.onAuthStateChanged(user=>{
-  if(!user){ window.location.href="login.html"; }
-});
-
-document.getElementById("cekGaji").addEventListener("click",()=>{
-  const val=document.getElementById("kodeGaji").value;
-  if(val===kodeAkses){
-    gajiContent.innerHTML="<p>Gaji Staff IT: Rp 10.000.000</p><p>Gaji Manager: Rp 20.000.000</p>";
-  } else {
-    gajiContent.innerHTML="<p style='color:red'>Kode salah!</p>";
-  }
-});
-
-document.getElementById("backBtn").addEventListener("click",()=>window.location.href="dashboard.html");
-document.getElementById("logoutBtn").addEventListener("click",()=>auth.signOut().then(()=>window.location.href="login.html"));
+const auth=firebase.auth();
+auth.onAuthStateChanged(user=>{if(!user){window.location.href="login.html";}});
 </script>
 </body>
 </html>
