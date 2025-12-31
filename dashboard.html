@@ -4,34 +4,33 @@
 <meta charset="UTF-8">
 <title>Dashboard | Web Perusahaan</title>
 <style>
-  body { font-family: "Segoe UI", Arial, sans-serif; margin:0; background: #f0f2f5; min-height: 100vh; }
-  header { background: #1e3c72; color: white; padding: 20px; text-align: center; font-size: 24px; }
-  .container { max-width: 800px; margin: 30px auto; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); text-align: center; }
-  h2 { color: #1e3c72; margin-bottom: 30px; }
-  button { display: block; width: 200px; margin: 10px auto; padding: 12px; border: none; border-radius: 8px; background: #1e3c72; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 16px; }
-  button:hover { background: #15509c; }
-  #logoutBtn { background: #d9534f; }
-  #logoutBtn:hover { background: #c9302c; }
+body { font-family:"Segoe UI",Arial,sans-serif; margin:0; background:#f0f2f5; min-height:100vh; }
+header { background:#1e3c72; color:white; padding:20px; text-align:center; font-size:24px; }
+.container { max-width:600px; margin:30px auto; background:white; border-radius:10px; padding:20px; box-shadow:0 10px 20px rgba(0,0,0,0.1); text-align:center; }
+button { display:block; width:80%; margin:12px auto; padding:12px 20px; border:none; border-radius:8px; background:#1e3c72; color:white; font-weight:bold; cursor:pointer; font-size:16px; }
+button:hover { background:#15509c; }
+#logoutBtn { background:#d9534f; }
+#logoutBtn:hover { background:#c9302c; }
+input.code-input { display:none; padding:10px; font-size:16px; width:60%; margin:10px auto; border-radius:6px; border:1px solid #ccc; }
 </style>
 </head>
 <body>
-
 <header>Dashboard Web Perusahaan</header>
-
 <div class="container">
-  <h2>Pilih Halaman</h2>
-  <button onclick="window.location.href='DataDiri.html'">Data Diri</button>
-  <button onclick="aksesKode('Perusahaan.html')">Perusahaan</button>
-  <button onclick="aksesKode('Gaji.html')">Daftar Gaji</button>
-  <button onclick="aksesKode('Pekerjaan.html')">Pekerjaan</button>
+  <h2>Menu Akses</h2>
+  <button id="btnDataDiri">Data Diri</button>
+  <button id="btnPerusahaan">Perusahaan</button>
+  <button id="btnGaji">Daftar Gaji</button>
+  <button id="btnPekerjaan">Pekerjaan</button>
+
+  <input type="password" id="accessCode" class="code-input" placeholder="Masukkan Kode Akses">
+
   <button id="logoutBtn">Logout</button>
 </div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
@@ -44,28 +43,45 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-// Cek login user
-auth.onAuthStateChanged(user => {
-  if(!user){
-    window.location.href = "login.html";
-  }
+// Cek login
+auth.onAuthStateChanged(user=>{
+  if(!user) window.location.href="login.html";
 });
 
 // Logout
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  auth.signOut().then(() => window.location.href = "login.html");
+document.getElementById("logoutBtn").addEventListener("click", ()=>auth.signOut().then(()=>window.location.href="login.html"));
+
+// Tombol Data Diri
+document.getElementById("btnDataDiri").addEventListener("click", ()=>{
+  window.location.href="DataDiri.html";
 });
 
-// Fungsi akses dengan kode
-function aksesKode(halaman){
-  const kode = prompt("Masukkan kode akses:");
-  if(kode === "1234"){ // ganti kode sesuai kebutuhan
-    window.location.href = halaman;
-  } else {
-    alert("Kode salah! Tidak bisa membuka halaman.");
-  }
-}
-</script>
+// Tombol lain pakai kode akses
+const accessCodeInput = document.getElementById("accessCode");
+let targetPage = "";
 
+function requestCode(page){
+  targetPage = page;
+  accessCodeInput.value = "";
+  accessCodeInput.style.display="block";
+  accessCodeInput.focus();
+}
+
+document.getElementById("btnPerusahaan").addEventListener("click", ()=>requestCode("Perusahaan.html"));
+document.getElementById("btnGaji").addEventListener("click", ()=>requestCode("Gaji.html"));
+document.getElementById("btnPekerjaan").addEventListener("click", ()=>requestCode("Pekerjaan.html"));
+
+// Tekan Enter untuk submit kode
+accessCodeInput.addEventListener("keyup", function(e){
+  if(e.key==="Enter"){
+    if(accessCodeInput.value === "1234"){ // kode akses default
+      window.location.href = targetPage;
+    } else {
+      alert("Kode akses salah!");
+      accessCodeInput.value = "";
+    }
+  }
+});
+</script>
 </body>
 </html>
