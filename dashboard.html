@@ -18,13 +18,11 @@ button:hover { background:#15509c; }
 <header>Dashboard Web Perusahaan</header>
 <div class="container">
   <h2>Menu Akses</h2>
-
   <button id="btnDataDiri">Data Diri</button>
   <button id="btnPerusahaan">Perusahaan</button>
   <button id="btnGaji">Daftar Gaji</button>
   <button id="btnPekerjaan">Pekerjaan</button>
   <button id="btnKalkulator">Kalkulator</button>
-
   <button id="logoutBtn">Logout</button>
 </div>
 
@@ -52,29 +50,29 @@ document.getElementById("logoutBtn").addEventListener("click", ()=>{
   auth.signOut().then(()=>window.location.href="login.html");
 });
 
-// Tombol Data Diri
+// Data Diri
 document.getElementById("btnDataDiri").addEventListener("click", ()=>{
   window.location.href="DataDiri.html";
 });
 
-// Tombol Kalkulator
+// Kalkulator
 document.getElementById("btnKalkulator").addEventListener("click", ()=>{
   window.location.href="kalkulator.html";
 });
 
 // Tombol lain pakai kode akses
-function requestCode(pageName){
-  let kode = prompt("Masukkan Kode Akses untuk membuka halaman " + pageName);
-  if(kode === "1234"){ // ganti kode sesuai kebutuhan
-    window.location.href = pageName;
+function aksesKode(page){
+  let kode = prompt("Masukkan Kode Akses untuk membuka halaman ini:");
+  if(kode === "1234"){
+    window.location.href = page;
   } else if(kode !== null) {
     alert("Kode akses salah!");
   }
 }
 
-document.getElementById("btnPerusahaan").addEventListener("click", ()=>requestCode("Perusahaan.html"));
-document.getElementById("btnGaji").addEventListener("click", ()=>requestCode("Gaji.html"));
-document.getElementById("btnPekerjaan").addEventListener("click", ()=>requestCode("Pekerjaan.html"));
+document.getElementById("btnPerusahaan").addEventListener("click", ()=>aksesKode("Perusahaan.html"));
+document.getElementById("btnGaji").addEventListener("click", ()=>aksesKode("Gaji.html"));
+document.getElementById("btnPekerjaan").addEventListener("click", ()=>aksesKode("Pekerjaan.html"));
 </script>
 </body>
 </html>
