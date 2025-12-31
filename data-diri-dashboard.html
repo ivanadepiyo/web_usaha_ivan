@@ -2,71 +2,25 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Data Diri | Dashboard</title>
+<title>Daftar Gaji</title>
 <style>
-body{font-family:"Segoe UI",Arial,sans-serif;margin:0;background:#f0f2f5;min-height:100vh;}
-header{background:#1e3c72;color:white;padding:20px;text-align:center;font-size:24px;}
-.container{max-width:800px;margin:30px auto;background:white;border-radius:10px;padding:20px;box-shadow:0 10px 20px rgba(0,0,0,0.1);}
-.data-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee;}
-.data-label{font-weight:bold;color:#555;}
-.data-value{color:#333;}
-#backBtn,#logoutBtn{display:inline-block;margin:20px 10px;padding:10px 20px;background:#1e3c72;color:white;border:none;border-radius:8px;cursor:pointer;}
-#backBtn:hover,#logoutBtn:hover{background:#15509c;}
+body { font-family:"Segoe UI",Arial,sans-serif; margin:0; background:#f0f2f5; min-height:100vh; }
+header { background:#1e3c72; color:white; padding:20px; text-align:center; font-size:24px; }
+.container { max-width:800px; margin:30px auto; background:white; border-radius:10px; padding:20px; box-shadow:0 10px 20px rgba(0,0,0,0.1); }
+h2 { text-align:center; color:#1e3c72; margin-bottom:20px; }
+.content { font-size:16px; color:#333; line-height:1.5; }
+button { display:block; margin:20px auto 0; padding:12px 20px; border:none; border-radius:8px; background:#1e3c72; color:white; font-weight:bold; cursor:pointer; }
+button:hover { background:#15509c; }
 </style>
 </head>
 <body>
-<header>Data Diri User</header>
-
+<header>Daftar Gaji</header>
 <div class="container">
-  <div class="data-row"><div class="data-label">Nama:</div><div class="data-value" id="userNama"></div></div>
-  <div class="data-row"><div class="data-label">Email:</div><div class="data-value" id="userEmail"></div></div>
-  <div class="data-row"><div class="data-label">Nomor Telepon:</div><div class="data-value" id="userTelp"></div></div>
-  <div class="data-row"><div class="data-label">Alamat:</div><div class="data-value" id="userAlamat"></div></div>
-
-  <button id="backBtn">Kembali ke Dashboard</button>
-  <button id="logoutBtn">Logout</button>
+<h2>Informasi Gaji</h2>
+<div class="content">
+  <p>Halaman daftar gaji karyawan. Hanya bisa diakses setelah memasukkan kode di dashboard.</p>
 </div>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
-  authDomain: "web-usaha-ivan.firebaseapp.com",
-  projectId: "web-usaha-ivan",
-  storageBucket: "web-usaha-ivan.appspot.com",
-  messagingSenderId: "588839561784",
-  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-const userNama=document.getElementById("userNama");
-const userEmail=document.getElementById("userEmail");
-const userTelp=document.getElementById("userTelp");
-const userAlamat=document.getElementById("userAlamat");
-const backBtn=document.getElementById("backBtn");
-const logoutBtn=document.getElementById("logoutBtn");
-
-// Cek user login
-auth.onAuthStateChanged(async user=>{
-  if(!user){ window.location.href="login.html"; return; }
-  try{
-    const doc = await db.collection("users").doc(user.uid).get();
-    if(doc.exists){
-      const data=doc.data();
-      userNama.textContent=data.nama||"-";
-      userEmail.textContent=data.email||"-";
-      userTelp.textContent=data.telp||"-";
-      userAlamat.textContent=data.alamat||"-";
-    }else{ alert("Data user tidak ditemukan!"); }
-  }catch(err){ alert("Gagal ambil data: "+err.message); }
-});
-
-backBtn.addEventListener("click",()=>window.location.href="dashboard.html");
-logoutBtn.addEventListener("click",()=>auth.signOut().then(()=>window.location.href="login.html"));
-</script>
+<button onclick="window.location.href='dashboard.html'">Kembali ke Dashboard</button>
+</div>
 </body>
 </html>
