@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard | Web Perusahaan</title>
 <style>
 body { font-family:"Segoe UI",Arial,sans-serif; margin:0; background:#f0f2f5; min-height:100vh; }
@@ -11,29 +12,24 @@ button { display:block; width:80%; margin:12px auto; padding:12px 20px; border:n
 button:hover { background:#15509c; }
 #logoutBtn { background:#d9534f; }
 #logoutBtn:hover { background:#c9302c; }
-#codeNotif { display:none; background:#fff3cd; color:#856404; padding:10px 15px; border-radius:6px; margin:10px auto; width:80%; border:1px solid #ffeeba; }
-input.code-input { display:none; padding:10px; font-size:16px; width:60%; margin:10px auto; border-radius:6px; border:1px solid #ccc; }
 </style>
 </head>
 <body>
 <header>Dashboard Web Perusahaan</header>
 <div class="container">
   <h2>Menu Akses</h2>
+
   <button id="btnDataDiri">Data Diri</button>
   <button id="btnPerusahaan">Perusahaan</button>
-  <button id="btnGaji">Gaji</button>
+  <button id="btnGaji">Daftar Gaji</button>
   <button id="btnPekerjaan">Pekerjaan</button>
   <button id="btnKalkulator">Kalkulator</button>
-
-  <div id="codeNotif">Masukkan kode akses untuk membuka halaman ini</div>
-  <input type="password" id="accessCode" class="code-input" placeholder="Masukkan Kode Akses">
 
   <button id="logoutBtn">Logout</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
@@ -52,40 +48,33 @@ auth.onAuthStateChanged(user=>{
 });
 
 // Logout
-document.getElementById("logoutBtn").addEventListener("click", ()=>auth.signOut().then(()=>window.location.href="login.html"));
+document.getElementById("logoutBtn").addEventListener("click", ()=>{
+  auth.signOut().then(()=>window.location.href="login.html");
+});
 
-// Tombol Data Diri & Kalkulator tanpa kode
-document.getElementById("btnDataDiri").addEventListener("click", ()=> window.location.href="DataDiri.html");
-document.getElementById("btnKalkulator").addEventListener("click", ()=> window.location.href="kalkulator.html");
+// Tombol Data Diri
+document.getElementById("btnDataDiri").addEventListener("click", ()=>{
+  window.location.href="DataDiri.html";
+});
+
+// Tombol Kalkulator
+document.getElementById("btnKalkulator").addEventListener("click", ()=>{
+  window.location.href="kalkulator.html";
+});
 
 // Tombol lain pakai kode akses
-const accessCodeInput = document.getElementById("accessCode");
-const codeNotif = document.getElementById("codeNotif");
-let targetPage = "";
-
-function requestCode(page){
-  targetPage = page;
-  accessCodeInput.value = "";
-  codeNotif.style.display="block";
-  accessCodeInput.style.display="block";
-  accessCodeInput.focus();
+function requestCode(pageName){
+  let kode = prompt("Masukkan Kode Akses untuk membuka halaman " + pageName);
+  if(kode === "1234"){ // ganti kode sesuai kebutuhan
+    window.location.href = pageName;
+  } else if(kode !== null) {
+    alert("Kode akses salah!");
+  }
 }
 
 document.getElementById("btnPerusahaan").addEventListener("click", ()=>requestCode("Perusahaan.html"));
 document.getElementById("btnGaji").addEventListener("click", ()=>requestCode("Gaji.html"));
 document.getElementById("btnPekerjaan").addEventListener("click", ()=>requestCode("Pekerjaan.html"));
-
-// Submit kode akses dengan Enter
-accessCodeInput.addEventListener("keyup", function(e){
-  if(e.key==="Enter"){
-    if(accessCodeInput.value === "1234"){ // kode akses default
-      window.location.href = targetPage;
-    } else {
-      alert("Kode akses salah!");
-      accessCodeInput.value = "";
-    }
-  }
-});
 </script>
 </body>
 </html>
