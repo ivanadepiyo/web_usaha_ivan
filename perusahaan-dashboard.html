@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <title>Perusahaan</title>
 <style>
-body { font-family:"Segoe UI",Arial,sans-serif; margin:0; background:#f0f2f5; min-height:100vh; }
-header { background:#1e3c72; color:white; padding:20px; text-align:center; font-size:24px; }
-.container { max-width:800px; margin:30px auto; background:white; border-radius:10px; padding:20px; box-shadow:0 10px 20px rgba(0,0,0,0.1); }
-h2 { text-align:center; color:#1e3c72; margin-bottom:20px; }
-.content { font-size:16px; color:#333; line-height:1.5; }
-button { display:block; margin:20px auto 0; padding:12px 20px; border:none; border-radius:8px; background:#1e3c72; color:white; font-weight:bold; cursor:pointer; }
-button:hover { background:#15509c; }
+body{font-family:"Segoe UI",Arial,sans-serif;margin:0;background:#f0f2f5;min-height:100vh;}
+header{background:#1e3c72;color:white;padding:20px;text-align:center;font-size:24px;}
+.container{max-width:800px;margin:30px auto;background:white;border-radius:10px;padding:20px;box-shadow:0 10px 20px rgba(0,0,0,0.1);}
+h2{text-align:center;color:#1e3c72;margin-bottom:20px;}
+.content{font-size:16px;color:#333;line-height:1.5;}
+button{display:block;margin:20px auto 0;padding:12px 20px;border:none;border-radius:8px;background:#1e3c72;color:white;font-weight:bold;cursor:pointer;}
+button:hover{background:#15509c;}
 </style>
 </head>
 <body>
@@ -18,10 +18,18 @@ button:hover { background:#15509c; }
 <div class="container">
 <h2>Informasi Perusahaan</h2>
 <div class="content">
-  <p>Ini adalah halaman perusahaan. Hanya bisa diakses dengan kode dari dashboard.</p>
-  <p>Isi data perusahaan dapat ditampilkan di sini.</p>
+<p>Halaman perusahaan. Hanya bisa diakses setelah login dan memasukkan kode di dashboard.</p>
 </div>
 <button onclick="window.location.href='dashboard.html'">Kembali ke Dashboard</button>
 </div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",authDomain:"web-usaha-ivan.firebaseapp.com",projectId:"web-usaha-ivan",storageBucket:"web-usaha-ivan.appspot.com",messagingSenderId:"588839561784",appId:"1:588839561784:web:4accd7d9316a5a0ec5d4cd"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+auth.onAuthStateChanged(user=>{if(!user){window.location.href="login.html";}});
+</script>
 </body>
 </html>
