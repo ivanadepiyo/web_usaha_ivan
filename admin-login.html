@@ -1,112 +1,160 @@
 <!DOCTYPE html>
 <html lang="id">
+
+<!-- ================================================= -->
+<!-- =============== HEAD / META ===================== -->
+<!-- ================================================= -->
 <head>
-  <meta charset="UTF-8">
-  <title>Login Admin | Web Perusahaan</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    /* RESET DASAR */
-    .page-login * {
-      box-sizing: border-box;
-      font-family: "Segoe UI", Arial, sans-serif;
-    }
+<meta charset="UTF-8">
+<title>Login Admin | Web Perusahaan</title>
 
-    body.page-login {
-      margin: 0;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #333;
-    }
+<!-- ================================================= -->
+<!-- ======================= CSS ===================== -->
+<!-- ================================================= -->
+<style>
 
-    .page-login .card {
-      background: #ffffff;
-      width: 100%;
-      max-width: 380px;
-      padding: 30px;
-      border-radius: 14px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-      text-align: center;
-    }
+  /* ================= GLOBAL ================= */
+  * {
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+  }
 
-    .page-login .card h2 {
-      margin-bottom: 20px;
-      color: #1e3c72;
-    }
+  /* Background halaman */
+  body.page-login.auth {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+  }
 
-    .page-login input {
-      width: 100%;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 15px;
-    }
+  /* ================= CARD ================= */
+  .card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 380px;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    text-align: center;
+  }
 
-    .page-login input:focus {
-      outline: none;
-      border-color: #2a5298;
-      box-shadow: 0 0 0 2px rgba(42,82,152,0.2);
-    }
+  .card h2 {
+    margin-bottom: 20px;
+    color: #1e3c72;
+  }
 
-    .page-login button {
-      width: 100%;
-      padding: 12px;
-      background: #1e3c72;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+  /* ================= INPUT ================= */
+  .input-group {
+    margin-bottom: 14px;
+    text-align: left;
+  }
 
-    .page-login button:hover {
-      background: #2a5298;
-    }
+  input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+  }
 
-    .page-login a {
-      color: #2a5298;
-      text-decoration: none;
-      font-size: 14px;
-    }
+  input:focus {
+    outline: none;
+    border-color: #2a5298;
+    box-shadow: 0 0 0 2px rgba(42,82,152,0.2);
+  }
 
-    .page-login a:hover {
-      text-decoration: underline;
-    }
+  /* ================= BUTTON ================= */
+  button {
+    width: 100%;
+    padding: 12px;
+    background: #1e3c72;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+  }
 
-    #msg {
-      margin-top: 10px;
-      font-size: 14px;
-      color: red;
-    }
+  button:hover {
+    background: #2a5298;
+  }
 
-    @media (max-width: 480px) {
-      body.page-login .card {
-        margin: 20px;
-        padding: 24px;
-      }
+  /* ================= LINK ================= */
+  a {
+    display: inline-block;
+    margin-top: 10px;
+    color: #2a5298;
+    text-decoration: none;
+    font-size: 14px;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  /* ================= MESSAGE ================= */
+  #msg {
+    margin-top: 10px;
+    font-size: 14px;
+    color: red;
+  }
+
+  /* ================= RESPONSIVE ================= */
+  @media (max-width: 480px) {
+    .card {
+      margin: 20px;
+      padding: 24px;
     }
-  </style>
+  }
+
+</style>
 </head>
+
+<!-- ================================================= -->
+<!-- ======================= HTML ==================== -->
+<!-- ================================================= -->
 <body class="page-login auth">
 
-  <div class="card">
-    <h2>Login Admin</h2>
+<!-- Card Login Admin -->
+<div class="card">
 
+  <h2>Login Admin</h2>
+
+  <!-- Input Email Admin -->
+  <div class="input-group">
     <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
-
-    <button onclick="adminLogin()">Login</button>
-    <br><a href="lupa-password.html">Lupa Password?</a>
-
-    <p id="msg"></p>
   </div>
 
-  <script src="firebase-init.js"></script>
-  <script src="auth.js"></script>
+  <!-- Input Password Admin -->
+  <div class="input-group">
+    <input id="password" type="password" placeholder="Password">
+  </div>
+
+  <!-- Tombol Login -->
+  <button onclick="adminLogin()">Login</button>
+
+  <!-- Link Lupa Password -->
+  <a href="lupa-password.html">Lupa Password?</a>
+
+  <!-- Pesan Status -->
+  <p id="msg"></p>
+
+</div>
+
+<!-- ================================================= -->
+<!-- ======================= JS ====================== -->
+<!-- ================================================= -->
+
+<!-- Firebase Init -->
+<script src="firebase-init.js"></script>
+
+<!-- Auth Logic -->
+<script src="auth.js"></script>
+
 </body>
 </html>
