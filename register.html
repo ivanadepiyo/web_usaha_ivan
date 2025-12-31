@@ -39,7 +39,7 @@ body.page-login.auth {
 
 input {
   width: 100%;
-  padding: 12px 14px;
+  padding: 12px 36px 12px 14px; /* ruang untuk ✔ ✖ */
   border-radius: 8px;
   border: 1px solid #ccc;
 }
@@ -50,31 +50,25 @@ input:focus {
   box-shadow: 0 0 0 2px rgba(42,82,152,.2);
 }
 
-/* ================= INDIKATOR ================= */
+/* ================= INDIKATOR ✔ ✖ ================= */
 .check {
   display: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
   position: absolute;
-  right: 10px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  animation: fadeIn .3s ease, pulse 1s ease;
+  font-size: 16px;
+  font-weight: bold;
+  pointer-events: none;
+  animation: fadeIn .2s ease;
 }
 
-.green { background: green; }
-.red   { background: red; }
+.check.valid { color: #2ecc71; }
+.check.invalid { color: #e74c3c; }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(.6); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
-@keyframes pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(0,0,0,.4); }
-  70%  { box-shadow: 0 0 0 6px rgba(0,0,0,0); }
-  100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+  from { opacity: 0; transform: translateY(-50%) scale(.7); }
+  to   { opacity: 1; transform: translateY(-50%) scale(1); }
 }
 
 /* ================= NOTE ================= */
@@ -82,6 +76,7 @@ input:focus {
   font-size: 12px;
   color: #555;
   margin-top: 4px;
+  text-align: left;
 }
 
 /* ================= BUTTON ================= */
@@ -98,6 +93,19 @@ button {
 
 button:disabled {
   background: #888;
+  cursor: not-allowed;
+}
+
+/* ===== HILANGKAN ICON MATA BAWAAN BROWSER ===== */
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none !important;
+}
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+input[type="password"] {
+  appearance: none;
 }
 </style>
 </head>
@@ -139,7 +147,6 @@ button:disabled {
     <div class="note">Minimal 8 karakter, huruf besar di awal, angka/simbol</div>
   </div>
 
-  <!-- ================= SHOW PASSWORD ================= -->
   <div style="margin:10px 0; text-align:left;">
     <input type="checkbox" id="showAllPass">
     <label for="showAllPass">Lihat semua kata sandi</label>
@@ -149,37 +156,35 @@ button:disabled {
 </div>
 
 <script>
-/* ================= ELEMENT ================= */
-
 const inputs = {
-  nama: document.getElementById("nama"),
-  telp: document.getElementById("telp"),
-  alamat: document.getElementById("alamat"),
-  email: document.getElementById("email"),
-  password: document.getElementById("password"),
-  confirm: document.getElementById("confirm"),
+  nama: nama,
+  telp: telp,
+  alamat: alamat,
+  email: email,
+  password: password,
+  confirm: confirm
 };
 
 const checks = {
-  nama: document.getElementById("namaCheck"),
-  telp: document.getElementById("telpCheck"),
-  alamat: document.getElementById("alamatCheck"),
-  email: document.getElementById("emailCheck"),
-  password: document.getElementById("passwordCheck"),
-  confirm: document.getElementById("confirmCheck"),
+  nama: namaCheck,
+  telp: telpCheck,
+  alamat: alamatCheck,
+  email: emailCheck,
+  password: passwordCheck,
+  confirm: confirmCheck
 };
 
-const btn = document.getElementById("registerBtn");
+const btn = registerBtn;
 
-/* ================= HELPER ================= */
-
+/* ===== helper indikator ===== */
 function setCheck(el, valid, value) {
   if (!value.trim()) {
     el.style.display = "none";
     return;
   }
-  el.style.display = "inline-block";
-  el.className = "check " + (valid ? "green" : "red");
+  el.style.display = "inline";
+  el.textContent = valid ? "✔" : "✖";
+  el.className = "check " + (valid ? "valid" : "invalid");
 }
 
 function enableBtn() {
@@ -193,8 +198,7 @@ function enableBtn() {
   );
 }
 
-/* ================= REAL-TIME VALIDATION ================= */
-
+/* ===== realtime validation ===== */
 inputs.nama.oninput = () => {
   setCheck(checks.nama, inputs.nama.value.length >= 3, inputs.nama.value);
   enableBtn();
@@ -211,8 +215,7 @@ inputs.alamat.oninput = () => {
 };
 
 inputs.email.oninput = () => {
-  setCheck(
-    checks.email,
+  setCheck(checks.email,
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputs.email.value),
     inputs.email.value
   );
@@ -230,13 +233,12 @@ inputs.confirm.oninput = () => {
   enableBtn();
 };
 
-/* ================= SHOW ALL PASSWORD ================= */
-
-document.getElementById("showAllPass").addEventListener("change", function () {
+/* ===== show password ===== */
+showAllPass.onchange = function () {
   const type = this.checked ? "text" : "password";
   inputs.password.type = type;
-  inputs.confirm.type  = type;
-});
+  inputs.confirm.type = type;
+};
 </script>
 
 </body>
