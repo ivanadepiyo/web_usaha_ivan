@@ -1,202 +1,104 @@
 <!DOCTYPE html>
 <html lang="id">
-
-<!-- ================================================= -->
-<!-- =============== HEAD / META ===================== -->
-<!-- ================================================= -->
 <head>
 <meta charset="UTF-8">
 <title>Login | Web Perusahaan</title>
-
-<!-- ================================================= -->
-<!-- ======================= CSS ===================== -->
-<!-- ================================================= -->
 <style>
-
-  /* ================= GLOBAL ================= */
-  * {
-    box-sizing: border-box;
-    font-family: "Segoe UI", Arial, sans-serif;
-  }
-
-  /* Background halaman */
-  body.page-login.auth {
-    margin: 0;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  /* ================= CARD ================= */
-  .card {
-    background: #ffffff;
-    width: 100%;
-    max-width: 380px;
-    padding: 30px;
-    border-radius: 14px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    text-align: center;
-  }
-
-  .card h1 {
-    margin-bottom: 20px;
-    color: #1e3c72;
-  }
-
-  /* ================= INPUT ================= */
-  .input-group {
-    position: relative;
-    margin-bottom: 14px;
-    text-align: left;
-  }
-
-  input {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 15px;
-  }
-
-  input:focus {
-    outline: none;
-    border-color: #2a5298;
-    box-shadow: 0 0 0 2px rgba(42,82,152,0.2);
-  }
-
-  /* ================= NOTE ================= */
-  .note {
-    font-size: 12px;
-    color: #555;
-    margin-top: 4px;
-  }
-
-  /* ================= BUTTON ================= */
-  button {
-    width: 100%;
-    padding: 12px;
-    background: #1e3c72;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background: #2a5298;
-  }
-
-  /* ================= LINK ================= */
-  .links {
-    margin-top: 15px;
-    font-size: 14px;
-  }
-
-  .links a {
-    color: #2a5298;
-    text-decoration: none;
-  }
-
-  /* ================= MESSAGE ================= */
-  #msg {
-    margin-top: 10px;
-    font-size: 14px;
-    color: red;
-  }
-
+* { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+body.page-login.auth { margin:0; min-height:100vh; background: linear-gradient(135deg, #1e3c72, #2a5298); display:flex; justify-content:center; align-items:center; }
+.card { background:#fff; width:100%; max-width:380px; padding:30px; border-radius:14px; box-shadow:0 20px 40px rgba(0,0,0,0.2); text-align:center; }
+.card h1 { margin-bottom:20px; color:#1e3c72; }
+.input-group { position:relative; margin-bottom:14px; text-align:left; }
+input { width:100%; padding:12px 14px; border-radius:8px; border:1px solid #ccc; font-size:15px; }
+input:focus { outline:none; border-color:#2a5298; box-shadow:0 0 0 2px rgba(42,82,152,0.2); }
+.note { font-size:12px; color:#555; margin-top:4px; }
+button { width:100%; padding:12px; background:#1e3c72; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; }
+button:hover { background:#2a5298; }
+.links { margin-top:15px; font-size:14px; }
+.links a { color:#2a5298; text-decoration:none; }
+#msg { margin-top:10px; font-size:14px; color:red; }
 </style>
 </head>
-
-<!-- ================================================= -->
-<!-- ======================= HTML ==================== -->
-<!-- ================================================= -->
 <body class="page-login auth">
 
-<!-- Card Login -->
 <div class="card">
   <h1>Login</h1>
 
-  <!-- Input Email -->
   <div class="input-group">
     <input type="email" id="email" placeholder="Email">
     <div class="note">Masukkan email terdaftar</div>
   </div>
 
-  <!-- Input Password -->
   <div class="input-group">
     <input type="password" id="password" placeholder="Password">
     <div class="note">Password akun Anda</div>
   </div>
 
-  <!-- Link lupa password -->
   <a href="lupa-password.html">Lupa Password?</a><br><br>
 
-  <!-- Tombol Login -->
   <button id="loginBtn">Masuk</button>
 
-  <!-- Navigasi -->
   <div class="links">
     <a href="register.html">Daftar Akun</a><br>
     <a href="admin-login.html">Login Admin</a>
   </div>
 
-  <!-- Pesan Status -->
   <p id="msg"></p>
 </div>
 
-<!-- ================================================= -->
-<!-- ======================= JS ====================== -->
-<!-- ================================================= -->
-
-<!-- Firebase -->
-<script src="firebase.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
+  authDomain: "web-usaha-ivan.firebaseapp.com",
+  projectId: "web-usaha-ivan",
+  storageBucket: "web-usaha-ivan.appspot.com",
+  messagingSenderId: "588839561784",
+  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
-  /* ================= AUTH ================= */
-  const auth = firebase.auth();
+// ELEMENTS
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const loginBtn = document.getElementById("loginBtn");
+const msg = document.getElementById("msg");
 
-  /* Ambil elemen input */
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
-  const loginBtn = document.getElementById("loginBtn");
-  const msg = document.getElementById("msg");
+// LOGIN LOGIC
+loginBtn.addEventListener("click", async () => {
+  msg.textContent = "";
 
-  /* ================= LOGIN LOGIC ================= */
-  loginBtn.addEventListener("click", async () => {
-    msg.textContent = "";
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
 
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
+  if (!email || !password) {
+    msg.textContent = "Email dan password harus diisi!";
+    return;
+  }
 
-    if (!email || !password) {
-      msg.textContent = "Email dan password harus diisi!";
+  try {
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+
+    if (!user.emailVerified) {
+      msg.textContent = "Silahkan verifikasi email terlebih dahulu!";
+      await auth.signOut();
       return;
     }
 
-    try {
-      const userCredential =
-        await auth.signInWithEmailAndPassword(email, password);
+    // login sukses → redirect ke dashboard
+    window.location.href = "dashboard.html";
 
-      const user = userCredential.user;
-
-      if (!user.emailVerified) {
-        msg.textContent = "Silahkan verifikasi email terlebih dahulu!";
-        await auth.signOut();
-        return;
-      }
-
-      window.location.href = "dashboard.html";
-
-    } catch (err) {
-      msg.textContent = err.message;
-    }
-  });
-
+  } catch (err) {
+    msg.textContent = err.message;
+  }
+});
 </script>
 
 </body>
