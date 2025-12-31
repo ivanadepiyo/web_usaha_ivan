@@ -5,34 +5,47 @@
 <title>Login | Web Perusahaan</title>
 <style>
 * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+
 body.page-login.auth { margin:0; min-height:100vh; background: linear-gradient(135deg, #1e3c72, #2a5298); display:flex; justify-content:center; align-items:center; }
-.card { background:#fff; width:100%; max-width:380px; padding:30px; border-radius:14px; box-shadow:0 20px 40px rgba(0,0,0,0.2); text-align:center; }
-.card h1 { margin-bottom:20px; color:#1e3c72; }
+
+.card { background:#fff; width:100%; max-width:350px; 
+padding:30px; border-radius:14px; box-shadow:0 20px 40px 
+rgba(0,0,0,0.2); text-align:center; }
+.card h1 { margin-bottom:30px; color:#1e3c72; }
+
 .input-group { position:relative; margin-bottom:14px; text-align:left; }
-input { width:100%; padding:12px 14px; border-radius:8px; border:1px solid #ccc; font-size:15px; }
+input { width:100%; padding:12px 14px; border-radius:8px;
+border:1px solid #ccc; font-size:12px; }
 input:focus { outline:none; border-color:#2a5298; box-shadow:0 0 0 2px rgba(42,82,152,0.2); }
-.note { font-size:12px; color:#555; margin-top:4px; }
-button { width:100%; padding:12px; background:#1e3c72; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; }
+
+.note { font-size:10px; color:#555; margin-top:4px; }
+
+button {  margin-top:-20px; width:90%; padding:8px; background:#1e3c72; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; }
 button:hover { background:#2a5298; }
-.links { margin-top:15px; font-size:14px; }
+
+.links { margin-top:8px; font-size:12px; }
 .links a { color:#2a5298; text-decoration:none; }
-#msg { margin-top:10px; font-size:14px; color:red; }
+
+#msg { margin-top:10px; font-size:10px; color:red; }
 </style>
 </head>
+
 <body class="page-login auth">
 
 <div class="card">
   <h1>Login</h1>
 
   <div class="input-group">
+<div class="note">Masukkan email terdaftar</div>
     <input type="email" id="email" placeholder="Email">
-    <div class="note">Masukkan email terdaftar</div>
   </div>
 
   <div class="input-group">
-    <input type="password" id="password" placeholder="Password">
-    <div class="note">Password akun Anda</div>
-  </div>
+  <div class="note">Password akun Anda</div>
+  <input type="password" id="password" placeholder="Password">
+  <span id="togglePass" style="position:absolute; right:12px; top:38px; cursor:pointer; font-size:14px; user-select:none;"></span>
+</div>
+
 
   <a href="lupa-password.html">Lupa Password?</a><br><br>
 
@@ -81,6 +94,17 @@ loginBtn.addEventListener("click", async () => {
     msg.textContent = "Email dan password harus diisi!";
     return;
   }
+
+const togglePass = document.getElementById("togglePass");
+togglePass.addEventListener("click", () => {
+  if(passwordInput.type === "password"){
+    passwordInput.type = "text";
+    togglePass.textContent = "🙈"; // ikon berubah saat terlihat
+  } else {
+    passwordInput.type = "password";
+    togglePass.textContent = "👁️"; // ikon mata kembali
+  }
+});
 
   try {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
