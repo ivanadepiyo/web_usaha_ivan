@@ -7,15 +7,18 @@
 body { font-family:"Segoe UI",Arial,sans-serif; margin:0; background:#f0f2f5; min-height:100vh; }
 header { background:#1e3c72; color:white; padding:20px; text-align:center; font-size:24px; }
 .container { max-width:600px; margin:30px auto; background:white; border-radius:10px; padding:20px; box-shadow:0 10px 20px rgba(0,0,0,0.1); text-align:center; }
-button { display:block; width:80%; margin:12px auto; padding:12px 20px; border:none; border-radius:8px; background:#1e3c72; color:white; font-weight:bold; cursor:pointer; font-size:16px; }
+button { display:block; width:80%; margin:12px auto; padding:12px 20px; border:none; border-radius:8px; background:#1e3c72; color:white; font-weight:bold; cursor:pointer; font-size:16px; transition:0.3s; }
 button:hover { background:#15509c; }
 #logoutBtn { background:#d9534f; }
 #logoutBtn:hover { background:#c9302c; }
 input.code-input { display:none; padding:10px; font-size:16px; width:60%; margin:10px auto; border-radius:6px; border:1px solid #ccc; }
+#codeNotif { color:red; font-size:14px; margin-top:5px; }
 </style>
 </head>
 <body>
+
 <header>Dashboard Web Perusahaan</header>
+
 <div class="container">
   <h2>Menu Akses</h2>
   <button id="btnDataDiri">Data Diri</button>
@@ -24,6 +27,7 @@ input.code-input { display:none; padding:10px; font-size:16px; width:60%; margin
   <button id="btnPekerjaan">Pekerjaan</button>
 
   <input type="password" id="accessCode" class="code-input" placeholder="Masukkan Kode Akses">
+  <div id="codeNotif"></div>
 
   <button id="logoutBtn">Logout</button>
 </div>
@@ -51,18 +55,20 @@ auth.onAuthStateChanged(user=>{
 // Logout
 document.getElementById("logoutBtn").addEventListener("click", ()=>auth.signOut().then(()=>window.location.href="login.html"));
 
-// Tombol Data Diri
+// Tombol Data Diri (langsung akses)
 document.getElementById("btnDataDiri").addEventListener("click", ()=>{
   window.location.href="DataDiri.html";
 });
 
 // Tombol lain pakai kode akses
 const accessCodeInput = document.getElementById("accessCode");
+const codeNotif = document.getElementById("codeNotif");
 let targetPage = "";
 
 function requestCode(page){
   targetPage = page;
   accessCodeInput.value = "";
+  codeNotif.textContent = "";
   accessCodeInput.style.display="block";
   accessCodeInput.focus();
 }
@@ -73,15 +79,19 @@ document.getElementById("btnPekerjaan").addEventListener("click", ()=>requestCod
 
 // Tekan Enter untuk submit kode
 accessCodeInput.addEventListener("keyup", function(e){
-  if(e.key==="Enter"){
+  if(e.key === "Enter"){
     if(accessCodeInput.value === "1234"){ // kode akses default
+      accessCodeInput.style.display = "none";
+      codeNotif.textContent = "";
       window.location.href = targetPage;
     } else {
-      alert("Kode akses salah!");
+      codeNotif.textContent = "Kode akses salah!";
       accessCodeInput.value = "";
+      accessCodeInput.focus();
     }
   }
 });
 </script>
+
 </body>
 </html>
