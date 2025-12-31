@@ -1,31 +1,75 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard | Web Perusahaan</title>
-  <style>
-    body { font-family: "Segoe UI", Arial, sans-serif; margin: 0; background: #f0f2f5; min-height: 100vh; }
-    header { background: #1e3c72; color: white; padding: 20px; text-align: center; font-size: 24px; }
-    .container { max-width: 800px; margin: 30px auto; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-    h2 { text-align: center; color: #1e3c72; margin-bottom: 20px; }
-    .data-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
-    .data-label { font-weight: bold; color: #555; }
-    .data-value { color: #333; }
-    #logoutBtn { display: block; width: 150px; margin: 30px auto 0; padding: 12px; background: #d9534f; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-    #logoutBtn:hover { background: #c9302c; }
-    @media (max-width: 600px) { .data-row { flex-direction: column; align-items: flex-start; } .data-value { margin-top: 5px; } }
-  </style>
+<meta charset="UTF-8">
+<title>Dashboard | Web Perusahaan</title>
+<style>
+body { font-family: "Segoe UI", Arial, sans-serif; margin:0; background:#f0f2f5; min-height:100vh; }
+header { background:#1e3c72; color:white; padding:20px; text-align:center; font-size:24px; }
+.container { max-width:900px; margin:30px auto; background:white; border-radius:10px; padding:20px; box-shadow:0 10px 20px rgba(0,0,0,0.1); }
+h2 { text-align:center; color:#1e3c72; margin-bottom:20px; }
+
+.tabs { display:flex; gap:10px; margin-bottom:20px; justify-content:center; }
+.tab { padding:10px 20px; border-radius:8px; cursor:pointer; background:#ddd; transition:0.3s; }
+.tab.active { background:#1e3c72; color:white; }
+
+.section { display:none; }
+.section.active { display:block; }
+
+.data-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee; }
+.data-label { font-weight:bold; color:#555; }
+.data-value { color:#333; }
+
+#logoutBtn { display:block; width:150px; margin:30px auto 0; padding:12px; background:#d9534f; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; transition:0.3s; }
+#logoutBtn:hover { background:#c9302c; }
+
+@media (max-width:600px) { .data-row { flex-direction:column; align-items:flex-start; } .data-value { margin-top:5px; } }
+</style>
 </head>
 <body>
 
 <header>Dashboard Web Perusahaan</header>
 
 <div class="container">
-  <h2>Data Diri & Perusahaan</h2>
-  <div class="data-row"><div class="data-label">Nama:</div><div class="data-value" id="userNama"></div></div>
-  <div class="data-row"><div class="data-label">Email:</div><div class="data-value" id="userEmail"></div></div>
-  <div class="data-row"><div class="data-label">Nomor Telepon:</div><div class="data-value" id="userTelp"></div></div>
-  <div class="data-row"><div class="data-label">Alamat:</div><div class="data-value" id="userAlamat"></div></div>
+  <div class="tabs">
+    <div class="tab active" data-target="dataDiri">Data Diri</div>
+    <div class="tab" data-target="perusahaan">Perusahaan</div>
+    <div class="tab" data-target="gaji">Daftar Gaji</div>
+    <div class="tab" data-target="pekerjaan">Pekerjaan</div>
+  </div>
+
+  <!-- Data Diri Section -->
+  <div class="section active" id="dataDiri">
+    <h2>Data Diri User</h2>
+    <div class="data-row"><div class="data-label">Nama:</div><div class="data-value" id="userNama"></div></div>
+    <div class="data-row"><div class="data-label">Email:</div><div class="data-value" id="userEmail"></div></div>
+    <div class="data-row"><div class="data-label">Nomor Telepon:</div><div class="data-value" id="userTelp"></div></div>
+    <div class="data-row"><div class="data-label">Alamat:</div><div class="data-value" id="userAlamat"></div></div>
+  </div>
+
+  <!-- Perusahaan Section -->
+  <div class="section" id="perusahaan">
+    <h2>Informasi Perusahaan</h2>
+    <p>Isi daftar perusahaan / info perusahaan di sini...</p>
+  </div>
+
+  <!-- Daftar Gaji Section -->
+  <div class="section" id="gaji">
+    <h2>Daftar Gaji</h2>
+    <p>Masukkan kode akses untuk melihat gaji:</p>
+    <input type="password" id="kodeGaji" placeholder="Masukkan kode" />
+    <button id="cekGaji">Cek Gaji</button>
+    <div id="gajiContent" style="margin-top:10px;"></div>
+  </div>
+
+  <!-- Pekerjaan Section -->
+  <div class="section" id="pekerjaan">
+    <h2>Pekerjaan</h2>
+    <p>Masukkan kode akses untuk melihat pekerjaan:</p>
+    <input type="password" id="kodeKerja" placeholder="Masukkan kode" />
+    <button id="cekKerja">Cek Pekerjaan</button>
+    <div id="kerjaContent" style="margin-top:10px;"></div>
+  </div>
 
   <button id="logoutBtn">Logout</button>
 </div>
@@ -36,52 +80,88 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
-    authDomain: "web-usaha-ivan.firebaseapp.com",
-    projectId: "web-usaha-ivan",
-    storageBucket: "web-usaha-ivan.appspot.com",
-    messagingSenderId: "588839561784",
-    appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
+  authDomain: "web-usaha-ivan.firebaseapp.com",
+  projectId: "web-usaha-ivan",
+  storageBucket: "web-usaha-ivan.appspot.com",
+  messagingSenderId: "588839561784",
+  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-  const userNama = document.getElementById("userNama");
-  const userEmail = document.getElementById("userEmail");
-  const userTelp = document.getElementById("userTelp");
-  const userAlamat = document.getElementById("userAlamat");
-  const logoutBtn = document.getElementById("logoutBtn");
+const userNama = document.getElementById("userNama");
+const userEmail = document.getElementById("userEmail");
+const userTelp = document.getElementById("userTelp");
+const userAlamat = document.getElementById("userAlamat");
+const logoutBtn = document.getElementById("logoutBtn");
 
-  // Cek user login
-  auth.onAuthStateChanged(async user => {
-    if(!user){
-      window.location.href = "login.html";
-      return;
+// Cek user login
+auth.onAuthStateChanged(async user => {
+  if(!user){
+    window.location.href = "login.html";
+    return;
+  }
+
+  try {
+    const doc = await db.collection("users").doc(user.uid).get();
+    if(doc.exists){
+      const data = doc.data();
+      userNama.textContent = data.nama || "-";
+      userEmail.textContent = data.email || "-";
+      userTelp.textContent = data.telp || "-";
+      userAlamat.textContent = data.alamat || "-";
+    } else {
+      alert("Data user tidak ditemukan!");
     }
+  } catch(err){
+    alert("Gagal mengambil data user: " + err.message);
+  }
+});
 
-    try {
-      const doc = await db.collection("users").doc(user.uid).get();
-      if(doc.exists){
-        const data = doc.data();
-        userNama.textContent = data.nama || "-";
-        userEmail.textContent = data.email || "-";
-        userTelp.textContent = data.telp || "-";
-        userAlamat.textContent = data.alamat || "-";
-      } else {
-        alert("Data user tidak ditemukan!");
-      }
-    } catch(err){
-      alert("Gagal mengambil data user: " + err.message);
-    }
-  });
+// Logout
+logoutBtn.addEventListener("click", () => {
+  auth.signOut().then(() => window.location.href = "login.html");
+});
 
-  // Logout
-  logoutBtn.addEventListener("click", () => {
-    auth.signOut().then(() => window.location.href = "login.html");
+// ================== TAB NAVIGATION ==================
+const tabs = document.querySelectorAll(".tab");
+const sections = document.querySelectorAll(".section");
+tabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    tabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    sections.forEach(sec => sec.classList.remove("active"));
+    document.getElementById(tab.dataset.target).classList.add("active");
   });
+});
+
+// ================== KODE AKSES DAFTAR GAJI ==================
+const kodeGaji = "1234"; // contoh kode
+document.getElementById("cekGaji").addEventListener("click", () => {
+  const val = document.getElementById("kodeGaji").value;
+  const konten = document.getElementById("gajiContent");
+  if(val === kodeGaji){
+    konten.innerHTML = "<p>Gaji: Rp 10.000.000</p>"; // contoh data
+  } else {
+    konten.innerHTML = "<p style='color:red'>Kode salah!</p>";
+  }
+});
+
+// ================== KODE AKSES PEKERJAAN ==================
+const kodeKerja = "5678"; // contoh kode
+document.getElementById("cekKerja").addEventListener("click", () => {
+  const val = document.getElementById("kodeKerja").value;
+  const konten = document.getElementById("kerjaContent");
+  if(val === kodeKerja){
+    konten.innerHTML = "<p>Pekerjaan: Staff IT</p>"; // contoh data
+  } else {
+    konten.innerHTML = "<p style='color:red'>Kode salah!</p>";
+  }
+});
 </script>
 
 </body>
