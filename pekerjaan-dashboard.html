@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Pekerjaan | Dashboard</title>
+<style>
+body{font-family:"Segoe UI",Arial,sans-serif;margin:0;background:#f0f2f5;min-height:100vh;}
+header{background:#1e3c72;color:white;padding:20px;text-align:center;font-size:24px;}
+.container{max-width:800px;margin:30px auto;background:white;border-radius:10px;padding:20px;box-shadow:0 10px 20px rgba(0,0,0,0.1);}
+input,button{padding:10px; border-radius:8px; border:1px solid #ccc; font-size:14px;}
+button{background:#1e3c72;color:white;border:none;cursor:pointer; transition:0.3s;}
+button:hover{background:#15509c;}
+#kerjaContent{margin-top:20px;}
+#backBtn,#logoutBtn{margin:20px 10px;}
+</style>
+</head>
+<body>
+
+<header>Pekerjaan</header>
+<div class="container">
+  <p>Masukkan kode untuk melihat pekerjaan:</p>
+  <input type="password" id="kodeKerja" placeholder="Kode Pekerjaan">
+  <button id="cekKerja">Cek</button>
+  <div id="kerjaContent"></div>
+
+  <button id="backBtn">Kembali ke Dashboard</button>
+  <button id="logoutBtn">Logout</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
+  authDomain: "web-usaha-ivan.firebaseapp.com",
+  projectId: "web-usaha-ivan",
+  storageBucket: "web-usaha-ivan.appspot.com",
+  messagingSenderId: "588839561784",
+  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+const kodeAkses = "KERJA123";
+const kerjaContent = document.getElementById("kerjaContent");
+
+auth.onAuthStateChanged(user=>{
+  if(!user){ window.location.href="login.html"; }
+});
+
+document.getElementById("cekKerja").addEventListener("click",()=>{
+  const val=document.getElementById("kodeKerja").value;
+  if(val===kodeAkses){
+    kerjaContent.innerHTML="<p>Pekerjaan Staff IT: Mengelola server dan jaringan</p><p>Pekerjaan Manager: Mengawasi tim</p>";
+  } else {
+    kerjaContent.innerHTML="<p style='color:red'>Kode salah!</p>";
+  }
+});
+
+document.getElementById("backBtn").addEventListener("click",()=>window.location.href="dashboard.html");
+document.getElementById("logoutBtn").addEventListener("click",()=>auth.signOut().then(()=>window.location.href="login.html"));
+</script>
+</body>
+</html>
