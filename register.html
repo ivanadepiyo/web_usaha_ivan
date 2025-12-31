@@ -115,10 +115,13 @@ showPass.onchange = e => { const t = e.target.checked?"text":"password"; passwor
 
 /* REGISTER USER */
 btn.addEventListener("click", async ()=>{
-  msg.textContent = "";
+  msg.textContent="";
   try {
+    // Buat akun baru
     const userCredential = await auth.createUserWithEmailAndPassword(email.value, password.value);
     const user = userCredential.user;
+
+    // Simpan data tambahan di Firestore
     await db.collection("users").doc(user.uid).set({
       nama: nama.value,
       telp: telp.value,
@@ -126,7 +129,12 @@ btn.addEventListener("click", async ()=>{
       email: email.value,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    await user.sendEmailVerification(); // KIRIM EMAIL VERIFIKASI
+
+    // Kirim email verifikasi
+    await user.sendEmailVerification({
+      url: window.location.origin + '/login.html' // redirect setelah verifikasi
+    });
+
     msg.style.color="green";
     msg.textContent="Akun berhasil dibuat! Silahkan cek email untuk verifikasi.";
     setTimeout(()=> window.location.href="login.html", 3000);
