@@ -12,9 +12,16 @@ button { display:block; width:80%; margin:12px auto; padding:12px 20px; border:n
 button:hover { background:#15509c; }
 #logoutBtn { background:#d9534f; }
 #logoutBtn:hover { background:#c9302c; }
+
+/* Modal Kode Akses */
+.modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); justify-content:center; align-items:center; }
+.modal-content { background:white; padding:20px; border-radius:10px; text-align:center; width:300px; }
+.modal-content input { width:80%; padding:10px; margin-top:10px; border-radius:6px; border:1px solid #ccc; font-size:16px; }
+.modal-content button { margin-top:15px; }
 </style>
 </head>
 <body>
+
 <header>Dashboard Web Perusahaan</header>
 <div class="container">
   <h2>Menu Akses</h2>
@@ -23,7 +30,17 @@ button:hover { background:#15509c; }
   <button id="btnGaji">Daftar Gaji</button>
   <button id="btnPekerjaan">Pekerjaan</button>
   <button id="btnKalkulator">Kalkulator</button>
+  <button id="btnBukuCatatan">Buku Catatan</button>
   <button id="logoutBtn">Logout</button>
+</div>
+
+<!-- Modal Kode Akses -->
+<div id="modalKode" class="modal">
+  <div class="modal-content">
+    <h3>Masukkan Kode Akses</h3>
+    <input type="password" id="inputKode" placeholder="Kode Akses">
+    <button id="submitKode">Buka Halaman</button>
+  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -50,29 +67,44 @@ document.getElementById("logoutBtn").addEventListener("click", ()=>{
   auth.signOut().then(()=>window.location.href="login.html");
 });
 
-// Data Diri
-document.getElementById("btnDataDiri").addEventListener("click", ()=>{
-  window.location.href="DataDiri.html";
-});
+// Halaman langsung
+document.getElementById("btnDataDiri").addEventListener("click", ()=>{ window.location.href="DataDiri.html"; });
+document.getElementById("btnKalkulator").addEventListener("click", ()=>{ window.location.href="kalkulator.html"; });
+document.getElementById("btnBukuCatatan").addEventListener("click", ()=>{ window.location.href="BukuCatatan.html"; });
 
-// Kalkulator
-document.getElementById("btnKalkulator").addEventListener("click", ()=>{
-  window.location.href="kalkulator.html";
-});
+// Modal Kode Akses
+const modal = document.getElementById("modalKode");
+const inputKode = document.getElementById("inputKode");
+const submitKode = document.getElementById("submitKode");
+let targetPage = "";
 
-// Tombol lain pakai kode akses
-function aksesKode(page){
-  let kode = prompt("Masukkan Kode Akses untuk membuka halaman ini:");
-  if(kode === "1234"){
-    window.location.href = page;
-  } else if(kode !== null) {
-    alert("Kode akses salah!");
-  }
+// Fungsi buka modal
+function bukaModal(page){
+  targetPage = page;
+  inputKode.value = "";
+  modal.style.display = "flex";
+  inputKode.focus();
 }
 
-document.getElementById("btnPerusahaan").addEventListener("click", ()=>aksesKode("Perusahaan.html"));
-document.getElementById("btnGaji").addEventListener("click", ()=>aksesKode("Gaji.html"));
-document.getElementById("btnPekerjaan").addEventListener("click", ()=>aksesKode("Pekerjaan.html"));
+// Tombol dengan kode akses
+document.getElementById("btnPerusahaan").addEventListener("click", ()=>bukaModal("Perusahaan.html"));
+document.getElementById("btnGaji").addEventListener("click", ()=>bukaModal("Gaji.html"));
+document.getElementById("btnPekerjaan").addEventListener("click", ()=>bukaModal("Pekerjaan.html"));
+
+// Submit kode
+submitKode.addEventListener("click", ()=>{
+  if(inputKode.value === "1234"){
+    window.location.href = targetPage;
+  } else {
+    alert("Kode akses salah!");
+  }
+  modal.style.display = "none";
+});
+
+// Tutup modal jika klik luar
+window.addEventListener("click", e=>{
+  if(e.target === modal) modal.style.display = "none";
+});
 </script>
 </body>
 </html>
