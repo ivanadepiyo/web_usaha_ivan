@@ -3,74 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <title>Daftar Akun</title>
-
 <style>
 * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
-body { margin: 0; min-height: 100vh; background: linear-gradient(135deg, #1e3c72, #2a5298); display: flex; justify-content: center; align-items: center; padding: 20px; }
-.card { background: #fff; width: 100%; max-width: 460px; padding: 26px 22px; border-radius: 14px; box-shadow: 0 20px 40px rgba(0,0,0,.25); }
-h2 { text-align: center; margin-bottom: 20px; }
-.input-group { position: relative; margin-bottom: 16px; }
-.input-group input { width: 100%; height: 44px; padding: 0 48px 0 14px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; }
-.input-group input:focus { outline: none; border-color: #2a5298; box-shadow: 0 0 0 2px rgba(42,82,152,.15); }
-.check { position: absolute; right: 12px; top: 0; height: 44px; width: 32px; display: none; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; line-height: 1; pointer-events: none; }
-.check.valid { color: #2ecc71; }
-.check.invalid { color: #e74c3c; }
-.note { font-size: 12px; color: #666; margin-top: 6px; }
-.show-pass { display: flex; align-items: center; gap: 8px; margin: 6px 0 14px; font-size: 14px; }
-button { width: 100%; padding: 12px; border: none; border-radius: 8px; background: #1e3c72; color: #fff; font-weight: bold; cursor: pointer; }
-button:disabled { background: #9aa0a6; cursor: not-allowed; }
-input[type="password"]::-webkit-textfield-decoration-container { display: none !important; }
-input[type="password"]::-ms-reveal, input[type="password"]::-ms-clear { display: none; }
-input[type="password"] { appearance: none; }
+body { margin:0; min-height:100vh; background:linear-gradient(135deg,#1e3c72,#2a5298); display:flex; justify-content:center; align-items:center; padding:20px; }
+.card { background:#fff; width:100%; max-width:460px; padding:26px 22px; border-radius:14px; box-shadow:0 20px 40px rgba(0,0,0,.25); }
+h2 { text-align:center; margin-bottom:20px; }
+.input-group { position:relative; margin-bottom:16px; }
+.input-group input { width:100%; height:44px; padding:0 48px 0 14px; border-radius:8px; border:1px solid #ccc; font-size:14px; }
+.input-group input:focus { outline:none; border-color:#2a5298; box-shadow:0 0 0 2px rgba(42,82,152,.15); }
+.check { position:absolute; right:12px; top:0; height:44px; width:32px; display:none; align-items:center; justify-content:center; font-size:15px; font-weight:700; line-height:1; pointer-events:none; }
+.check.valid { color:#2ecc71; }
+.check.invalid { color:#e74c3c; }
+.note { font-size:12px; color:#666; margin-top:6px; }
+.show-pass { display:flex; align-items:center; gap:8px; margin:6px 0 14px; font-size:14px; }
+button { width:100%; padding:12px; border:none; border-radius:8px; background:#1e3c72; color:#fff; font-weight:bold; cursor:pointer; }
+button:disabled { background:#9aa0a6; cursor:not-allowed; }
+input[type="password"]::-webkit-textfield-decoration-container { display:none !important; }
+input[type="password"]::-ms-reveal, input[type="password"]::-ms-clear { display:none; }
+input[type="password"] { appearance:none; }
 </style>
 </head>
-
 <body>
-
 <div class="card">
   <h2>Daftar Akun</h2>
-
   <div class="input-group">
     <input id="nama" placeholder="Nama">
     <span class="check" id="namaCheck"></span>
   </div>
-
   <div class="input-group">
     <input id="telp" placeholder="Nomor Telepon" inputmode="numeric">
     <span class="check" id="telpCheck"></span>
   </div>
-
   <div class="input-group">
     <input id="alamat" placeholder="Alamat">
     <span class="check" id="alamatCheck"></span>
   </div>
-
   <div class="input-group">
     <input id="email" placeholder="Email">
     <span class="check" id="emailCheck"></span>
     <div class="note">Gunakan email valid</div>
   </div>
-
   <div class="input-group">
     <input id="password" type="password" placeholder="Password">
     <span class="check" id="passwordCheck"></span>
   </div>
-
   <div class="input-group">
     <input id="confirm" type="password" placeholder="Konfirmasi Password">
     <span class="check" id="confirmCheck"></span>
     <div class="note">Min 8 karakter, huruf besar, huruf kecil, angka & simbol</div>
   </div>
-
   <div class="show-pass">
     <input type="checkbox" id="showPass">
     <label for="showPass">Lihat semua password</label>
   </div>
-
   <button id="btn" disabled>Simpan</button>
+  <p id="msg" style="margin-top:10px;font-size:14px;"></p>
 </div>
 
-<!-- Firebase SDK -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -98,6 +88,7 @@ const password = document.getElementById("password");
 const confirm = document.getElementById("confirm");
 const btn = document.getElementById("btn");
 const showPass = document.getElementById("showPass");
+const msg = document.getElementById("msg");
 
 /* ONLY NUMBER TELP */
 telp.addEventListener("input", ()=>{ telp.value = telp.value.replace(/[^0-9]/g,''); });
@@ -120,33 +111,30 @@ function validate(){
 document.querySelectorAll("input").forEach(i=>i.addEventListener("input",validate));
 
 /* SHOW PASSWORD TOGGLE */
-showPass.onchange = e => {
-  const t = e.target.checked?"text":"password";
-  password.type = confirm.type = t;
-};
+showPass.onchange = e => { const t = e.target.checked?"text":"password"; password.type = confirm.type = t; };
 
-/* FIREBASE REGISTER */
-btn.addEventListener("click", ()=>{
-  const emailVal = email.value;
-  const passVal = password.value;
-  auth.createUserWithEmailAndPassword(emailVal, passVal)
-    .then(userCredential=>{
-      const user = userCredential.user;
-      // simpan data tambahan di Firestore
-      db.collection("users").doc(user.uid).set({
-        nama: nama.value,
-        telp: telp.value,
-        alamat: alamat.value,
-        email: email.value
-      });
-      alert("Akun berhasil dibuat! Silahkan login.");
-      window.location.href = "login.html"; // redirect ke login
-    })
-    .catch(error=>{
-      alert(error.message);
+/* REGISTER USER */
+btn.addEventListener("click", async ()=>{
+  msg.textContent = "";
+  try {
+    const userCredential = await auth.createUserWithEmailAndPassword(email.value, password.value);
+    const user = userCredential.user;
+    await db.collection("users").doc(user.uid).set({
+      nama: nama.value,
+      telp: telp.value,
+      alamat: alamat.value,
+      email: email.value,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
+    await user.sendEmailVerification(); // KIRIM EMAIL VERIFIKASI
+    msg.style.color="green";
+    msg.textContent="Akun berhasil dibuat! Silahkan cek email untuk verifikasi.";
+    setTimeout(()=> window.location.href="login.html", 3000);
+  } catch(error){
+    msg.style.color="red";
+    msg.textContent=error.message;
+  }
 });
 </script>
-
 </body>
 </html>
