@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Dashboard | Web Perusahaan</title>
-  <link rel="stylesheet" href="style.css">
   <style>
     body { font-family: "Segoe UI", Arial, sans-serif; margin: 0; background: #f0f2f5; min-height: 100vh; }
     header { background: #1e3c72; color: white; padding: 20px; text-align: center; font-size: 24px; }
@@ -19,47 +18,71 @@
 </head>
 <body>
 
-  <header>Dashboard Web Perusahaan</header>
+<header>Dashboard Web Perusahaan</header>
 
-  <div class="container">
-    <h2>Data Diri & Perusahaan</h2>
-    <div class="data-row"><div class="data-label">Nama:</div><div class="data-value" id="userNama"></div></div>
-    <div class="data-row"><div class="data-label">Email:</div><div class="data-value" id="userEmail"></div></div>
-    <div class="data-row"><div class="data-label">Nomor Telepon:</div><div class="data-value" id="userTelp"></div></div>
-    <div class="data-row"><div class="data-label">Alamat:</div><div class="data-value" id="userAlamat"></div></div>
+<div class="container">
+  <h2>Data Diri & Perusahaan</h2>
+  <div class="data-row"><div class="data-label">Nama:</div><div class="data-value" id="userNama"></div></div>
+  <div class="data-row"><div class="data-label">Email:</div><div class="data-value" id="userEmail"></div></div>
+  <div class="data-row"><div class="data-label">Nomor Telepon:</div><div class="data-value" id="userTelp"></div></div>
+  <div class="data-row"><div class="data-label">Alamat:</div><div class="data-value" id="userAlamat"></div></div>
 
-    <button id="logoutBtn">Logout</button>
-  </div>
+  <button id="logoutBtn">Logout</button>
+</div>
 
-  <script src="firebase.js"></script>
-  <script>
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const userNama = document.getElementById("userNama");
-    const userEmail = document.getElementById("userEmail");
-    const userTelp = document.getElementById("userTelp");
-    const userAlamat = document.getElementById("userAlamat");
-    const logoutBtn = document.getElementById("logoutBtn");
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-    auth.onAuthStateChanged(async user => {
-      if(!user){
-        window.location.href = "login.html";
-        return;
+<script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
+    authDomain: "web-usaha-ivan.firebaseapp.com",
+    projectId: "web-usaha-ivan",
+    storageBucket: "web-usaha-ivan.appspot.com",
+    messagingSenderId: "588839561784",
+    appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  const userNama = document.getElementById("userNama");
+  const userEmail = document.getElementById("userEmail");
+  const userTelp = document.getElementById("userTelp");
+  const userAlamat = document.getElementById("userAlamat");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  // Cek user login
+  auth.onAuthStateChanged(async user => {
+    if(!user){
+      window.location.href = "login.html";
+      return;
+    }
+
+    try {
+      const doc = await db.collection("users").doc(user.uid).get();
+      if(doc.exists){
+        const data = doc.data();
+        userNama.textContent = data.nama || "-";
+        userEmail.textContent = data.email || "-";
+        userTelp.textContent = data.telp || "-";
+        userAlamat.textContent = data.alamat || "-";
+      } else {
+        alert("Data user tidak ditemukan!");
       }
-      try{
-        const doc = await db.collection("users").doc(user.uid).get();
-        if(doc.exists){
-          const data = doc.data();
-          userNama.textContent = data.nama || "-";
-          userEmail.textContent = data.email || "-";
-          userTelp.textContent = data.telp || "-";
-          userAlamat.textContent = data.alamat || "-";
-        }
-      } catch(err){ alert("Gagal mengambil data user: " + err.message); }
-    });
+    } catch(err){
+      alert("Gagal mengambil data user: " + err.message);
+    }
+  });
 
-    logoutBtn.addEventListener("click", ()=> auth.signOut().then(()=> window.location.href="login.html"));
-  </script>
+  // Logout
+  logoutBtn.addEventListener("click", () => {
+    auth.signOut().then(() => window.location.href = "login.html");
+  });
+</script>
 
 </body>
 </html>
