@@ -2,101 +2,115 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Daftar Akun | Web Perusahaan</title>
+<title>Daftar Akun</title>
 
 <style>
-/* ================= GLOBAL ================= */
 * {
   box-sizing: border-box;
   font-family: "Segoe UI", Arial, sans-serif;
 }
 
-body.page-login.auth {
+body {
   margin: 0;
   min-height: 100vh;
   background: linear-gradient(135deg, #1e3c72, #2a5298);
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px;
 }
 
-/* ================= CARD ================= */
+/* ===== CARD ===== */
 .card {
   background: #fff;
-  width: 90%;
-  max-width: 480px;
-  padding: 30px 25px;
+  width: 100%;
+  max-width: 460px;
+  padding: 26px 22px;
   border-radius: 14px;
-  box-shadow: 0 20px 40px rgba(0,0,0,.2);
-  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,.25);
 }
 
-/* ================= INPUT ================= */
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* ===== INPUT ===== */
 .input-group {
   position: relative;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
-input {
+.input-group input {
   width: 100%;
-  padding: 12px 36px 12px 14px; /* ruang untuk ✔ ✖ */
+  height: 44px;
+  padding: 0 48px 0 14px; /* padding kanan ditambah supaya icon tidak nabrak */
   border-radius: 8px;
   border: 1px solid #ccc;
+  font-size: 14px;
 }
 
-input:focus {
-  border-color: #2a5298;
+.input-group input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(42,82,152,.2);
+  border-color: #2a5298;
+  box-shadow: 0 0 0 2px rgba(42,82,152,.15);
 }
 
-/* ================= INDIKATOR ✔ ✖ ================= */
+/* ===== INDIKATOR (TENGAH SEMPURNA) ===== */
 .check {
-  display: none;
   position: absolute;
   right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 16px;
-  font-weight: bold;
+  top: 0;
+  height: 44px;   /* sama dengan tinggi input */
+  width: 32px;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
   pointer-events: none;
-  animation: fadeIn .2s ease;
 }
 
 .check.valid { color: #2ecc71; }
 .check.invalid { color: #e74c3c; }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-50%) scale(.7); }
-  to   { opacity: 1; transform: translateY(-50%) scale(1); }
-}
-
-/* ================= NOTE ================= */
+/* ===== NOTE ===== */
 .note {
   font-size: 12px;
-  color: #555;
-  margin-top: 4px;
-  text-align: left;
+  color: #666;
+  margin-top: 6px;
 }
 
-/* ================= BUTTON ================= */
+/* ===== CHECKBOX ===== */
+.show-pass {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 14px;
+  font-size: 14px;
+}
+
+/* ===== BUTTON ===== */
 button {
   width: 100%;
   padding: 12px;
-  background: #1e3c72;
-  color: #fff;
   border: none;
   border-radius: 8px;
+  background: #1e3c72;
+  color: #fff;
   font-weight: bold;
   cursor: pointer;
 }
 
 button:disabled {
-  background: #888;
+  background: #9aa0a6;
   cursor: not-allowed;
 }
 
-/* ===== HILANGKAN ICON MATA BAWAAN BROWSER ===== */
+/* ===== HILANGKAN ICON MATA ===== */
 input[type="password"]::-webkit-textfield-decoration-container {
   display: none !important;
 }
@@ -110,134 +124,125 @@ input[type="password"] {
 </style>
 </head>
 
-<body class="page-login auth">
+<body>
 
 <div class="card">
   <h2>Daftar Akun</h2>
 
   <div class="input-group">
     <input id="nama" placeholder="Nama">
-    <span id="namaCheck" class="check"></span>
+    <span class="check" id="namaCheck"></span>
   </div>
 
   <div class="input-group">
-    <input id="telp" placeholder="Nomor Telepon">
-    <span id="telpCheck" class="check"></span>
+    <input id="telp" placeholder="Nomor Telepon" inputmode="numeric">
+    <span class="check" id="telpCheck"></span>
   </div>
 
   <div class="input-group">
     <input id="alamat" placeholder="Alamat">
-    <span id="alamatCheck" class="check"></span>
+    <span class="check" id="alamatCheck"></span>
   </div>
 
   <div class="input-group">
     <input id="email" placeholder="Email">
-    <span id="emailCheck" class="check"></span>
+    <span class="check" id="emailCheck"></span>
     <div class="note">Gunakan email valid</div>
   </div>
 
   <div class="input-group">
     <input id="password" type="password" placeholder="Password">
-    <span id="passwordCheck" class="check"></span>
+    <span class="check" id="passwordCheck"></span>
   </div>
 
   <div class="input-group">
     <input id="confirm" type="password" placeholder="Konfirmasi Password">
-    <span id="confirmCheck" class="check"></span>
-    <div class="note">Minimal 8 karakter, huruf besar di awal, angka/simbol</div>
+    <span class="check" id="confirmCheck"></span>
+     <div class="note">
+      Min 8 karakter, huruf besar, huruf kecil, angka & simbol
+    </div>
   </div>
 
-  <div style="margin:10px 0; text-align:left;">
-    <input type="checkbox" id="showAllPass">
-    <label for="showAllPass">Lihat semua kata sandi</label>
+  <div class="show-pass">
+    <input type="checkbox" id="showPass">
+    <label for="showPass">Lihat semua password</label>
   </div>
 
-  <button id="registerBtn" disabled>Simpan</button>
+  <button id="btn" disabled>Simpan</button>
 </div>
 
 <script>
-const inputs = {
-  nama: nama,
-  telp: telp,
-  alamat: alamat,
-  email: email,
-  password: password,
-  confirm: confirm
-};
+const nama = document.getElementById("nama");
+const telp = document.getElementById("telp");
+const alamat = document.getElementById("alamat");
+const email = document.getElementById("email");
+const password = document.getElementById("password");
+const confirm = document.getElementById("confirm");
+const btn = document.getElementById("btn");
+const showPass = document.getElementById("showPass");
 
-const checks = {
-  nama: namaCheck,
-  telp: telpCheck,
-  alamat: alamatCheck,
-  email: emailCheck,
-  password: passwordCheck,
-  confirm: confirmCheck
-};
+/* ===== ONLY NUMBER (TELP) ===== */
+telp.addEventListener("input", () => {
+  telp.value = telp.value.replace(/[^0-9]/g, "");
+});
 
-const btn = registerBtn;
-
-/* ===== helper indikator ===== */
-function setCheck(el, valid, value) {
-  if (!value.trim()) {
-    el.style.display = "none";
-    return;
-  }
-  el.style.display = "inline";
-  el.textContent = valid ? "✔" : "✖";
-  el.className = "check " + (valid ? "valid" : "invalid");
+/* ===== HELPER ===== */
+function show(el, ok) {
+  el.style.display = "flex";
+  el.textContent = ok ? "✔" : "✖";
+  el.className = "check " + (ok ? "valid" : "invalid");
 }
 
-function enableBtn() {
+function hide(el) {
+  el.style.display = "none";
+}
+
+function validPassword(v) {
+  return (
+    v.length >= 8 &&
+    /[A-Z]/.test(v) &&
+    /[a-z]/.test(v) &&
+    /[0-9]/.test(v) &&
+    /[^A-Za-z0-9]/.test(v)
+  );
+}
+
+/* ===== VALIDASI ===== */
+function validate() {
+  nama.value ? show(namaCheck, nama.value.length >= 3) : hide(namaCheck);
+  telp.value ? show(telpCheck, telp.value.length >= 10) : hide(telpCheck);
+  alamat.value ? show(alamatCheck, alamat.value.length >= 5) : hide(alamatCheck);
+
+  email.value
+    ? show(emailCheck, /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value))
+    : hide(emailCheck);
+
+  password.value
+    ? show(passwordCheck, validPassword(password.value))
+    : hide(passwordCheck);
+
+  confirm.value
+    ? show(confirmCheck, confirm.value === password.value)
+    : hide(confirmCheck);
+
   btn.disabled = !(
-    inputs.nama.value.length >= 3 &&
-    inputs.telp.value.length >= 10 &&
-    inputs.alamat.value.length >= 5 &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputs.email.value) &&
-    inputs.password.value.length >= 8 &&
-    inputs.password.value === inputs.confirm.value
+    nama.value.length >= 3 &&
+    telp.value.length >= 10 &&
+    alamat.value.length >= 5 &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value) &&
+    validPassword(password.value) &&
+    confirm.value === password.value
   );
 }
 
-/* ===== realtime validation ===== */
-inputs.nama.oninput = () => {
-  setCheck(checks.nama, inputs.nama.value.length >= 3, inputs.nama.value);
-  enableBtn();
-};
+document.querySelectorAll("input").forEach(i =>
+  i.addEventListener("input", validate)
+);
 
-inputs.telp.oninput = () => {
-  setCheck(checks.telp, inputs.telp.value.length >= 10, inputs.telp.value);
-  enableBtn();
-};
-
-inputs.alamat.oninput = () => {
-  setCheck(checks.alamat, inputs.alamat.value.length >= 5, inputs.alamat.value);
-  enableBtn();
-};
-
-inputs.email.oninput = () => {
-  setCheck(checks.email,
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputs.email.value),
-    inputs.email.value
-  );
-  enableBtn();
-};
-
-inputs.password.oninput = () => {
-  setCheck(checks.password, inputs.password.value.length >= 8, inputs.password.value);
-  setCheck(checks.confirm, inputs.confirm.value === inputs.password.value, inputs.confirm.value);
-  enableBtn();
-};
-
-inputs.confirm.oninput = () => {
-  setCheck(checks.confirm, inputs.confirm.value === inputs.password.value, inputs.confirm.value);
-  enableBtn();
-};
-
-/* ===== show password ===== */
-showAllPass.onchange = function () {
-  const type = this.checked ? "text" : "password";
-  inputs.password.type = type;
-  inputs.confirm.type = type;
+/* ===== SHOW PASSWORD ===== */
+showPass.onchange = e => {
+  const t = e.target.checked ? "text" : "password";
+  password.type = confirm.type = t;
 };
 </script>
 
