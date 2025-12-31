@@ -199,5 +199,16 @@ inputs.password.oninput = () => { setCheck(checks.password, inputs.password.valu
 inputs.confirm.oninput = () => { setCheck(checks.confirm, inputs.confirm.value===inputs.password.value, inputs.confirm.value); enableBtn(); };
 </script>
 
+/* ================= SHOW ALL PASSWORD ================= */
+
+const showAllPass = document.getElementById("showAllPass");
+
+showAllPass.addEventListener("change", () => {
+  const type = showAllPass.checked ? "text" : "password";
+  inputs.password.type = type;
+  inputs.confirm.type  = type;
+});
+</script>
+
 </body>
 </html>
