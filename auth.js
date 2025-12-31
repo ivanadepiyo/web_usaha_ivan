@@ -8,7 +8,7 @@ const db = firebase.firestore();
 /* ================================================= */
 /* ================= REGISTER ====================== */
 /* ================================================= */
-document.getElementById("registerBtn")?.addEventListener("click", async () => {
+document.getElementById("btn")?.addEventListener("click", async () => {
   const nama = document.getElementById("nama").value.trim();
   const email = document.getElementById("email").value.trim();
   const telp = document.getElementById("telp").value.trim();
@@ -54,8 +54,10 @@ document.getElementById("registerBtn")?.addEventListener("click", async () => {
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // Kirim email verifikasi
-    await user.sendEmailVerification();
+    // Kirim email verifikasi dengan redirect ke login.html
+    await user.sendEmailVerification({
+      url: window.location.origin + '/login.html'
+    });
 
     msg.style.color = "green";
     msg.textContent = "Akun berhasil dibuat! Silahkan cek email untuk verifikasi.";
@@ -63,6 +65,7 @@ document.getElementById("registerBtn")?.addEventListener("click", async () => {
     setTimeout(() => window.location.href = "login.html", 3000);
 
   } catch (err) {
+    msg.style.color = "red";
     msg.textContent = "Gagal mendaftar: " + err.message;
   }
 });
@@ -103,7 +106,7 @@ document.getElementById("loginBtn")?.addEventListener("click", async () => {
 /* ================= RESET PASSWORD ================= */
 /* ================================================= */
 function resetPassword() {
-  const email = document.getElementById("email").value.trim();
+  const email = document.getElementById("email")?.value.trim();
   if (!email) {
     alert("Masukkan email terlebih dahulu!");
     return;
@@ -127,7 +130,6 @@ document.getElementById("logoutBtn")?.addEventListener("click", async () => {
 /* ================================================= */
 auth.onAuthStateChanged(async (user) => {
   if (location.pathname.includes("dashboard")) {
-
     if (!user) {
       window.location.href = "login.html";
       return;
