@@ -1,0 +1,132 @@
+
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BukuCatatan</title>
+
+<style>
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(120deg, #6a11cb, #2575fc);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    width: 500px;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 30px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+}
+
+h2 {
+    text-align: center;
+}
+
+textarea {
+    width: 95%;
+    height: 120px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #aaa;
+    font-size: 16px;
+    outline: none;
+}
+
+button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    background: #2575fc;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #1a5fd4;
+}
+
+.note {
+    background: #f3f3f3;
+    padding: 80px;
+    margin-top: 1px;
+    border-radius: 1px;
+    position: relative;
+}
+
+.delete-btn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: red;
+    color: white;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Buku Catatan</h2>
+
+    <textarea id="inputCatatan" placeholder="Tulis catatan di sini..."></textarea>
+    <button onclick="tambahCatatan()">Tambah Catatan</button>
+
+    <div id="daftarCatatan"></div>
+</div>
+
+<script>
+let catatan = JSON.parse(localStorage.getItem("catatan")) || [];
+
+function tampilkanCatatan() {
+    const daftar = document.getElementById("daftarCatatan");
+    daftar.innerHTML = "";
+
+    catatan.forEach((isi, index) => {
+        daftar.innerHTML += `
+            <div class="note">
+                ${isi}
+                <button class="delete-btn" onclick="hapusCatatan(${index})">X</button>
+            </div>
+        `;
+    });
+}
+
+function tambahCatatan() {
+    const input = document.getElementById("inputCatatan").value;
+
+    if (input.trim() === "") return alert("Catatan tidak boleh kosong!");
+
+    catatan.push(input);
+    localStorage.setItem("catatan", JSON.stringify(catatan));
+
+    document.getElementById("inputCatatan").value = "";
+    tampilkanCatatan();
+}
+
+function hapusCatatan(i) {
+    catatan.splice(i, 1);
+    localStorage.setItem("catatan", JSON.stringify(catatan));
+    tampilkanCatatan();
+}
+
+// Tampilkan saat halaman dibuka
+tampilkanCatatan();
+</script>
+
+</body>
+</html>
+
