@@ -104,7 +104,7 @@ document.getElementById("loginBtn")?.addEventListener("click", async () => {
 /* ================================================= */
 function resetPassword() {
   const email = document.getElementById("email").value.trim();
-  if(!email){
+  if (!email) {
     alert("Masukkan email terlebih dahulu!");
     return;
   }
@@ -126,23 +126,23 @@ document.getElementById("logoutBtn")?.addEventListener("click", async () => {
 /* ============ PROTEKSI DASHBOARD ================ */
 /* ================================================= */
 auth.onAuthStateChanged(async (user) => {
-  if(location.pathname.includes("dashboard")) {
+  if (location.pathname.includes("dashboard")) {
 
-    if(!user){
+    if (!user) {
       window.location.href = "login.html";
       return;
     }
 
     try {
       const doc = await db.collection("users").doc(user.uid).get();
-      if(doc.exists){
+      if (doc.exists) {
         const data = doc.data();
         document.getElementById("userNama").textContent = data.nama || "-";
         document.getElementById("userEmail").textContent = data.email || "-";
         document.getElementById("userTelp").textContent = data.telp || "-";
         document.getElementById("userAlamat").textContent = data.alamat || "-";
       }
-    } catch(err) {
+    } catch (err) {
       alert("Gagal mengambil data user: " + err.message);
     }
   }
