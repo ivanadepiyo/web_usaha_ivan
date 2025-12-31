@@ -1,279 +1,196 @@
 <!DOCTYPE html>
 <html lang="id">
-
-<!-- ================================================= -->
-<!-- =============== HEAD / META ===================== -->
-<!-- ================================================= -->
 <head>
 <meta charset="UTF-8">
 <title>Daftar Akun | Web Perusahaan</title>
 
-<!-- ================================================= -->
-<!-- ======================= CSS ===================== -->
-<!-- ================================================= -->
 <style>
+/* ================= GLOBAL ================= */
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
 
-  /* ================= LOADER ================= */
-  /* Loader kecil di tombol simpan */
-  .btn-loader {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #fff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-left: 10px;
-  }
+body.page-login.auth {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  /* Loader saat proses berjalan */
-  .loader {
-    display: none;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #1e3c72;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    animation: spin 1s linear infinite;
-    margin: 10px auto;
-  }
+/* ================= CARD ================= */
+.card {
+  background: #fff;
+  width: 90%;
+  max-width: 480px;
+  padding: 30px 25px;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.2);
+  text-align: center;
+}
 
-  /* Animasi loader */
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
+/* ================= INPUT ================= */
+.input-group {
+  position: relative;
+  margin-bottom: 14px;
+}
 
-  /* ================= GLOBAL ================= */
-  /* Reset box & font default */
-  * {
-    box-sizing: border-box;
-    font-family: "Segoe UI", Arial, sans-serif;
-  }
+input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
 
-  /* Background halaman */
-  body.page-login.auth {
-    margin: 0;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+input:focus {
+  border-color: #2a5298;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(42,82,152,.2);
+}
 
-  /* ================= CARD ================= */
-  /* Kotak form utama */
-  .card {
-    background: #fff;
-    width: 90%;
-    max-width: 480px;
-    padding: 30px 25px;
-    border-radius: 14px;
-    box-shadow: 0 20px 40px rgba(0,0,0,.2);
-    text-align: center;
-    margin-top: 40px;
-  }
+/* ================= INDIKATOR ================= */
+.check {
+  display: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: fadeIn .3s ease, pulse 1s ease;
+}
 
-  /* ================= INPUT ================= */
-  /* Pembungkus input + indikator */
-  .input-group {
-    position: relative;
-    margin-bottom: 14px;
-    text-align: left;
-  }
+.green { background: green; }
+.red   { background: red; }
 
-  /* Field input */
-  input {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-  }
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
 
-  /* Efek saat input aktif */
-  input:focus {
-    border-color: #2a5298;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(42,82,152,0.2);
-  }
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(0,0,0,.4); }
+  70%  { box-shadow: 0 0 0 6px rgba(0,0,0,0); }
+  100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+}
 
-  /* ================= INDIKATOR ================= */
-  /* Titik validasi input */
-  .check {
-    display: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
+/* ================= NOTE ================= */
+.note {
+  font-size: 12px;
+  color: #555;
+  margin-top: 4px;
+}
 
-  /* Valid */
-  .green { background: green; }
-  /* Tidak valid */
-  .red { background: red; }
+/* ================= BUTTON ================= */
+button {
+  width: 100%;
+  padding: 12px;
+  background: #1e3c72;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-  /* ================= NOTE ================= */
-  /* Catatan kecil di bawah input */
-  .note {
-    font-size: 12px;
-    color: #555;
-    margin: 4px 0;
-  }
-
-  /* ================= SHOW PASSWORD ================= */
-  /* Area checkbox show password */
-  .show-pass {
-    text-align: center;
-    margin-bottom: 14px;
-  }
-
-  /* ================= BUTTON ================= */
-  /* Tombol daftar */
-  button {
-    width: 100%;
-    padding: 12px;
-    background: #1e3c72;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  /* Tombol nonaktif */
-  button:disabled {
-    background: #888;
-    cursor: not-allowed;
-  }
-
+button:disabled {
+  background: #888;
+}
 </style>
 </head>
 
-<!-- ================================================= -->
-<!-- ======================= HTML ==================== -->
-<!-- ================================================= -->
 <body class="page-login auth">
 
-<!-- Card Form -->
 <div class="card">
   <h2>Daftar Akun</h2>
 
-  <!-- Input Nama -->
   <div class="input-group">
     <input id="nama" placeholder="Nama">
     <span id="namaCheck" class="check"></span>
   </div>
 
-  <!-- Input Nomor Telepon -->
   <div class="input-group">
     <input id="telp" placeholder="Nomor Telepon">
     <span id="telpCheck" class="check"></span>
   </div>
 
-  <!-- Input Alamat -->
   <div class="input-group">
     <input id="alamat" placeholder="Alamat">
     <span id="alamatCheck" class="check"></span>
   </div>
 
-  <!-- Input Email -->
   <div class="input-group">
     <input id="email" placeholder="Email">
     <span id="emailCheck" class="check"></span>
-    <div class="note">Gunakan Gmail valid</div>
+    <div class="note">Gunakan email valid</div>
   </div>
 
-  <!-- Input Password -->
   <div class="input-group">
     <input id="password" type="password" placeholder="Password">
     <span id="passwordCheck" class="check"></span>
   </div>
 
-  <!-- Konfirmasi Password -->
   <div class="input-group">
     <input id="confirm" type="password" placeholder="Konfirmasi Password">
     <span id="confirmCheck" class="check"></span>
-    <div class="note">Minimal 8 karakter, huruf besar di awal, angka/simbol</div>
+    <div class="note">Minimal 8 karakter</div>
   </div>
 
-  <!-- Checkbox tampilkan password -->
-  <div class="show-pass">
-    <input type="checkbox" id="showPass">
-    <label for="showPass">Show Password</label>
-  </div>
-
-  <!-- Loader proses -->
-  <div class="loader" id="loader"></div>
-
-  <!-- Tombol daftar -->
-  <button id="registerBtn" disabled>
-    Simpan
-    <span id="btnLoader" class="btn-loader" style="display:none;"></span>
-  </button>
-
-  <!-- Pesan status -->
-  <p id="msg"></p>
+  <button id="registerBtn" disabled>Simpan</button>
 </div>
 
-<!-- ================================================= -->
-<!-- ======================= JS ====================== -->
-<!-- ================================================= -->
-
-<!-- Firebase Config -->
-<script src="firebase.js"></script>
-<!-- Auth Logic -->
-<script src="auth.js"></script>
-
 <script>
+/* ================= VALIDATION ================= */
 
-  /* Ambil semua elemen input */
-  const namaInput = document.getElementById("nama");
-  const emailInput = document.getElementById("email");
-  const telpInput = document.getElementById("telp");
-  const alamatInput = document.getElementById("alamat");
-  const passwordInput = document.getElementById("password");
-  const confirmInput = document.getElementById("confirm");
+const inputs = {
+  nama: document.getElementById("nama"),
+  telp: document.getElementById("telp"),
+  alamat: document.getElementById("alamat"),
+  email: document.getElementById("email"),
+  password: document.getElementById("password"),
+  confirm: document.getElementById("confirm"),
+};
 
-  /* Elemen UI */
-  const msg = document.getElementById("msg");
-  const registerBtn = document.getElementById("registerBtn");
-  const loader = document.getElementById("loader");
-  const btnLoader = document.getElementById("btnLoader");
-  const showPass = document.getElementById("showPass");
+const checks = {
+  nama: namaCheck,
+  telp: telpCheck,
+  alamat: alamatCheck,
+  email: emailCheck,
+  password: passwordCheck,
+  confirm: confirmCheck,
+};
 
-  /* Status valid email */
-  let emailValid = false;
+const btn = registerBtn;
 
-  /* Toggle tampil / sembunyi password */
-  showPass.addEventListener("change", () => {
-    const type = showPass.checked ? "text" : "password";
-    passwordInput.type = confirmInput.type = type;
-  });
-
-  /* Tampilkan indikator validasi */
-  function setCheck(el, valid, value) {
-    if (!value.trim()) {
-      el.style.display = "none";
-    } else {
-      el.style.display = "inline-block";
-      el.className = "check " + (valid ? "green" : "red");
-    }
+function setCheck(el, valid, value) {
+  if (!value.trim()) {
+    el.style.display = "none";
+    return;
   }
+  el.style.display = "inline-block";
+  el.className = "check " + (valid ? "green" : "red");
+}
 
-  /* Aktifkan tombol jika semua input valid */
-  function enableButton() {
-    registerBtn.disabled = !(
-      namaInput.value &&
-      emailValid &&
-      telpInput.value &&
-      alamatInput.value &&
-      passwordInput.value === confirmInput.value &&
-      passwordInput.value.length >= 8
-    );
-  }
+function enableBtn() {
+  btn.disabled = !(
+    inputs.nama.value.length >= 3 &&
+    inputs.telp.value.length >= 10 &&
+    inputs.alamat.value.length >= 5 &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputs.email.value) &&
+    inputs.password.value.length >= 8 &&
+    inputs.password.value === inputs.confirm.value
+  );
+}
 
+inputs.nama.oninput = () => { setCheck(checks.nama, inputs.nama.value.length>=3, inputs.nama.value); enableBtn(); };
+inputs.telp.oninput = () => { setCheck(checks.telp, inputs.telp.value.length>=10, inputs.telp.value); enableBtn(); };
+inputs.alamat.oninput = () => { setCheck(checks.alamat, inputs.alamat.value.length>=5, inputs.alamat.value); enableBtn(); };
+inputs.email.oninput = () => { setCheck(checks.email, /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputs.email.value), inputs.email.value); enableBtn(); };
+inputs.password.oninput = () => { setCheck(checks.password, inputs.password.value.length>=8, inputs.password.value); enableBtn(); };
+inputs.confirm.oninput = () => { setCheck(checks.confirm, inputs.confirm.value===inputs.password.value, inputs.confirm.value); enableBtn(); };
 </script>
 
 </body>
