@@ -7,82 +7,31 @@
 
 <style>
 * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
-
-body {
-  margin: 0;
-  background: #f0f2f5;
-}
-
+body { margin:0; background:#f0f2f5; }
 header {
-  background: #1e3c72;
-  color: white;
-  padding: 20px;
-  text-align: center;
-  font-size: 22px;
+  background:#1e3c72; color:white;
+  padding:20px; text-align:center; font-size:22px;
 }
-
 .container {
-  max-width: 1000px;
-  margin: 30px auto;
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  max-width:1000px; margin:30px auto;
+  background:white; padding:20px;
+  border-radius:12px;
+  box-shadow:0 10px 20px rgba(0,0,0,0.1);
 }
-
-h2 {
-  text-align: center;
-  color: #1e3c72;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-th, td {
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-}
-
-th {
-  background: #1e3c72;
-  color: white;
-  text-align: left;
-}
-
-tr:hover {
-  background: #f5f5f5;
-}
-
-.role-admin {
-  color: green;
-  font-weight: bold;
-}
-
-.role-user {
-  color: #555;
-}
-
-.logout {
-  margin-top: 20px;
-  text-align: center;
-}
-
+h2 { text-align:center; color:#1e3c72; }
+table { width:100%; border-collapse:collapse; margin-top:20px; }
+th, td { padding:12px; border-bottom:1px solid #ddd; }
+th { background:#1e3c72; color:white; }
+tr:hover { background:#f5f5f5; }
+.role-admin { color:green; font-weight:bold; }
+.role-user { color:#555; }
+.logout { text-align:center; margin-top:20px; }
 button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  background: #d9534f;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
+  padding:10px 20px; border:none;
+  border-radius:8px; background:#d9534f;
+  color:white; font-weight:bold; cursor:pointer;
 }
-
-button:hover {
-  background: #c9302c;
-}
+button:hover { background:#c9302c; }
 </style>
 </head>
 
@@ -91,7 +40,7 @@ button:hover {
 <header>Dashboard Admin</header>
 
 <div class="container">
-  <h2>Daftar Semua User Terdaftar</h2>
+  <h2>Daftar Semua User</h2>
 
   <table>
     <thead>
@@ -103,9 +52,7 @@ button:hover {
       </tr>
     </thead>
     <tbody id="userTable">
-      <tr>
-        <td colspan="4">Memuat data...</td>
-      </tr>
+      <tr><td colspan="4">Memuat data...</td></tr>
     </tbody>
   </table>
 
@@ -120,9 +67,6 @@ button:hover {
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-/* ======================
-   FIREBASE CONFIG
-====================== */
 const firebaseConfig = {
   apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
   authDomain: "web-usaha-ivan.firebaseapp.com",
@@ -138,71 +82,44 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const table = document.getElementById("userTable");
 
-/* ======================
-   CEK LOGIN & ROLE ADMIN
-====================== */
 auth.onAuthStateChanged(async user => {
   if (!user) {
-    window.location.href = "login-admin.html";
+    window.location.href = "admin-login.html";
     return;
   }
 
-  try {
-    const snap = await db.collection("users").doc(user.uid).get();
-
-    if (!snap.exists || snap.data().role !== "admin") {
-      alert("Akses ditolak! Bukan admin.");
-      await auth.signOut();
-      window.location.href = "login-admin.html";
-      return;
-    }
-
-    loadUsers();
-
-  } catch (err) {
-    alert("Terjadi kesalahan: " + err.message);
+  const adminSnap = await db.collection("admins").doc(user.uid).get();
+  if (!adminSnap.exists) {
     await auth.signOut();
-    window.location.href = "login-admin.html";
+    window.location.href = "admin-login.html";
+    return;
   }
+
+  loadUsers();
 });
 
-/* ======================
-   LOAD SEMUA USER
-====================== */
 async function loadUsers() {
-  table.innerHTML = `<tr><td colspan="4">Memuat data...</td></tr>`;
-
   const snapshot = await db.collection("users").get();
   table.innerHTML = "";
-
   let no = 1;
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const role = data.role || "user";
-    const roleClass = role === "admin" ? "role-admin" : "role-user";
 
+  snapshot.forEach(doc => {
+    const d = doc.data();
     table.innerHTML += `
       <tr>
         <td>${no++}</td>
         <td>${doc.id}</td>
-        <td>${data.email || "-"}</td>
-        <td class="${roleClass}">${role}</td>
+        <td>${d.email || "-"}</td>
+        <td class="role-user">user</td>
       </tr>
     `;
   });
-
-  if (snapshot.empty) {
-    table.innerHTML = `<tr><td colspan="4">Belum ada user</td></tr>`;
-  }
 }
 
-/* ======================
-   LOGOUT
-====================== */
-document.getElementById("logoutBtn").addEventListener("click", async () => {
+document.getElementById("logoutBtn").onclick = async () => {
   await auth.signOut();
-  window.location.href = "login-admin.html";
-});
+  window.location.href = "admin-login.html";
+};
 </script>
 
 </body>
