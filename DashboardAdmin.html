@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>DashboardAdmin</title>
+<title>Dashboard Admin | Web Perusahaan</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -44,12 +44,12 @@ table {
 th, td {
   padding: 12px;
   border-bottom: 1px solid #ddd;
-  text-align: left;
 }
 
 th {
   background: #1e3c72;
   color: white;
+  text-align: left;
 }
 
 tr:hover {
@@ -120,6 +120,9 @@ button:hover {
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
+/* ======================
+   FIREBASE CONFIG
+====================== */
 const firebaseConfig = {
   apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
   authDomain: "web-usaha-ivan.firebaseapp.com",
@@ -136,7 +139,7 @@ const db = firebase.firestore();
 const table = document.getElementById("userTable");
 
 /* ======================
-   CEK ADMIN LOGIN
+   CEK LOGIN & ROLE ADMIN
 ====================== */
 auth.onAuthStateChanged(async user => {
   if (!user) {
@@ -144,38 +147,53 @@ auth.onAuthStateChanged(async user => {
     return;
   }
 
-  const doc = await db.collection("users").doc(user.uid).get();
-  if (!doc.exists || doc.data().role !== "admin") {
-    await auth.signOut();
-    alert("Akses ditolak!");
-    window.location.href = "login-admin.html";
-    return;
-  }
+  try {
+    const snap = await db.collection("users").doc(user.uid).get();
 
-  loadUsers();
+    if (!snap.exists || snap.data().role !== "admin") {
+      alert("Akses ditolak! Bukan admin.");
+      await auth.signOut();
+      window.location.href = "login-admin.html";
+      return;
+    }
+
+    loadUsers();
+
+  } catch (err) {
+    alert("Terjadi kesalahan: " + err.message);
+    await auth.signOut();
+    window.location.href = "login-admin.html";
+  }
 });
 
 /* ======================
    LOAD SEMUA USER
 ====================== */
 async function loadUsers() {
+  table.innerHTML = `<tr><td colspan="4">Memuat data...</td></tr>`;
+
   const snapshot = await db.collection("users").get();
   table.innerHTML = "";
 
   let no = 1;
   snapshot.forEach(doc => {
     const data = doc.data();
-    const roleClass = data.role === "admin" ? "role-admin" : "role-user";
+    const role = data.role || "user";
+    const roleClass = role === "admin" ? "role-admin" : "role-user";
 
     table.innerHTML += `
       <tr>
         <td>${no++}</td>
         <td>${doc.id}</td>
         <td>${data.email || "-"}</td>
-        <td class="${roleClass}">${data.role || "user"}</td>
+        <td class="${roleClass}">${role}</td>
       </tr>
     `;
   });
+
+  if (snapshot.empty) {
+    table.innerHTML = `<tr><td colspan="4">Belum ada user</td></tr>`;
+  }
 }
 
 /* ======================
