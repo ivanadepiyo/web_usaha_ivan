@@ -5,20 +5,35 @@
 <title>Login Admin | Web Perusahaan</title>
 <style>
 * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
-body.page-login.auth { margin:0; min-height:100vh; background: linear-gradient(135deg, #1e3c72, #2a5298); display:flex; justify-content:center; align-items:center; color:#333; }
-.card { background:#fff; width:100%; max-width:380px; padding:30px; border-radius:14px; box-shadow:0 20px 40px rgba(0,0,0,0.2); text-align:center; }
+body.page-login.auth {
+  margin:0; min-height:100vh;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  display:flex; justify-content:center; align-items:center;
+}
+.card {
+  background:#fff; width:100%; max-width:380px;
+  padding:30px; border-radius:14px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.2);
+  text-align:center;
+}
 .card h2 { margin-bottom:20px; color:#1e3c72; }
-.input-group { margin-bottom:14px; text-align:left; }
-input { width:100%; padding:12px 14px; border-radius:8px; border:1px solid #ccc; font-size:15px; }
-input:focus { outline:none; border-color:#2a5298; box-shadow:0 0 0 2px rgba(42,82,152,0.2); }
-button { width:100%; padding:12px; background:#1e3c72; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; transition:0.3s; }
+.input-group { margin-bottom:14px; }
+input {
+  width:100%; padding:12px 14px;
+  border-radius:8px; border:1px solid #ccc;
+}
+button {
+  width:100%; padding:12px;
+  background:#1e3c72; color:white;
+  border:none; border-radius:8px;
+  font-size:16px; font-weight:bold;
+  cursor:pointer;
+}
 button:hover { background:#2a5298; }
-a { display:inline-block; margin-top:10px; color:#2a5298; text-decoration:none; font-size:14px; }
-a:hover { text-decoration:underline; }
-#msg { margin-top:10px; font-size:14px; color:red; }
-@media (max-width:480px) { .card { margin:20px; padding:24px; } }
+#msg { margin-top:10px; color:red; font-size:14px; }
 </style>
 </head>
+
 <body class="page-login auth">
 
 <div class="card">
@@ -33,17 +48,15 @@ a:hover { text-decoration:underline; }
   </div>
 
   <button id="loginBtn">Login</button>
-  <a href="lupa-password.html">Lupa Password?</a>
   <p id="msg"></p>
 </div>
 
-<!-- Firebase SDK -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
   authDomain: "web-usaha-ivan.firebaseapp.com",
@@ -52,48 +65,35 @@ const firebaseConfig = {
   messagingSenderId: "588839561784",
   appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
 };
+
 firebase.initializeApp(firebaseConfig);
+
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// ELEMENTS
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const loginBtn = document.getElementById("loginBtn");
-const msg = document.getElementById("msg");
-
-// LOGIN ADMIN
-loginBtn.addEventListener("click", async () => {
+document.getElementById("loginBtn").addEventListener("click", async () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
   msg.textContent = "";
-  const email = emailInput.value.trim();
-  const password = passwordInput.value;
 
   if (!email || !password) {
-    msg.textContent = "Email dan password harus diisi!";
+    msg.textContent = "Email dan password wajib diisi";
     return;
   }
 
   try {
-    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-    const user = userCredential.user;
+    const cred = await auth.signInWithEmailAndPassword(email, password);
+    const user = cred.user;
 
-    // Cek apakah email sudah diverifikasi
-    if (!user.emailVerified) {
-      msg.textContent = "Silahkan verifikasi email terlebih dahulu!";
+    const snap = await db.collection("admins").doc(user.uid).get();
+    if (!snap.exists) {
+      msg.textContent = "Akses ditolak: bukan admin";
       await auth.signOut();
       return;
     }
 
-    // Ambil data user dari Firestore untuk cek role
-    const doc = await db.collection("users").doc(user.uid).get();
-    if (!doc.exists || doc.data().role !== "admin") {
-      msg.textContent = "Akses ditolak: bukan akun admin!";
-      await auth.signOut();
-      return;
-    }
-
-    // Login sukses → redirect admin dashboard
-    window.location.href = "dashboard.html";
+    window.location.href = "DashboardAdmin.html";
 
   } catch (err) {
     msg.textContent = err.message;
