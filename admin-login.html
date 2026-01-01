@@ -2,27 +2,35 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Admin</title>
+<title>Login Admin | Web Perusahaan</title>
 <style>
-body{margin:0;font-family:Segoe UI;background:#f0f2f5}
-header{background:#1e3c72;color:white;padding:20px;text-align:center}
-.container{max-width:1000px;margin:30px auto;background:white;padding:20px;border-radius:12px}
-table{width:100%;border-collapse:collapse}
-th,td{padding:12px;border-bottom:1px solid #ddd}
-th{background:#1e3c72;color:white}
-.role-admin{color:green;font-weight:bold}
+* { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+body.page-login.auth { margin:0; min-height:100vh; background: linear-gradient(135deg, #1e3c72, #2a5298); display:flex; justify-content:center; align-items:center; }
+.card { background:#fff; width:100%; max-width:380px; padding:30px; border-radius:14px; box-shadow:0 20px 40px rgba(0,0,0,0.2); text-align:center; }
+.card h2 { margin-bottom:20px; color:#1e3c72; }
+.input-group { margin-bottom:14px; }
+input { width:100%; padding:12px 14px; border-radius:8px; border:1px solid #ccc; }
+button { width:100%; padding:12px; background:#1e3c72; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; }
+button:hover { background:#2a5298; }
+a { display:inline-block; margin-top:10px; color:#2a5298; text-decoration:none; }
+#msg { margin-top:10px; color:red; font-size:14px; }
 </style>
 </head>
 
-<body>
-<header>Dashboard Admin</header>
+<body class="page-login auth">
+<div class="card">
+  <h2>Login Admin</h2>
 
-<div class="container">
-<table>
-<thead><tr><th>No</th><th>UID</th><th>Email</th><th>Role</th></tr></thead>
-<tbody id="userTable"></tbody>
-</table>
-<button id="logoutBtn">Logout</button>
+  <div class="input-group">
+    <input id="email" placeholder="Email">
+  </div>
+  <div class="input-group">
+    <input id="password" type="password" placeholder="Password">
+  </div>
+
+  <button id="loginBtn">Login</button>
+  <a href="#" id="forgot">Lupa Password?</a>
+  <p id="msg"></p>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -38,32 +46,43 @@ firebase.initializeApp({
 
 const auth = firebase.auth();
 const db = firebase.firestore();
-const table = document.getElementById("userTable");
+const msg = document.getElementById("msg");
 
-auth.onAuthStateChanged(async user=>{
-  if(!user) return location.href="admin-login.html";
+document.getElementById("loginBtn").onclick = async () => {
+  msg.textContent = "";
+  try {
+    const email = email.value.trim();
+    const pass = password.value;
+    const cred = await auth.signInWithEmailAndPassword(email, pass);
 
-  const admin = await db.collection("admins").doc(user.uid).get();
-  if(!admin.exists){
-    await auth.signOut();
-    return location.href="admin-login.html";
+    if (!cred.user.emailVerified) {
+      msg.textContent = "Verifikasi email dulu!";
+      await auth.signOut();
+      return;
+    }
+
+    const snap = await db.collection("admins").doc(cred.user.uid).get();
+    if (!snap.exists) {
+      msg.textContent = "Bukan akun admin!";
+      await auth.signOut();
+      return;
+    }
+
+    window.location.href = "DashboardAdmin.html";
+
+  } catch (e) {
+    msg.textContent = e.message;
   }
+};
 
-  const snap = await db.collection("users").get();
-  let no=1;
-  snap.forEach(d=>{
-    table.innerHTML += `<tr>
-      <td>${no++}</td>
-      <td>${d.id}</td>
-      <td>${d.data().email||"-"}</td>
-      <td class="role-admin">user</td>
-    </tr>`;
-  });
-});
-
-logoutBtn.onclick = async ()=>{
-  await auth.signOut();
-  location.href="admin-login.html";
+// ✅ LUPA PASSWORD (AKTIF)
+document.getElementById("forgot").onclick = async () => {
+  if (!email.value) {
+    alert("Masukkan email admin dulu");
+    return;
+  }
+  await auth.sendPasswordResetEmail(email.value);
+  alert("Link reset password dikirim ke email");
 };
 </script>
 </body>
