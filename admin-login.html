@@ -5,14 +5,31 @@
 <title>Login Admin | Web Perusahaan</title>
 <style>
 * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
-body.page-login.auth { margin:0; min-height:100vh; background: linear-gradient(135deg, #1e3c72, #2a5298); display:flex; justify-content:center; align-items:center; }
-.card { background:#fff; width:100%; max-width:380px; padding:30px; border-radius:14px; box-shadow:0 20px 40px rgba(0,0,0,0.2); text-align:center; }
+body.page-login.auth {
+  margin:0; min-height:100vh;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  display:flex; justify-content:center; align-items:center;
+}
+.card {
+  background:#fff; width:100%; max-width:380px;
+  padding:30px; border-radius:14px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.2);
+  text-align:center;
+}
 .card h2 { margin-bottom:20px; color:#1e3c72; }
 .input-group { margin-bottom:14px; }
-input { width:100%; padding:12px 14px; border-radius:8px; border:1px solid #ccc; }
-button { width:100%; padding:12px; background:#1e3c72; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; }
+input {
+  width:100%; padding:12px 14px;
+  border-radius:8px; border:1px solid #ccc;
+}
+button {
+  width:100%; padding:12px;
+  background:#1e3c72; color:white;
+  border:none; border-radius:8px;
+  font-weight:bold; cursor:pointer;
+}
 button:hover { background:#2a5298; }
-a { display:inline-block; margin-top:10px; color:#2a5298; text-decoration:none; }
+a { display:block; margin-top:10px; color:#2a5298; }
 #msg { margin-top:10px; color:red; font-size:14px; }
 </style>
 </head>
@@ -24,12 +41,13 @@ a { display:inline-block; margin-top:10px; color:#2a5298; text-decoration:none; 
   <div class="input-group">
     <input id="email" placeholder="Email">
   </div>
+
   <div class="input-group">
     <input id="password" type="password" placeholder="Password">
   </div>
 
   <button id="loginBtn">Login</button>
-  <a href="#" id="forgot">Lupa Password?</a>
+  <a href="lupa-password.html">Lupa Password?</a>
   <p id="msg"></p>
 </div>
 
@@ -41,29 +59,40 @@ a { display:inline-block; margin-top:10px; color:#2a5298; text-decoration:none; 
 firebase.initializeApp({
   apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
   authDomain: "web-usaha-ivan.firebaseapp.com",
-  projectId: "web-usaha-ivan"
+  projectId: "web-usaha-ivan",
+  storageBucket: "web-usaha-ivan.appspot.com",
+  messagingSenderId: "588839561784",
+  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
 });
 
 const auth = firebase.auth();
 const db = firebase.firestore();
-const msg = document.getElementById("msg");
 
 document.getElementById("loginBtn").onclick = async () => {
-  msg.textContent = "";
-  try {
-    const email = email.value.trim();
-    const pass = password.value;
-    const cred = await auth.signInWithEmailAndPassword(email, pass);
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
 
-    if (!cred.user.emailVerified) {
-      msg.textContent = "Verifikasi email dulu!";
+  msg.textContent = "";
+
+  if (!email || !password) {
+    msg.textContent = "Email dan password harus diisi!";
+    return;
+  }
+
+  try {
+    const cred = await auth.signInWithEmailAndPassword(email, password);
+    const user = cred.user;
+
+    if (!user.emailVerified) {
+      msg.textContent = "Silakan verifikasi email!";
       await auth.signOut();
       return;
     }
 
-    const snap = await db.collection("admins").doc(cred.user.uid).get();
-    if (!snap.exists) {
-      msg.textContent = "Bukan akun admin!";
+    const adminDoc = await db.collection("admins").doc(user.uid).get();
+    if (!adminDoc.exists || adminDoc.data().role !== "admin") {
+      msg.textContent = "Akses ditolak!";
       await auth.signOut();
       return;
     }
@@ -73,16 +102,6 @@ document.getElementById("loginBtn").onclick = async () => {
   } catch (e) {
     msg.textContent = e.message;
   }
-};
-
-// ✅ LUPA PASSWORD (AKTIF)
-document.getElementById("forgot").onclick = async () => {
-  if (!email.value) {
-    alert("Masukkan email admin dulu");
-    return;
-  }
-  await auth.sendPasswordResetEmail(email.value);
-  alert("Link reset password dikirim ke email");
 };
 </script>
 </body>
