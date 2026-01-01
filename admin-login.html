@@ -17,7 +17,7 @@ body.page-login.auth {
   text-align:center;
 }
 .card h2 { margin-bottom:20px; color:#1e3c72; }
-.input-group { margin-bottom:14px; }
+.input-group { margin-bottom:14px; text-align:left; }
 input {
   width:100%; padding:12px 14px;
   border-radius:8px; border:1px solid #ccc;
@@ -26,15 +26,17 @@ button {
   width:100%; padding:12px;
   background:#1e3c72; color:white;
   border:none; border-radius:8px;
-  font-weight:bold; cursor:pointer;
+  font-size:16px; font-weight:bold;
+  cursor:pointer;
 }
 button:hover { background:#2a5298; }
-a { display:block; margin-top:10px; color:#2a5298; }
+a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
 #msg { margin-top:10px; color:red; font-size:14px; }
 </style>
 </head>
 
 <body class="page-login auth">
+
 <div class="card">
   <h2>Login Admin</h2>
 
@@ -51,24 +53,27 @@ a { display:block; margin-top:10px; color:#2a5298; }
   <p id="msg"></p>
 </div>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-firebase.initializeApp({
+const firebaseConfig = {
   apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
   authDomain: "web-usaha-ivan.firebaseapp.com",
   projectId: "web-usaha-ivan",
   storageBucket: "web-usaha-ivan.appspot.com",
   messagingSenderId: "588839561784",
   appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
-});
+};
+
+firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-document.getElementById("loginBtn").onclick = async () => {
+document.getElementById("loginBtn").addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const msg = document.getElementById("msg");
@@ -76,7 +81,7 @@ document.getElementById("loginBtn").onclick = async () => {
   msg.textContent = "";
 
   if (!email || !password) {
-    msg.textContent = "Email dan password harus diisi!";
+    msg.textContent = "Email dan password wajib diisi!";
     return;
   }
 
@@ -85,24 +90,26 @@ document.getElementById("loginBtn").onclick = async () => {
     const user = cred.user;
 
     if (!user.emailVerified) {
-      msg.textContent = "Silakan verifikasi email!";
+      msg.textContent = "Silakan verifikasi email terlebih dahulu!";
       await auth.signOut();
       return;
     }
 
-    const adminDoc = await db.collection("admins").doc(user.uid).get();
-    if (!adminDoc.exists || adminDoc.data().role !== "admin") {
-      msg.textContent = "Akses ditolak!";
+    const adminSnap = await db.collection("admins").doc(user.uid).get();
+
+    if (!adminSnap.exists || adminSnap.data().role !== "admin") {
+      msg.textContent = "Akses ditolak: bukan admin!";
       await auth.signOut();
       return;
     }
 
     window.location.href = "DashboardAdmin.html";
 
-  } catch (e) {
-    msg.textContent = e.message;
+  } catch (err) {
+    msg.textContent = err.message;
   }
-};
+});
 </script>
+
 </body>
 </html>
