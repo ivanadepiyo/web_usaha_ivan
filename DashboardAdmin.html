@@ -2,15 +2,31 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Admin</title>
+<title>Dashboard Admin | Web Perusahaan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-body{margin:0;font-family:Segoe UI;background:#f0f2f5}
-header{background:#1e3c72;color:white;padding:20px;text-align:center}
-.container{max-width:1000px;margin:30px auto;background:white;padding:20px;border-radius:12px}
-table{width:100%;border-collapse:collapse}
-th,td{padding:12px;border-bottom:1px solid #ddd}
-th{background:#1e3c72;color:white}
-.role-admin{color:green;font-weight:bold}
+* { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+body { margin:0; background:#f0f2f5; }
+header { background:#1e3c72; color:#fff; padding:20px; text-align:center; font-size:22px; }
+.container {
+  max-width:1000px; margin:30px auto;
+  background:#fff; padding:20px;
+  border-radius:12px;
+  box-shadow:0 10px 20px rgba(0,0,0,.1);
+}
+h2 { text-align:center; color:#1e3c72; }
+table { width:100%; border-collapse:collapse; margin-top:20px; }
+th,td { padding:12px; border-bottom:1px solid #ddd; }
+th { background:#1e3c72; color:white; }
+.role-admin { color:green; font-weight:bold; }
+.logout { text-align:center; margin-top:20px; }
+button {
+  padding:10px 20px; border:none;
+  border-radius:8px;
+  background:#d9534f; color:white;
+  font-weight:bold; cursor:pointer;
+}
 </style>
 </head>
 
@@ -18,11 +34,20 @@ th{background:#1e3c72;color:white}
 <header>Dashboard Admin</header>
 
 <div class="container">
-<table>
-<thead><tr><th>No</th><th>UID</th><th>Email</th><th>Role</th></tr></thead>
-<tbody id="userTable"></tbody>
-</table>
-<button id="logoutBtn">Logout</button>
+  <h2>Daftar Semua User</h2>
+
+  <table>
+    <thead>
+      <tr><th>No</th><th>UID</th><th>Email</th><th>Role</th></tr>
+    </thead>
+    <tbody id="userTable">
+      <tr><td colspan="4">Memuat...</td></tr>
+    </tbody>
+  </table>
+
+  <div class="logout">
+    <button id="logoutBtn">Logout</button>
+  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -33,35 +58,42 @@ th{background:#1e3c72;color:white}
 firebase.initializeApp({
   apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
   authDomain: "web-usaha-ivan.firebaseapp.com",
-  projectId: "web-usaha-ivan"
+  projectId: "web-usaha-ivan",
+  storageBucket: "web-usaha-ivan.appspot.com",
+  messagingSenderId: "588839561784",
+  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
 });
 
 const auth = firebase.auth();
 const db = firebase.firestore();
 const table = document.getElementById("userTable");
 
-auth.onAuthStateChanged(async user=>{
-  if(!user) return location.href="admin-login.html";
+auth.onAuthStateChanged(async user => {
+  if (!user) return location.href="admin-login.html";
 
   const admin = await db.collection("admins").doc(user.uid).get();
-  if(!admin.exists){
+  if (!admin.exists) {
     await auth.signOut();
     return location.href="admin-login.html";
   }
 
   const snap = await db.collection("users").get();
+  table.innerHTML="";
   let no=1;
+
   snap.forEach(d=>{
-    table.innerHTML += `<tr>
-      <td>${no++}</td>
-      <td>${d.id}</td>
-      <td>${d.data().email||"-"}</td>
-      <td class="role-admin">user</td>
-    </tr>`;
+    const u=d.data();
+    table.innerHTML+=`
+      <tr>
+        <td>${no++}</td>
+        <td>${d.id}</td>
+        <td>${u.email||"-"}</td>
+        <td class="role-admin">${u.role||"user"}</td>
+      </tr>`;
   });
 });
 
-logoutBtn.onclick = async ()=>{
+document.getElementById("logoutBtn").onclick = async()=>{
   await auth.signOut();
   location.href="admin-login.html";
 };
