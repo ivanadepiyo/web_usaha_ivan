@@ -8,40 +8,50 @@
 <style>
 * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
 body { margin:0; background:#f0f2f5; }
-header { background:#1e3c72; color:#fff; padding:20px; text-align:center; font-size:22px; }
+header {
+  background:#1e3c72; color:white;
+  padding:20px; text-align:center; font-size:22px;
+}
 .container {
   max-width:1000px; margin:30px auto;
-  background:#fff; padding:20px;
+  background:white; padding:20px;
   border-radius:12px;
-  box-shadow:0 10px 20px rgba(0,0,0,.1);
+  box-shadow:0 10px 20px rgba(0,0,0,0.1);
 }
-h2 { text-align:center; color:#1e3c72; }
 table { width:100%; border-collapse:collapse; margin-top:20px; }
-th,td { padding:12px; border-bottom:1px solid #ddd; }
+th, td { padding:12px; border-bottom:1px solid #ddd; }
 th { background:#1e3c72; color:white; }
 .role-admin { color:green; font-weight:bold; }
+.role-user { color:#555; }
 .logout { text-align:center; margin-top:20px; }
 button {
-  padding:10px 20px; border:none;
-  border-radius:8px;
+  padding:10px 20px;
   background:#d9534f; color:white;
+  border:none; border-radius:8px;
   font-weight:bold; cursor:pointer;
 }
+button:hover { background:#c9302c; }
 </style>
 </head>
 
 <body>
+
 <header>Dashboard Admin</header>
 
 <div class="container">
-  <h2>Daftar Semua User</h2>
+  <h2>Daftar Semua User Terdaftar</h2>
 
   <table>
     <thead>
-      <tr><th>No</th><th>UID</th><th>Email</th><th>Role</th></tr>
+      <tr>
+        <th>No</th>
+        <th>UID</th>
+        <th>Email</th>
+        <th>Role</th>
+      </tr>
     </thead>
     <tbody id="userTable">
-      <tr><td colspan="4">Memuat...</td></tr>
+      <tr><td colspan="4">Memuat data...</td></tr>
     </tbody>
   </table>
 
@@ -59,9 +69,6 @@ firebase.initializeApp({
   apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
   authDomain: "web-usaha-ivan.firebaseapp.com",
   projectId: "web-usaha-ivan",
-  storageBucket: "web-usaha-ivan.appspot.com",
-  messagingSenderId: "588839561784",
-  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
 });
 
 const auth = firebase.auth();
@@ -69,34 +76,47 @@ const db = firebase.firestore();
 const table = document.getElementById("userTable");
 
 auth.onAuthStateChanged(async user => {
-  if (!user) return location.href="admin-login.html";
-
-  const admin = await db.collection("admins").doc(user.uid).get();
-  if (!admin.exists) {
-    await auth.signOut();
-    return location.href="admin-login.html";
+  if (!user) {
+    window.location.href = "admin-login.html";
+    return;
   }
 
-  const snap = await db.collection("users").get();
-  table.innerHTML="";
-  let no=1;
+  const adminSnap = await db.collection("admins").doc(user.uid).get();
 
-  snap.forEach(d=>{
-    const u=d.data();
-    table.innerHTML+=`
-      <tr>
-        <td>${no++}</td>
-        <td>${d.id}</td>
-        <td>${u.email||"-"}</td>
-        <td class="role-admin">${u.role||"user"}</td>
-      </tr>`;
-  });
+  if (!adminSnap.exists || adminSnap.data().role !== "admin") {
+    alert("Akses ditolak!");
+    await auth.signOut();
+    window.location.href = "admin-login.html";
+    return;
+  }
+
+  loadUsers();
 });
 
-document.getElementById("logoutBtn").onclick = async()=>{
+async function loadUsers() {
+  const snap = await db.collection("users").get();
+  table.innerHTML = "";
+  let no = 1;
+
+  snap.forEach(doc => {
+    const d = doc.data();
+    const role = d.role || "user";
+    table.innerHTML += `
+      <tr>
+        <td>${no++}</td>
+        <td>${doc.id}</td>
+        <td>${d.email || "-"}</td>
+        <td class="${role === "admin" ? "role-admin" : "role-user"}">${role}</td>
+      </tr>
+    `;
+  });
+}
+
+document.getElementById("logoutBtn").onclick = async () => {
   await auth.signOut();
-  location.href="admin-login.html";
+  window.location.href = "admin-login.html";
 };
 </script>
+
 </body>
 </html>
