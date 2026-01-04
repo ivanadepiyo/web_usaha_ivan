@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>dashboard admin | Web Perusahaan</title>
+<title>Dashboard Admin | Web Perusahaan</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -18,27 +18,59 @@ header {
   border-radius:12px;
   box-shadow:0 10px 20px rgba(0,0,0,0.1);
 }
+.stats {
+  display:flex; gap:15px; margin-bottom:15px;
+}
+.stat-box {
+  flex:1; padding:12px; background:#f7f9fc;
+  border-radius:8px; text-align:center;
+  font-weight:bold;
+}
 table { width:100%; border-collapse:collapse; margin-top:20px; }
-th, td { padding:12px; border-bottom:1px solid #ddd; }
+th, td { padding:12px; border-bottom:1px solid #ddd; text-align:center; }
 th { background:#1e3c72; color:white; }
+
 .role-admin { color:green; font-weight:bold; }
 .role-user { color:#555; }
+
+.btn {
+  padding:6px 10px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:12px;
+  margin:2px;
+}
+.btn-admin { background:#1e3c72; color:white; }
+.btn-user { background:#6c757d; color:white; }
+.btn-delete { background:#d9534f; color:white; }
+.btn-warn { background:#f0ad4e; color:white; }
+.btn-ok { background:#5cb85c; color:white; }
+
 .logout { text-align:center; margin-top:20px; }
-button {
+.logout button {
   padding:10px 20px;
   background:#d9534f; color:white;
   border:none; border-radius:8px;
   font-weight:bold; cursor:pointer;
 }
-button:hover { background:#c9302c; }
+.logout button:hover { background:#c9302c; }
 </style>
 </head>
 
 <body>
 
-<header>dashboard admin</header>
+<header>Dashboard Admin</header>
 
 <div class="container">
+
+  <!-- STATISTIK -->
+  <div class="stats">
+    <div class="stat-box">👤 Total User: <span id="totalUser">0</span></div>
+    <div class="stat-box">🛑 Disuspend: <span id="suspendUser">0</span></div>
+    <div class="stat-box">🧑‍💼 Admin: <span id="totalAdmin">0</span></div>
+  </div>
+
   <h2>Daftar Semua User Terdaftar</h2>
 
   <table>
@@ -48,10 +80,12 @@ button:hover { background:#c9302c; }
         <th>UID</th>
         <th>Email</th>
         <th>Role</th>
+        <th>Status</th>
+        <th>Aksi</th>
       </tr>
     </thead>
     <tbody id="userTable">
-      <tr><td colspan="4">Memuat data...</td></tr>
+      <tr><td colspan="6">Memuat data...</td></tr>
     </tbody>
   </table>
 
@@ -60,62 +94,51 @@ button:hover { background:#c9302c; }
   </div>
 </div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-const firebaseConfig = {
+firebase.initializeApp({
   apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
   authDomain: "web-usaha-ivan.firebaseapp.com",
   projectId: "web-usaha-ivan",
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+});
 
 const auth = firebase.auth();
 const db = firebase.firestore();
 const table = document.getElementById("userTable");
 
-/* ================= PROTEKSI ADMIN ================= */
-auth.onAuthStateChanged(async (user) => {
-  if (!user) {
-    window.location.href = "admin-login.html";
-    return;
-  }
+let currentAdminUID = null;
 
-  try {
-    const adminSnap = await db.collection("admins").doc(user.uid).get();
+/* ================= AUTH ================= */
+auth.onAuthStateChanged(async user => {
+  if (!user) return location.href = "login-admin.html";
 
-    if (!adminSnap.exists) {
-      await auth.signOut();
-      window.location.href = "admin-login.html";
-      return;
-    }
-
-    loadUsers();
-
-  } catch (err) {
-    alert("Terjadi kesalahan: " + err.message);
+  currentAdminUID = user.uid;
+  const adminSnap = await db.collection("admins").doc(user.uid).get();
+  if (!adminSnap.exists) {
     await auth.signOut();
-    window.location.href = "admin-login.html";
+    return location.href = "login-admin.html";
   }
+  loadUsers();
 });
 
 /* ================= LOAD USERS ================= */
 async function loadUsers() {
-  table.innerHTML = "<tr><td colspan='4'>Memuat data...</td></tr>";
-
   const snap = await db.collection("users").get();
   table.innerHTML = "";
-  let no = 1;
+
+  let no = 1, total = 0, suspend = 0, admin = 0;
 
   snap.forEach(doc => {
     const d = doc.data();
     const role = d.role || "user";
+    const suspended = d.suspended === true;
+
+    total++;
+    if (suspended) suspend++;
+    if (role === "admin") admin++;
 
     table.innerHTML += `
       <tr>
@@ -123,20 +146,55 @@ async function loadUsers() {
         <td>${doc.id}</td>
         <td>${d.email || "-"}</td>
         <td class="${role === "admin" ? "role-admin" : "role-user"}">${role}</td>
+        <td>${suspended ? "Nonaktif" : "Aktif"}</td>
+        <td>
+          ${doc.id !== currentAdminUID ? `
+            <button class="btn btn-warn" onclick="resetPassword('${d.email}')">Reset</button>
+            <button class="btn ${suspended ? "btn-ok" : "btn-delete"}"
+              onclick="toggleSuspend('${doc.id}', ${suspended})">
+              ${suspended ? "Aktifkan" : "Suspend"}
+            </button>
+          ` : "-"}
+        </td>
       </tr>
     `;
   });
 
-  if (snap.empty) {
-    table.innerHTML = "<tr><td colspan='4'>Belum ada user</td></tr>";
-  }
+  document.getElementById("totalUser").textContent = total;
+  document.getElementById("suspendUser").textContent = suspend;
+  document.getElementById("totalAdmin").textContent = admin;
+}
+
+/* ================= RESET PASSWORD ================= */
+function resetPassword(email) {
+  if (!confirm("Kirim reset password ke user ini?")) return;
+  auth.sendPasswordResetEmail(email);
+  logAction("reset_password", email);
+  alert("Email reset password terkirim");
+}
+
+/* ================= SUSPEND ================= */
+async function toggleSuspend(uid, status) {
+  await db.collection("users").doc(uid).update({ suspended: !status });
+  logAction(status ? "aktifkan_user" : "suspend_user", uid);
+  loadUsers();
+}
+
+/* ================= LOG AKTIVITAS ================= */
+function logAction(action, target) {
+  db.collection("admin_logs").add({
+    adminUid: currentAdminUID,
+    action,
+    targetUid: target,
+    time: firebase.firestore.FieldValue.serverTimestamp()
+  });
 }
 
 /* ================= LOGOUT ================= */
-document.getElementById("logoutBtn").addEventListener("click", async () => {
+document.getElementById("logoutBtn").onclick = async () => {
   await auth.signOut();
-  window.location.href = "admin-login.html";
-});
+  location.href = "login-admin.html";
+};
 </script>
 
 </body>
