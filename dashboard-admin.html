@@ -112,13 +112,13 @@ let currentAdminUID = null;
 
 /* ================= CEK USER LOGIN ================= */
 auth.onAuthStateChanged(async user => {
-  if (!user) return location.href = "login-admin.html";
+  if (!user) return location.href = "admin-login.html";
 
   currentAdminUID = user.uid;
   const adminSnap = await db.collection("admins").doc(user.uid).get();
   if (!adminSnap.exists) {
     await auth.signOut();
-    return location.href = "login-admin.html";
+    return location.href = "admin-login.html";
   }
 
   loadUsers();
@@ -197,7 +197,7 @@ logoutBtn.addEventListener("click", async () => {
   logoutBtn.textContent = "Keluar...";
   try {
     await auth.signOut();
-    location.href = "login-admin.html";
+    location.href = "admin-login.html";
   } catch (err) {
     alert("Gagal logout: " + err.message);
     logoutBtn.disabled = false;
