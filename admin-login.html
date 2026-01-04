@@ -72,9 +72,8 @@ a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
     <!-- EYE ICON -->
     <svg id="togglePass" class="toggle-password" viewBox="0 0 24 24"
       fill="none" stroke="#444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path id="eyePath"
-        d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/>
-      <circle id="eyeCircle" cx="12" cy="12" r="3"/>
+      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/>
+      <circle cx="12" cy="12" r="3"/>
       <line id="eyeSlash" x1="3" y1="3" x2="21" y2="21" style="display:none"/>
     </svg>
   </div>
@@ -100,6 +99,7 @@ firebase.initializeApp({
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const togglePass = document.getElementById("togglePass");
 const eyeSlash = document.getElementById("eyeSlash");
@@ -131,11 +131,11 @@ togglePass.addEventListener("click", () => {
   }
 });
 
-/* LOGIN ADMIN */
+/* LOGIN ADMIN (FIX TOMBOL STUCK) */
 loginBtn.addEventListener("click", async () => {
   msg.textContent = "";
 
-  const email = document.getElementById("email").value.trim();
+  const email = emailInput.value.trim();
   const password = passwordInput.value;
 
   if (!email || !password) {
@@ -157,8 +157,11 @@ loginBtn.addEventListener("click", async () => {
     }
 
     window.location.href = "dashboard-admin.html";
+
   } catch (err) {
     msg.textContent = err.message;
+  } finally {
+    /* 🔥 INI KUNCI ANTI KOCak */
     loginBtn.disabled = false;
     loginBtn.textContent = "Masuk";
   }
