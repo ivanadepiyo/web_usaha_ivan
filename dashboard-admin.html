@@ -6,55 +6,67 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-* { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
-body { margin:0; background:#f0f2f5; }
-header {
-  background:#1e3c72; color:white;
-  padding:20px; text-align:center; font-size:22px;
+*{box-sizing:border-box;font-family:"Segoe UI",Arial}
+:root{
+  --bg:#f0f2f5;
+  --card:#fff;
+  --text:#222;
+  --primary:#1e3c72;
 }
-.container {
-  max-width:1000px; margin:30px auto;
-  background:white; padding:20px;
-  border-radius:12px;
-  box-shadow:0 10px 20px rgba(0,0,0,0.1);
+body.dark{
+  --bg:#121212;
+  --card:#1e1e1e;
+  --text:#f5f5f5;
 }
-.stats {
-  display:flex; gap:15px; margin-bottom:15px;
+body{margin:0;background:var(--bg);color:var(--text);transition:.3s}
+header{background:var(--primary);color:white;padding:20px;text-align:center;font-size:22px}
+.container{
+  max-width:1100px;margin:20px auto;
+  background:var(--card);padding:20px;
+  border-radius:15px;box-shadow:0 10px 25px rgba(0,0,0,.15)
 }
-.stat-box {
-  flex:1; padding:12px; background:#f7f9fc;
-  border-radius:8px; text-align:center;
-  font-weight:bold;
+.stats{display:flex;gap:15px;margin-bottom:15px;flex-wrap:wrap}
+.stat-box{
+  flex:1;padding:12px;background:#f7f9fc;
+  border-radius:10px;text-align:center;font-weight:bold
 }
-table { width:100%; border-collapse:collapse; margin-top:20px; }
-th, td { padding:12px; border-bottom:1px solid #ddd; text-align:center; }
-th { background:#1e3c72; color:white; }
+body.dark .stat-box{background:#2a2a2a}
+.topbar{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between}
+input,select{
+  padding:8px;border-radius:8px;border:1px solid #ccc
+}
+.toggle{cursor:pointer;font-size:20px}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{padding:12px;border-bottom:1px solid #ddd;text-align:center}
+th{background:var(--primary);color:white}
+.btn{
+  padding:6px 10px;border:none;border-radius:6px;
+  cursor:pointer;font-size:12px;margin:2px
+}
+.btn-admin{background:#1e3c72;color:white}
+.btn-user{background:#6c757d;color:white}
+.btn-delete{background:#d9534f;color:white}
+.btn-warn{background:#f0ad4e;color:white}
+.btn-ok{background:#5cb85c;color:white}
+.logout{text-align:center;margin-top:20px}
+.logout button{
+  padding:10px 20px;background:#d9534f;color:white;
+  border:none;border-radius:8px;font-weight:bold;cursor:pointer
+}
+.logout button:hover{opacity:.9}
 
-.role-admin { color:green; font-weight:bold; }
-.role-user { color:#555; }
-
-.btn {
-  padding:6px 10px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  font-size:12px;
-  margin:2px;
+/* ===== MODAL ===== */
+.modal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.6);
+  display:flex;align-items:center;justify-content:center
 }
-.btn-admin { background:#1e3c72; color:white; }
-.btn-user { background:#6c757d; color:white; }
-.btn-delete { background:#d9534f; color:white; }
-.btn-warn { background:#f0ad4e; color:white; }
-.btn-ok { background:#5cb85c; color:white; }
-
-.logout { text-align:center; margin-top:20px; }
-.logout button {
-  padding:10px 20px;
-  background:#d9534f; color:white;
-  border:none; border-radius:8px;
-  font-weight:bold; cursor:pointer;
+.modal-box{
+  background:white;padding:20px;
+  border-radius:12px;max-width:400px;width:100%
 }
-.logout button:hover { background:#c9302c; }
+body.dark .modal-box{background:#1e1e1e;color:white}
+.hidden{display:none}
 </style>
 </head>
 
@@ -64,14 +76,23 @@ th { background:#1e3c72; color:white; }
 
 <div class="container">
 
-  <!-- STATISTIK -->
   <div class="stats">
-    <div class="stat-box">👤 Total User: <span id="totalUser">0</span></div>
-    <div class="stat-box">🛑 Disuspend: <span id="suspendUser">0</span></div>
-    <div class="stat-box">🧑‍💼 Admin: <span id="totalAdmin">0</span></div>
+    <div class="stat-box">👤 Total User<br><span id="totalUser">0</span></div>
+    <div class="stat-box">🛑 Disuspend<br><span id="suspendUser">0</span></div>
+    <div class="stat-box">🧑‍💼 Admin<br><span id="totalAdmin">0</span></div>
   </div>
 
-  <h2>Daftar Semua User Terdaftar</h2>
+  <div class="topbar">
+    <div>
+      <input type="text" id="search" placeholder="Cari email / UID..." onkeyup="render()">
+      <select id="filter" onchange="render()">
+        <option value="">Semua Role</option>
+        <option value="admin">Admin</option>
+        <option value="user">User</option>
+      </select>
+    </div>
+    <span class="toggle" onclick="toggleDark()">🌙</span>
+  </div>
 
   <table>
     <thead>
@@ -85,12 +106,21 @@ th { background:#1e3c72; color:white; }
       </tr>
     </thead>
     <tbody id="userTable">
-      <tr><td colspan="6">Memuat data...</td></tr>
+      <tr><td colspan="6">Memuat...</td></tr>
     </tbody>
   </table>
 
   <div class="logout">
-    <button id="logoutBtn">Logout</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<!-- MODAL DETAIL -->
+<div class="modal hidden" id="detailModal">
+  <div class="modal-box">
+    <h3>👤 Detail User</h3>
+    <p id="detailContent"></p>
+    <button onclick="closeModal()">Tutup</button>
   </div>
 </div>
 
@@ -100,110 +130,94 @@ th { background:#1e3c72; color:white; }
 
 <script>
 firebase.initializeApp({
-  apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
-  authDomain: "web-usaha-ivan.firebaseapp.com",
-  projectId: "web-usaha-ivan",
+  apiKey:"AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
+  authDomain:"web-usaha-ivan.firebaseapp.com",
+  projectId:"web-usaha-ivan"
 });
 
-const auth = firebase.auth();
-const db = firebase.firestore();
-const table = document.getElementById("userTable");
-let currentAdminUID = null;
+const auth=firebase.auth();
+const db=firebase.firestore();
+let users=[], currentUID=null;
 
-/* ================= CEK USER LOGIN ================= */
-auth.onAuthStateChanged(async user => {
-  if (!user) return location.href = "admin-login.html";
-
-  currentAdminUID = user.uid;
-  const adminSnap = await db.collection("admins").doc(user.uid).get();
-  if (!adminSnap.exists) {
-    await auth.signOut();
-    return location.href = "admin-login.html";
-  }
-
-  loadUsers();
+/* ===== AUTH CHECK ===== */
+auth.onAuthStateChanged(async user=>{
+  if(!user) return location.href="admin-login.html";
+  currentUID=user.uid;
+  const admin=await db.collection("admins").doc(user.uid).get();
+  if(!admin.exists){ await auth.signOut(); location.href="admin-login.html"; }
+  realtimeUsers();
 });
 
-/* ================= LOAD USERS ================= */
-async function loadUsers() {
-  const snap = await db.collection("users").get();
-  table.innerHTML = "";
-
-  let no = 1, total = 0, suspend = 0, admin = 0;
-
-  snap.forEach(doc => {
-    const d = doc.data();
-    const role = d.role || "user";
-    const suspended = d.suspended === true;
-
-    total++;
-    if (suspended) suspend++;
-    if (role === "admin") admin++;
-
-    table.innerHTML += `
-      <tr>
-        <td>${no++}</td>
-        <td>${doc.id}</td>
-        <td>${d.email || "-"}</td>
-        <td class="${role === "admin" ? "role-admin" : "role-user"}">${role}</td>
-        <td>${suspended ? "Nonaktif" : "Aktif"}</td>
-        <td>
-          ${doc.id !== currentAdminUID ? `
-            <button class="btn btn-warn" onclick="resetPassword('${d.email}')">Reset</button>
-            <button class="btn ${suspended ? "btn-ok" : "btn-delete"}"
-              onclick="toggleSuspend('${doc.id}', ${suspended})">
-              ${suspended ? "Aktifkan" : "Suspend"}
-            </button>
-          ` : "-"}
-        </td>
-      </tr>
-    `;
-  });
-
-  document.getElementById("totalUser").textContent = total;
-  document.getElementById("suspendUser").textContent = suspend;
-  document.getElementById("totalAdmin").textContent = admin;
-}
-
-/* ================= RESET PASSWORD ================= */
-function resetPassword(email) {
-  if (!confirm("Kirim reset password ke user ini?")) return;
-  auth.sendPasswordResetEmail(email);
-  logAction("reset_password", email);
-  alert("Email reset password terkirim");
-}
-
-/* ================= SUSPEND ================= */
-async function toggleSuspend(uid, status) {
-  await db.collection("users").doc(uid).update({ suspended: !status });
-  logAction(status ? "aktifkan_user" : "suspend_user", uid);
-  loadUsers();
-}
-
-/* ================= LOG AKTIVITAS ================= */
-function logAction(action, target) {
-  db.collection("admin_logs").add({
-    adminUid: currentAdminUID,
-    action,
-    targetUid: target,
-    time: firebase.firestore.FieldValue.serverTimestamp()
+/* ===== REALTIME USERS ===== */
+function realtimeUsers(){
+  db.collection("users").onSnapshot(snap=>{
+    users=[];
+    snap.forEach(d=>users.push({id:d.id,...d.data()}));
+    render();
   });
 }
 
-/* ================= LOGOUT ================= */
-const logoutBtn = document.getElementById("logoutBtn");
-logoutBtn.addEventListener("click", async () => {
-  logoutBtn.disabled = true;
-  logoutBtn.textContent = "Keluar...";
-  try {
-    await auth.signOut();
-    location.href = "admin-login.html";
-  } catch (err) {
-    alert("Gagal logout: " + err.message);
-    logoutBtn.disabled = false;
-    logoutBtn.textContent = "Logout";
-  }
-});
+/* ===== RENDER ===== */
+function render(){
+  const tbody=document.getElementById("userTable");
+  const q=search.value.toLowerCase();
+  const f=filter.value;
+  tbody.innerHTML="";
+  let no=1,total=0,suspend=0,admin=0;
+
+  users.filter(u=>{
+    return (u.email||"").toLowerCase().includes(q) &&
+      (f===""||u.role===f);
+  }).forEach(u=>{
+    total++; if(u.suspended) suspend++; if(u.role==="admin") admin++;
+    tbody.innerHTML+=`
+    <tr>
+      <td>${no++}</td>
+      <td>${u.id}</td>
+      <td>${u.email||"-"}</td>
+      <td>${u.role||"user"}</td>
+      <td>${u.suspended?"Nonaktif":"Aktif"}</td>
+      <td>
+        <button class="btn btn-admin" onclick="detail('${u.id}')">Detail</button>
+        ${u.id!==currentUID?`
+        <button class="btn ${u.suspended?"btn-ok":"btn-delete"}"
+        onclick="toggleSuspend('${u.id}',${u.suspended})">
+        ${u.suspended?"Aktifkan":"Suspend"}</button>`:"-"}
+      </td>
+    </tr>`;
+  });
+
+  totalUser.textContent=total;
+  suspendUser.textContent=suspend;
+  totalAdmin.textContent=admin;
+}
+
+/* ===== DETAIL ===== */
+function detail(uid){
+  const u=users.find(x=>x.id===uid);
+  detailContent.innerHTML=`
+  <b>UID:</b> ${u.id}<br>
+  <b>Email:</b> ${u.email}<br>
+  <b>Role:</b> ${u.role}<br>
+  <b>Status:</b> ${u.suspended?"Nonaktif":"Aktif"}
+  `;
+  detailModal.classList.remove("hidden");
+}
+function closeModal(){detailModal.classList.add("hidden")}
+
+/* ===== SUSPEND ===== */
+function toggleSuspend(uid,status){
+  if(!confirm("Ubah status user?")) return;
+  db.collection("users").doc(uid).update({suspended:!status});
+}
+
+/* ===== DARK ===== */
+function toggleDark(){document.body.classList.toggle("dark")}
+
+/* ===== LOGOUT ===== */
+function logout(){
+  auth.signOut().then(()=>location.href="admin-login.html");
+}
 </script>
 
 </body>
