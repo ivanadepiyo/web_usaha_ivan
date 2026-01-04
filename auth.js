@@ -6,7 +6,7 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 /* ================================================= */
-/* ================= REGISTER ====================== */
+/* ================= REGISTER USER ================= */
 /* ================================================= */
 document.getElementById("btn")?.addEventListener("click", async () => {
   const nama = document.getElementById("nama").value.trim();
@@ -20,7 +20,6 @@ document.getElementById("btn")?.addEventListener("click", async () => {
   msg.textContent = "";
   msg.style.color = "red";
 
-  // Validasi input
   if (
     !nama || nama.length < 3 || nama.length > 50 ||
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
@@ -34,18 +33,15 @@ document.getElementById("btn")?.addEventListener("click", async () => {
   }
 
   try {
-    // Cek email sudah terdaftar
     const methods = await auth.fetchSignInMethodsForEmail(email);
     if (methods.length > 0) {
       msg.textContent = "Email sudah terdaftar!";
       return;
     }
 
-    // Buat akun baru
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
-    // Simpan data tambahan ke Firestore
     await db.collection("users").doc(user.uid).set({
       nama,
       email,
@@ -54,7 +50,6 @@ document.getElementById("btn")?.addEventListener("click", async () => {
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // Kirim email verifikasi dengan redirect ke login.html
     await user.sendEmailVerification({
       url: window.location.origin + '/login.html'
     });
@@ -65,28 +60,27 @@ document.getElementById("btn")?.addEventListener("click", async () => {
     setTimeout(() => window.location.href = "login.html", 3000);
 
   } catch (err) {
-    msg.style.color = "red";
     msg.textContent = "Gagal mendaftar: " + err.message;
   }
 });
 
 /* ================================================= */
-/* ================= LOGIN ========================= */
+/* ================= LOGIN USER ==================== */
 /* ================================================= */
 document.getElementById("loginBtn")?.addEventListener("click", async () => {
-  const emailInput = document.getElementById("email").value.trim();
-  const passwordInput = document.getElementById("password").value;
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
   const msg = document.getElementById("msg");
 
   msg.textContent = "";
 
-  if (!emailInput || !passwordInput) {
+  if (!email || !password) {
     msg.textContent = "Email dan password harus diisi!";
     return;
   }
 
   try {
-    const userCredential = await auth.signInWithEmailAndPassword(emailInput, passwordInput);
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
     if (!user.emailVerified) {
@@ -103,7 +97,41 @@ document.getElementById("loginBtn")?.addEventListener("click", async () => {
 });
 
 /* ================================================= */
-/* ================= RESET PASSWORD ================= */
+/* ================= LOGIN ADMIN =================== */
+/* ================================================= */
+document.getElementById("loginAdminBtn")?.addEventListener("click", async () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
+
+  msg.textContent = "";
+
+  if (!email || !password) {
+    msg.textContent = "Email dan password harus diisi!";
+    return;
+  }
+
+  try {
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+
+    const adminDoc = await db.collection("admins").doc(user.uid).get();
+
+    if (!adminDoc.exists) {
+      await auth.signOut();
+      msg.textContent = "Akses ditolak: bukan admin";
+      return;
+    }
+
+    window.location.href = "dashboard-admin.html";
+
+  } catch (err) {
+    msg.textContent = err.message;
+  }
+});
+
+/* ================================================= */
+/* ================= RESET PASSWORD ================ */
 /* ================================================= */
 function resetPassword() {
   const email = document.getElementById("email")?.value.trim();
@@ -118,7 +146,7 @@ function resetPassword() {
 }
 
 /* ================================================= */
-/* ================= LOGOUT ========================= */
+/* ================= LOGOUT ======================== */
 /* ================================================= */
 document.getElementById("logoutBtn")?.addEventListener("click", async () => {
   await auth.signOut();
@@ -126,26 +154,42 @@ document.getElementById("logoutBtn")?.addEventListener("click", async () => {
 });
 
 /* ================================================= */
-/* ============ PROTEKSI DASHBOARD ================ */
+/* ============ PROTEKSI DASHBOARD USER ============ */
 /* ================================================= */
 auth.onAuthStateChanged(async (user) => {
-  if (location.pathname.includes("dashboard")) {
+
+  /* ---- Dashboard USER ---- */
+  if (location.pathname.includes("dashboard.html")) {
     if (!user) {
       window.location.href = "login.html";
       return;
     }
 
-    try {
-      const doc = await db.collection("users").doc(user.uid).get();
-      if (doc.exists) {
-        const data = doc.data();
-        document.getElementById("userNama").textContent = data.nama || "-";
-        document.getElementById("userEmail").textContent = data.email || "-";
-        document.getElementById("userTelp").textContent = data.telp || "-";
-        document.getElementById("userAlamat").textContent = data.alamat || "-";
-      }
-    } catch (err) {
-      alert("Gagal mengambil data user: " + err.message);
+    const docUser = await db.collection("users").doc(user.uid).get();
+    if (!docUser.exists) {
+      await auth.signOut();
+      window.location.href = "login.html";
+      return;
+    }
+
+    const data = docUser.data();
+    document.getElementById("userNama")?.textContent = data.nama || "-";
+    document.getElementById("userEmail")?.textContent = data.email || "-";
+    document.getElementById("userTelp")?.textContent = data.telp || "-";
+    document.getElementById("userAlamat")?.textContent = data.alamat || "-";
+  }
+
+  /* ---- Dashboard ADMIN ---- */
+  if (location.pathname.includes("dashboard-admin")) {
+    if (!user) {
+      window.location.href = "login-admin.html";
+      return;
+    }
+
+    const adminDoc = await db.collection("admins").doc(user.uid).get();
+    if (!adminDoc.exists) {
+      await auth.signOut();
+      window.location.href = "login-admin.html";
     }
   }
 });
