@@ -60,40 +60,55 @@ button:hover { background:#c9302c; }
   </div>
 </div>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-firebase.initializeApp({
+const firebaseConfig = {
   apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
   authDomain: "web-usaha-ivan.firebaseapp.com",
   projectId: "web-usaha-ivan",
-});
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 const auth = firebase.auth();
 const db = firebase.firestore();
 const table = document.getElementById("userTable");
 
-auth.onAuthStateChanged(async user => {
+/* ================= PROTEKSI ADMIN ================= */
+auth.onAuthStateChanged(async (user) => {
   if (!user) {
-    window.location.href = "admin-login.html";
+    window.location.href = "login-admin.html";
     return;
   }
 
-  const adminSnap = await db.collection("admins").doc(user.uid).get();
+  try {
+    const adminSnap = await db.collection("admins").doc(user.uid).get();
 
-  if (!adminSnap.exists || adminSnap.data().role !== "admin") {
-    alert("Akses ditolak!");
+    if (!adminSnap.exists) {
+      await auth.signOut();
+      window.location.href = "login-admin.html";
+      return;
+    }
+
+    loadUsers();
+
+  } catch (err) {
+    alert("Terjadi kesalahan: " + err.message);
     await auth.signOut();
-    window.location.href = "admin-login.html";
-    return;
+    window.location.href = "login-admin.html";
   }
-
-  loadUsers();
 });
 
+/* ================= LOAD USERS ================= */
 async function loadUsers() {
+  table.innerHTML = "<tr><td colspan='4'>Memuat data...</td></tr>";
+
   const snap = await db.collection("users").get();
   table.innerHTML = "";
   let no = 1;
@@ -101,6 +116,7 @@ async function loadUsers() {
   snap.forEach(doc => {
     const d = doc.data();
     const role = d.role || "user";
+
     table.innerHTML += `
       <tr>
         <td>${no++}</td>
@@ -110,12 +126,17 @@ async function loadUsers() {
       </tr>
     `;
   });
+
+  if (snap.empty) {
+    table.innerHTML = "<tr><td colspan='4'>Belum ada user</td></tr>";
+  }
 }
 
-document.getElementById("logoutBtn").onclick = async () => {
+/* ================= LOGOUT ================= */
+document.getElementById("logoutBtn").addEventListener("click", async () => {
   await auth.signOut();
-  window.location.href = "admin-login.html";
-};
+  window.location.href = "login-admin.html";
+});
 </script>
 
 </body>
