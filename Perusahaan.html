@@ -1,26 +1,87 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <title>Perusahaan</title>
 <style>
-body { font-family:"Segoe UI",Arial,sans-serif; margin:0; background:#f0f2f5; min-height:100vh; }
-header { background:#1e3c72; color:white; padding:20px; text-align:center; font-size:24px; }
-.container { max-width:800px; margin:30px auto; background:white; border-radius:10px; padding:20px; box-shadow:0 10px 20px rgba(0,0,0,0.1); text-align:center; }
-h2 { color:#1e3c72; margin-bottom:20px; }
-.content { font-size:16px; color:#333; line-height:1.5; }
-button { display:block; margin:20px auto 0; padding:12px 20px; border:none; border-radius:8px; background:#1e3c72; color:white; font-weight:bold; cursor:pointer; }
-button:hover { background:#15509c; }
+body { 
+  font-family:"Segoe UI",Arial,sans-serif; 
+  margin:0; 
+  background:#f0f2f5; 
+  min-height:100vh; 
+}
+header { 
+  background:#1e3c72; 
+  color:white; 
+  padding:20px; 
+  text-align:center; 
+  font-size:24px; 
+}
+.container { 
+  max-width:800px; 
+  margin:30px auto; 
+  background:white; 
+  border-radius:10px; 
+  padding:20px; 
+  box-shadow:0 10px 20px rgba(0,0,0,0.1); 
+  text-align:center; 
+}
+h2 { 
+  color:#1e3c72; 
+  margin-bottom:20px; 
+}
+.content { 
+  font-size:16px; 
+  color:#333; 
+  line-height:1.5; 
+}
+
+button { 
+  display:block; 
+  width:100%;
+  margin:15px 0; 
+  padding:12px 20px; 
+  border:none; 
+  border-radius:8px; 
+  background:#1e3c72; 
+  color:white; 
+  font-weight:bold; 
+  cursor:pointer; 
+}
+button:hover { 
+  background:#15509c; 
+}
+
+.btn-secondary {
+  background:#607d8b;
+}
+.btn-secondary:hover {
+  background:#4b6670;
+}
 </style>
 </head>
+
 <body>
+
 <header>Perusahaan</header>
+
 <div class="container">
-<h2>Informasi Perusahaan</h2>
-<div class="content">
-  <p>Halaman perusahaan. Hanya bisa diakses setelah memasukkan kode di dashboard.</p>
+  <h2>Informasi Perusahaan</h2>
+
+  <div class="content">
+    <p>Halaman perusahaan. Hanya bisa diakses setelah memasukkan kode di dashboard.</p>
+  </div>
+
+  <!-- 🔹 TOMBOL AKSES BARU -->
+  <button onclick="window.location.href='perusahaan-peternakan.html'">
+    🐄 Perusahaan Peternakan
+  </button>
+
+  <!-- 🔹 TOMBOL KEMBALI -->
+  <button class="btn-secondary" onclick="window.location.href='dashboard.html'">
+    ⬅ Kembali ke Dashboard
+  </button>
 </div>
-<button onclick="window.location.href='dashboard.html'">Kembali ke Dashboard</button>
-</div>
+
 </body>
 </html>
