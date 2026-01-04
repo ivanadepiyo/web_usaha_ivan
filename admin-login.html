@@ -23,11 +23,12 @@ body.page-login.auth {
 
 input {
   width:100%;
-  padding:12px 42px 12px 14px;
+  padding:12px 44px 12px 14px;
   border-radius:8px;
   border:1px solid #ccc;
 }
 
+/* ICON */
 .toggle-password {
   position:absolute;
   right:12px;
@@ -37,10 +38,9 @@ input {
   height:22px;
   cursor:pointer;
   display:none;
-  opacity:.65;
+  opacity:.6;
   transition:.15s;
 }
-
 .toggle-password:hover { opacity:1; }
 
 button {
@@ -50,11 +50,7 @@ button {
   font-size:16px; font-weight:bold;
   cursor:pointer;
 }
-
-button:disabled {
-  opacity:.7;
-  cursor:not-allowed;
-}
+button:disabled { opacity:.7; cursor:not-allowed; }
 
 a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
 #msg { margin-top:10px; color:red; font-size:14px; }
@@ -73,10 +69,13 @@ a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
   <div class="input-group">
     <input id="password" type="password" placeholder="Password">
 
-    <!-- SVG EYE ICON -->
-    <svg id="togglePass" class="toggle-password" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2">
-      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/>
-      <circle cx="12" cy="12" r="3"/>
+    <!-- EYE ICON -->
+    <svg id="togglePass" class="toggle-password" viewBox="0 0 24 24"
+      fill="none" stroke="#444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path id="eyePath"
+        d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/>
+      <circle id="eyeCircle" cx="12" cy="12" r="3"/>
+      <line id="eyeSlash" x1="3" y1="3" x2="21" y2="21" style="display:none"/>
     </svg>
   </div>
 
@@ -101,30 +100,34 @@ firebase.initializeApp({
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const togglePass = document.getElementById("togglePass");
+const eyeSlash = document.getElementById("eyeSlash");
 const loginBtn = document.getElementById("loginAdminBtn");
 const msg = document.getElementById("msg");
 
 let hideTimer = null;
 
-/* tampilkan ikon hanya jika ada input */
+/* tampilkan ikon hanya jika password ada */
 passwordInput.addEventListener("input", () => {
   togglePass.style.display = passwordInput.value ? "block" : "none";
 });
 
-/* toggle + auto hide 3 detik */
+/* toggle + eye-off + auto hide */
 togglePass.addEventListener("click", () => {
   clearTimeout(hideTimer);
 
   if (passwordInput.type === "password") {
     passwordInput.type = "text";
+    eyeSlash.style.display = "block";
+
     hideTimer = setTimeout(() => {
       passwordInput.type = "password";
+      eyeSlash.style.display = "none";
     }, 3000);
   } else {
     passwordInput.type = "password";
+    eyeSlash.style.display = "none";
   }
 });
 
@@ -132,7 +135,7 @@ togglePass.addEventListener("click", () => {
 loginBtn.addEventListener("click", async () => {
   msg.textContent = "";
 
-  const email = emailInput.value.trim();
+  const email = document.getElementById("email").value.trim();
   const password = passwordInput.value;
 
   if (!email || !password) {
@@ -154,7 +157,6 @@ loginBtn.addEventListener("click", async () => {
     }
 
     window.location.href = "dashboard-admin.html";
-
   } catch (err) {
     msg.textContent = err.message;
     loginBtn.disabled = false;
