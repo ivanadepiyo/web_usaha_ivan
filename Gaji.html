@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Manajemen Gaji</title>
 
-<!-- ================= FIREBASE SDK ================= -->
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-<!-- ================= EXPORT EXCEL ================= -->
+<!-- EXPORT -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 :root{
@@ -26,86 +27,26 @@ body.dark{
   --text:#f5f5f5;
 }
 *{box-sizing:border-box;font-family:"Segoe UI",Arial}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  transition:.3s;
-}
-header{
-  background:var(--primary);
-  color:white;
-  padding:20px;
-  text-align:center;
-  font-size:24px;
-}
-.container{
-  max-width:1100px;
-  margin:20px auto;
-  padding:15px;
-}
-.card{
-  background:var(--card);
-  border-radius:15px;
-  padding:20px;
-  box-shadow:0 10px 25px rgba(0,0,0,.15);
-}
-.top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  flex-wrap:wrap;
-}
-button{
-  padding:10px 15px;
-  border:none;
-  border-radius:8px;
-  background:var(--primary);
-  color:white;
-  cursor:pointer;
-}
-button:hover{opacity:.9}
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:15px;
-}
-th,td{
-  padding:12px;
-  border-bottom:1px solid #ccc;
-  text-align:left;
-}
+body{margin:0;background:var(--bg);color:var(--text);transition:.3s}
+header{background:var(--primary);color:white;padding:20px;text-align:center;font-size:24px}
+.container{max-width:1100px;margin:20px auto;padding:15px}
+.card{background:var(--card);border-radius:15px;padding:20px;box-shadow:0 10px 25px rgba(0,0,0,.15)}
+.top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
+button{padding:8px 12px;border:none;border-radius:8px;background:var(--primary);color:white;cursor:pointer}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{padding:12px;border-bottom:1px solid #ccc;text-align:left}
 th{background:rgba(0,0,0,.05)}
 .toggle{cursor:pointer;font-size:20px;margin-right:10px}
-
-/* ===== MODAL KODE ===== */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-.modal-box{
-  background:white;
-  padding:25px;
-  border-radius:12px;
-  width:320px;
-  text-align:center;
-}
-.modal-box input{
-  width:100%;
-  padding:10px;
-  margin:10px 0;
-}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;justify-content:center;align-items:center}
+.modal-box{background:white;padding:25px;border-radius:12px;width:320px;text-align:center}
+.modal-box input{width:100%;padding:10px;margin:10px 0}
 .hidden{display:none}
 </style>
 </head>
 
 <body>
 
-<!-- ========== MODAL VALIDASI KODE ========== -->
+<!-- MODAL KODE -->
 <div class="modal" id="kodeModal">
   <div class="modal-box">
     <h3>🔐 Akses Data Gaji</h3>
@@ -123,6 +64,7 @@ th{background:rgba(0,0,0,.05)}
       <div>
         <span class="toggle" onclick="toggleDark()">🌙</span>
         <button onclick="exportExcel()">📥 Excel</button>
+        <button onclick="formTambah()">➕ Gaji</button>
       </div>
     </div>
 
@@ -132,19 +74,20 @@ th{background:rgba(0,0,0,.05)}
           <th>Nama</th>
           <th>Jabatan</th>
           <th>Gaji</th>
+          <th>Aksi</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
 
     <button style="margin-top:20px" onclick="location.href='dashboard.html'">
-      ⬅ Kembali ke Dashboard
+      ⬅ Dashboard
     </button>
   </div>
 </div>
 
 <script>
-/* ================= FIREBASE CONFIG ================= */
+/* FIREBASE CONFIG */
 firebase.initializeApp({
   apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
   authDomain: "web-usaha-ivan.firebaseapp.com",
@@ -155,49 +98,89 @@ firebase.initializeApp({
 });
 
 const db = firebase.firestore();
+let userRole = "viewer";
 
-/* ================= KODE AKSES ================= */
-const KODE_GAJI = "GAJI-IVAN-2025";
+/* ROLE USER */
+firebase.auth().onAuthStateChanged(user=>{
+  if(user){
+    db.collection("users").doc(user.uid).get().then(d=>{
+      if(d.exists) userRole = d.data().role;
+    });
+  }
+});
 
+/* KODE AKSES */
+const KODE_GAJI="GAJI-IVAN-2025";
 function cekKode(){
-  if(kodeInput.value === KODE_GAJI){
+  if(kodeInput.value===KODE_GAJI){
     kodeModal.classList.add("hidden");
     app.classList.remove("hidden");
     loadGaji();
-  }else{
-    alert("❌ Kode gaji salah");
-  }
+  } else alert("Kode salah");
 }
 
-/* ================= LOAD DATA REALTIME ================= */
+/* LOAD DATA */
 function loadGaji(){
-  db.collection("gaji").onSnapshot(snapshot=>{
-    const tbody = document.querySelector("#tabelGaji tbody");
-    tbody.innerHTML = "";
-    snapshot.forEach(doc=>{
-      const d = doc.data();
-      tbody.innerHTML += `
-        <tr>
-          <td>${d.nama}</td>
-          <td>${d.jabatan}</td>
-          <td>Rp ${Number(d.gaji).toLocaleString("id-ID")}</td>
-        </tr>
-      `;
+  db.collection("gaji").onSnapshot(snap=>{
+    const tbody=document.querySelector("#tabelGaji tbody");
+    tbody.innerHTML="";
+    snap.forEach(doc=>{
+      const d=doc.data();
+      tbody.innerHTML+=`
+      <tr>
+        <td>${d.nama}</td>
+        <td>${d.jabatan}</td>
+        <td>Rp ${Number(d.gaji).toLocaleString("id-ID")}</td>
+        <td>
+          ${userRole!=="viewer"?`
+          <button onclick="editGaji('${doc.id}','${d.nama}','${d.jabatan}',${d.gaji})">✏️</button>
+          <button onclick="hapusGaji('${doc.id}')">🗑</button>`:""}
+          <button onclick="cetakPDF('${d.nama}','${d.jabatan}',${d.gaji})">📄</button>
+        </td>
+      </tr>`;
     });
   });
 }
 
-/* ================= DARK MODE ================= */
-function toggleDark(){
-  document.body.classList.toggle("dark");
+/* TAMBAH */
+function formTambah(){
+  if(userRole==="viewer") return alert("Akses ditolak");
+  const n=prompt("Nama");
+  const j=prompt("Jabatan");
+  const g=prompt("Gaji");
+  if(n&&j&&g) db.collection("gaji").add({nama:n,jabatan:j,gaji:Number(g)});
 }
 
-/* ================= EXPORT EXCEL ================= */
+/* EDIT */
+function editGaji(id,n,j,g){
+  const nn=prompt("Nama",n);
+  const jj=prompt("Jabatan",j);
+  const gg=prompt("Gaji",g);
+  if(nn&&jj&&gg) db.collection("gaji").doc(id).update({nama:nn,jabatan:jj,gaji:Number(gg)});
+}
+
+/* HAPUS */
+function hapusGaji(id){
+  if(confirm("Hapus data?")) db.collection("gaji").doc(id).delete();
+}
+
+/* PDF */
+function cetakPDF(n,j,g){
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF();
+  pdf.text("SLIP GAJI",20,20);
+  pdf.text(`Nama : ${n}`,20,40);
+  pdf.text(`Jabatan : ${j}`,20,50);
+  pdf.text(`Gaji : Rp ${g.toLocaleString("id-ID")}`,20,60);
+  pdf.save(`Slip_Gaji_${n}.pdf`);
+}
+
+/* DARK */
+function toggleDark(){document.body.classList.toggle("dark");}
+
+/* EXCEL */
 function exportExcel(){
-  const wb = XLSX.utils.table_to_book(
-    document.getElementById("tabelGaji"),
-    {sheet:"Gaji"}
-  );
+  const wb=XLSX.utils.table_to_book(tabelGaji,{sheet:"Gaji"});
   XLSX.writeFile(wb,"Data_Gaji.xlsx");
 }
 </script>
