@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Login Admin | Web Perusahaan</title>
+
 <style>
 * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
 body.page-login.auth {
@@ -41,14 +42,16 @@ a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
   <h2>Login Admin</h2>
 
   <div class="input-group">
-    <input id="email" placeholder="Email">
+    <input id="email" type="email" placeholder="Email">
   </div>
 
   <div class="input-group">
     <input id="password" type="password" placeholder="Password">
   </div>
 
-  <button id="loginBtn">Login</button>
+  <!-- PENTING: id ini khusus admin -->
+  <button id="loginAdminBtn">Login Admin</button>
+
   <a href="lupa-password.html">Lupa Password?</a>
   <p id="msg"></p>
 </div>
@@ -68,12 +71,15 @@ const firebaseConfig = {
   appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
 };
 
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-document.getElementById("loginBtn").addEventListener("click", async () => {
+/* ================= LOGIN ADMIN ================= */
+document.getElementById("loginAdminBtn").addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const msg = document.getElementById("msg");
@@ -89,21 +95,15 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
     const cred = await auth.signInWithEmailAndPassword(email, password);
     const user = cred.user;
 
-    if (!user.emailVerified) {
-      msg.textContent = "Silakan verifikasi email terlebih dahulu!";
-      await auth.signOut();
-      return;
-    }
-
     const adminSnap = await db.collection("admins").doc(user.uid).get();
 
-    if (!adminSnap.exists || adminSnap.data().role !== "admin") {
-      msg.textContent = "Akses ditolak: bukan admin!";
+    if (!adminSnap.exists) {
       await auth.signOut();
+      msg.textContent = "Akses ditolak: bukan admin!";
       return;
     }
 
-    window.location.href = "DashboardAdmin.html";
+    window.location.href = "dashboard-admin.html";
 
   } catch (err) {
     msg.textContent = err.message;
