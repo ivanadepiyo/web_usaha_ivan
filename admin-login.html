@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>admin login| Web Perusahaan</title>
+<title>admin login | Web Perusahaan</title>
 
 <style>
 * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
@@ -18,11 +18,31 @@ body.page-login.auth {
   text-align:center;
 }
 .card h2 { margin-bottom:20px; color:#1e3c72; }
-.input-group { margin-bottom:14px; text-align:left; }
-input {
-  width:100%; padding:12px 14px;
-  border-radius:8px; border:1px solid #ccc;
+
+.input-group {
+  margin-bottom:14px;
+  text-align:left;
+  position:relative;
 }
+
+input {
+  width:100%;
+  padding:12px 40px 12px 14px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+.toggle-password {
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  cursor:pointer;
+  font-size:18px;
+  color:#666;
+  user-select:none;
+}
+
 button {
   width:100%; padding:12px;
   background:#1e3c72; color:white;
@@ -31,6 +51,7 @@ button {
   cursor:pointer;
 }
 button:hover { background:#2a5298; }
+
 a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
 #msg { margin-top:10px; color:red; font-size:14px; }
 </style>
@@ -39,7 +60,7 @@ a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
 <body class="page-login auth">
 
 <div class="card">
-  <h2>Login Admin</h2>
+  <h2>admin login</h2>
 
   <div class="input-group">
     <input id="email" type="email" placeholder="Email">
@@ -47,10 +68,10 @@ a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
 
   <div class="input-group">
     <input id="password" type="password" placeholder="Password">
+    <span class="toggle-password" onclick="togglePassword()">👁️</span>
   </div>
 
-  <!-- PENTING: id ini khusus admin -->
-  <button id="loginAdminBtn">admin login</button>
+  <button id="adminloginBtn">admin login</button>
 
   <a href="lupa-password.html">Lupa Password?</a>
   <p id="msg"></p>
@@ -78,8 +99,14 @@ if (!firebase.apps.length) {
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+/* 👁️ TOGGLE PASSWORD (FITUR BARU, AMAN) */
+function togglePassword() {
+  const p = document.getElementById("password");
+  p.type = p.type === "password" ? "text" : "password";
+}
+
 /* ================= LOGIN ADMIN ================= */
-document.getElementById("admin loginBtn").addEventListener("click", async () => {
+document.getElementById("adminloginBtn").addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const msg = document.getElementById("msg");
@@ -96,7 +123,6 @@ document.getElementById("admin loginBtn").addEventListener("click", async () => 
     const user = cred.user;
 
     const adminSnap = await db.collection("admins").doc(user.uid).get();
-
     if (!adminSnap.exists) {
       await auth.signOut();
       msg.textContent = "Akses ditolak: bukan admin!";
