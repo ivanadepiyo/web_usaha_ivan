@@ -99,7 +99,7 @@ document.getElementById("loginBtn")?.addEventListener("click", async () => {
 /* ================================================= */
 /* ================= LOGIN ADMIN =================== */
 /* ================================================= */
-document.getElementById("loginAdminBtn")?.addEventListener("click", async () => {
+document.getElementById("adminloginBtn")?.addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const msg = document.getElementById("msg");
@@ -182,14 +182,14 @@ auth.onAuthStateChanged(async (user) => {
   /* ---- Dashboard ADMIN ---- */
   if (location.pathname.includes("dashboard-admin")) {
     if (!user) {
-      window.location.href = "login-admin.html";
+      window.location.href = "admin-login.html";
       return;
     }
 
     const adminDoc = await db.collection("admins").doc(user.uid).get();
     if (!adminDoc.exists) {
       await auth.signOut();
-      window.location.href = "login-admin.html";
+      window.location.href = "admin-login.html";
     }
   }
 });
