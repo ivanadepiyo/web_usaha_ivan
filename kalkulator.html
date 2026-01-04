@@ -1,198 +1,230 @@
-
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>kalkulator</title>
+<title>Kalkulator</title>
+
 <style>
-body {
-    font-family: 'Arial', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(120deg, #2980b9, #6dd5fa);
-    margin: 0;
-    height: 100vh;
+*{
+  box-sizing:border-box;
+  font-family:"Segoe UI",Arial,sans-serif;
+}
+body{
+  margin:0;
+  min-height:100vh;
+  background:#f0f2f5;
 }
 
-/* Container horizontal untuk kalkulator + history */
-.container {
-    display: flex;
-    gap: 20px;
+/* HEADER */
+header{
+  background:#1e3c72;
+  color:#fff;
+  padding:18px;
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
 }
 
-/* Kalkulator */
-.kalkulator {
-    width: 300px;
-    background: #1e1e1e;
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 0 25px rgba(0,0,0,0.5);
+/* LAYOUT */
+.container{
+  max-width:1100px;
+  margin:30px auto;
+  display:flex;
+  gap:20px;
+  padding:0 15px;
 }
 
-.layar {
-    width: 95%;
-    height: 60px;
-    font-size: 28px;
-    text-align: right;
-    padding: 10px;
-    border-radius: 10px;
-    border: none;
-    outline: none;
-    background: #fff;
-    margin-bottom: 10px;
+/* CARD */
+.card{
+  background:#fff;
+  border-radius:12px;
+  padding:20px;
+  box-shadow:0 8px 18px rgba(0,0,0,0.1);
 }
 
-/* Tombol */
-.tombol {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
+/* KALKULATOR */
+.kalkulator{
+  width:340px;
 }
-button {
-    height: 30px;
-    font-size: 10px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    background: #333;
-    color: white;
-    transition: 0.2s;
+.layar{
+  width:100%;
+  height:60px;
+  font-size:26px;
+  text-align:right;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  margin-bottom:15px;
 }
-button:hover { background: #555; }
-.operator { background: #ff9500; }
-.operator:hover { background: #e08900; }
-.clear { background: #d32f2f; }
-.clear:hover { background: #b71c1c; }
-.hasil { grid-column: span 5; background: #4caf50; }
-.hasil:hover { background: #43a047; }
 
-/* History di samping */
-.history-container {
-    width: 250px;
-    background: #f9f9f9;
-    color: #333;
-    border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3);
-    max-height: 500px;
-    overflow-y: auto;
+.tombol{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
 }
-.history-container h3 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 18px;
-    text-align: center;
+button{
+  height:42px;
+  border:none;
+  border-radius:8px;
+  background:#e3e7ed;
+  color:#333;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
 }
+button:hover{background:#d6dce6}
+
+.operator{
+  background:#1e3c72;
+  color:#fff;
+}
+.operator:hover{background:#15509c}
+
+.clear{
+  background:#d32f2f;
+  color:#fff;
+}
+.clear:hover{background:#b71c1c}
+
+.hasil{
+  grid-column:span 5;
+  background:#4caf50;
+  color:#fff;
+}
+.hasil:hover{background:#43a047}
+
+/* HISTORY */
+.history{
+  flex:1;
+}
+.history h3{
+  margin-top:0;
+  color:#1e3c72;
+  text-align:center;
+}
+#history{
+  font-size:14px;
+  line-height:1.6;
+  color:#333;
+}
+
+/* FOOTER BUTTON */
+.back{
+  margin-top:20px;
+  width:100%;
+  background:#607d8b;
+  color:#fff;
+}
+.back:hover{background:#4b6670}
 </style>
 </head>
+
 <body>
 
+<header>Kalkulator</header>
+
 <div class="container">
-    <div class="kalkulator">
-        <input type="text" class="layar" id="layar" disabled>
 
-        <div class="tombol">
-            <!-- Tombol kalkulator -->
+  <!-- KALKULATOR -->
+  <div class="card kalkulator">
+    <input id="layar" class="layar" disabled>
 
-            <button class="clear" onclick="hapus()">C</button>
-	    <button onclick="hapusSatu()">⌫</button>
-            <button onclick="hapusRiwayat()">Hapus Riwayat</button>
-            <button onclick="tambah('±')">±</button>
-            <button onclick="tambah('%')">%</button>
-            <button onclick="tambah('√')">√</button>
-            <button class="operator" onclick="tambah('/')">/</button>
+    <div class="tombol">
+      <button class="clear" onclick="clearAll()">C</button>
+      <button onclick="backspace()">⌫</button>
+      <button onclick="clearHistory()">Hapus Riwayat</button>
+      <button onclick="toggleSign()">±</button>
+      <button onclick="percent()">%</button>
 
-            <button onclick="tambah('7')">7</button>
-            <button onclick="tambah('8')">8</button>
-            <button onclick="tambah('9')">9</button>
-            <button onclick="tambah('^2')">x²</button>
-            <button class="operator" onclick="tambah('*')">*</button>
+      <button onclick="sqrt()">√</button>
+      <button class="operator" onclick="add('/')">/</button>
+      <button onclick="add('7')">7</button>
+      <button onclick="add('8')">8</button>
+      <button onclick="add('9')">9</button>
 
-            <button onclick="tambah('4')">4</button>
-            <button onclick="tambah('5')">5</button>
-            <button onclick="tambah('6')">6</button>
-            <button onclick="tambah('^3')">x³</button>
-            <button class="operator" onclick="tambah('-')">-</button>
+      <button onclick="square()">x²</button>
+      <button class="operator" onclick="add('*')">*</button>
+      <button onclick="add('4')">4</button>
+      <button onclick="add('5')">5</button>
+      <button onclick="add('6')">6</button>
 
-            <button onclick="tambah('1')">1</button>
-            <button onclick="tambah('2')">2</button>
-            <button onclick="tambah('3')">3</button>
-            <button onclick="tambah('(')">(</button>
-            <button class="operator" onclick="tambah('+')">+</button>
+      <button onclick="cube()">x³</button>
+      <button class="operator" onclick="add('-')">-</button>
+      <button onclick="add('1')">1</button>
+      <button onclick="add('2')">2</button>
+      <button onclick="add('3')">3</button>
 
-            <button onclick="tambah('0')">0</button>
-            <button onclick="tambah('.')">.</button>
-            <button onclick="tambah(')')">)</button>
-            <button onclick="tambah('^')">^</button>
-            <button class="hasil" onclick="hitung()">=</button>
+      <button onclick="add('(')">(</button>
+      <button class="operator" onclick="add('+')">+</button>
+      <button onclick="add('0')">0</button>
+      <button onclick="add('.')">.</button>
+      <button onclick="add(')')">)</button>
 
-            <!-- Tombol ilmiah -->
-            <button onclick="tambah('Math.sin(')">sin</button>
-            <button onclick="tambah('Math.cos(')">cos</button>
-            <button onclick="tambah('Math.tan(')">tan</button>
-            <button onclick="tambah('Math.log10(')">log</button>
-            <button onclick="tambah('Math.log(')">ln</button>
-        </div>
+      <button class="hasil" onclick="calculate()">=</button>
+
+      <button onclick="trig('sin')">sin</button>
+      <button onclick="trig('cos')">cos</button>
+      <button onclick="trig('tan')">tan</button>
+      <button onclick="log10()">log</button>
+      <button onclick="ln()">ln</button>
     </div>
 
-    <!-- History terpisah di samping -->
-    <div class="history-container">
-        <h3>Riwayat Perhitungan</h3>
-        <div id="history"></div>
-    </div>
+    <button class="back" onclick="window.location.href='dashboard.html'">
+      ⬅ Kembali ke Dashboard
+    </button>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="card history">
+    <h3>Riwayat Perhitungan</h3>
+    <div id="history"></div>
+  </div>
+
 </div>
 
 <script>
-let historyData = [];
+let layar=document.getElementById("layar")
+let history=[]
 
-function tambah(value) {
-    const layar = document.getElementById("layar");
-    if(value === '±') {
-        if(layar.value) layar.value = (-1 * parseFloat(layar.value)).toString();
-        return;
-    }
-    layar.value += value;
+function add(v){layar.value+=v}
+function clearAll(){layar.value=""}
+function backspace(){layar.value=layar.value.slice(0,-1)}
+
+function toggleSign(){if(layar.value) layar.value=eval(layar.value)*-1}
+function percent(){if(layar.value) layar.value=eval(layar.value)/100}
+function sqrt(){if(layar.value) layar.value=Math.sqrt(eval(layar.value))}
+function square(){if(layar.value) layar.value=Math.pow(eval(layar.value),2)}
+function cube(){if(layar.value) layar.value=Math.pow(eval(layar.value),3)}
+
+function trig(t){
+  let v=eval(layar.value)
+  let r=v*Math.PI/180
+  if(t==="sin") layar.value=Math.sin(r)
+  if(t==="cos") layar.value=Math.cos(r)
+  if(t==="tan") layar.value=Math.tan(r)
 }
 
-function hapusSatu() {
-    let layar = document.getElementById("layar");
-    layar.value = layar.value.slice(0, -1);
+function log10(){layar.value=Math.log10(eval(layar.value))}
+function ln(){layar.value=Math.log(eval(layar.value))}
+
+function calculate(){
+  try{
+    let r=eval(layar.value)
+    history.unshift(layar.value+" = "+r)
+    if(history.length>10)history.pop()
+    document.getElementById("history").innerHTML=history.join("<br>")
+    layar.value=r
+  }catch{
+    layar.value="Error"
+  }
 }
 
-function hapus() {
-    document.getElementById("layar").value = "";
-}
-
-// Fungsi hapus riwayat
-function hapusRiwayat() {
-    historyData = [];
-    document.getElementById("history").innerHTML = "";
-}
-
-function hitung() {
-    try {
-        let layarEl = document.getElementById("layar");
-        let ekspresi = layarEl.value;
-
-        ekspresi = ekspresi.replace(/√/g, "Math.sqrt");
-        ekspresi = ekspresi.replace(/\^2/g, "**2");
-        ekspresi = ekspresi.replace(/\^3/g, "**3");
-        ekspresi = ekspresi.replace(/%/g, "*0.01");
-
-        let hasil = eval(ekspresi);
-        layarEl.value = hasil;
-
-        // Update history
-        historyData.unshift(ekspresi + " = " + hasil);
-        if(historyData.length > 10) historyData.pop();
-        document.getElementById("history").innerHTML = historyData.join("<br>");
-    } catch {
-        document.getElementById("layar").value = "Error";
-    }
+function clearHistory(){
+  history=[]
+  document.getElementById("history").innerHTML=""
 }
 </script>
 
 </body>
 </html>
-
