@@ -5,19 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Manajemen Pekerjaan</title>
 
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <style>
 :root{
-  --bg:#f0f2f5;
-  --card:#ffffff;
-  --text:#222;
-  --primary:#1e3c72;
-  --muted:#777;
+  --bg:#f0f2f5;--card:#fff;--text:#222;--primary:#1e3c72;
 }
 body.dark{
-  --bg:#121212;
-  --card:#1e1e1e;
-  --text:#f5f5f5;
-  --muted:#aaa;
+  --bg:#121212;--card:#1e1e1e;--text:#f5f5f5;
 }
 *{box-sizing:border-box;font-family:"Segoe UI",Arial}
 body{margin:0;background:var(--bg);color:var(--text);transition:.3s}
@@ -27,12 +24,10 @@ header{background:var(--primary);color:white;padding:20px;text-align:center;font
 .top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
 input,select{padding:10px;border-radius:8px;border:1px solid #ccc}
 button{padding:10px 14px;border:none;border-radius:8px;background:var(--primary);color:white;cursor:pointer}
-button:hover{opacity:.9}
 .toggle{cursor:pointer;font-size:20px}
 
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin:15px 0}
 .stat{background:rgba(0,0,0,.05);padding:15px;border-radius:12px;text-align:center}
-.stat h3{margin:5px 0}
 
 table{width:100%;border-collapse:collapse;margin-top:15px}
 th,td{padding:12px;border-bottom:1px solid #ccc}
@@ -42,18 +37,9 @@ th{background:rgba(0,0,0,.05)}
 .aktif{background:#4caf50}
 .selesai{background:#777}
 
-.prio-tinggi{color:#e53935;font-weight:bold}
-.prio-sedang{color:#f9a825}
-.prio-rendah{color:#43a047}
-
-.actions button{margin-right:5px}
-
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center}
 .modal-box{background:var(--card);padding:25px;border-radius:15px;width:320px}
-.modal-box h3{text-align:center;margin-top:0}
 .modal-box input,.modal-box select{width:100%;margin-bottom:10px}
-
-.footer-btn{margin-top:20px;text-align:center}
 </style>
 </head>
 
@@ -73,23 +59,8 @@ th{background:rgba(0,0,0,.05)}
 </div>
 
 <div class="stats">
-<div class="stat">
-<h3 id="totalAktif">0</h3>
-<span>Aktif</span>
-</div>
-<div class="stat">
-<h3 id="totalSelesai">0</h3>
-<span>Selesai</span>
-</div>
-</div>
-
-<div class="top">
-<input id="search" placeholder="Cari..." onkeyup="render()">
-<select id="filter" onchange="render()">
-<option value="">Semua Status</option>
-<option value="Aktif">Aktif</option>
-<option value="Selesai">Selesai</option>
-</select>
+<div class="stat"><h3 id="aktif">0</h3>Aktif</div>
+<div class="stat"><h3 id="selesai">0</h3>Selesai</div>
 </div>
 
 <table>
@@ -106,10 +77,6 @@ th{background:rgba(0,0,0,.05)}
 <tbody id="tbody"></tbody>
 </table>
 
-<div class="footer-btn">
-<button onclick="location.href='dashboard.html'">⬅ Kembali ke Dashboard</button>
-</div>
-
 </div>
 </div>
 
@@ -118,85 +85,80 @@ th{background:rgba(0,0,0,.05)}
 <div class="modal-box">
 <h3>Tambah Pekerjaan</h3>
 <input id="nama" placeholder="Nama karyawan">
-<input id="judul" placeholder="Pekerjaan">
+<input id="judul" placeholder="Nama pekerjaan">
 <input type="date" id="deadline">
 <select id="prioritas">
-<option value="Rendah">Rendah</option>
-<option value="Sedang">Sedang</option>
-<option value="Tinggi">Tinggi</option>
+<option>Rendah</option>
+<option>Sedang</option>
+<option>Tinggi</option>
 </select>
-<button onclick="simpanPekerjaan()">Simpan</button>
+<button onclick="simpan()">Simpan</button>
 </div>
 </div>
 
 <script>
-let pekerjaan = JSON.parse(localStorage.getItem("pekerjaan")) || [];
+firebase.initializeApp({
+  apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
+  authDomain: "web-usaha-ivan.firebaseapp.com",
+  projectId: "web-usaha-ivan"
+});
+
+const db = firebase.firestore();
+const tbody = document.getElementById("tbody");
 
 function render(){
-const tbody=document.getElementById("tbody");
+db.collection("pekerjaan").orderBy("createdAt","desc")
+.onSnapshot(snap=>{
 tbody.innerHTML="";
-let aktif=0, selesai=0;
-const search=searchInput().toLowerCase();
-const filter=document.getElementById("filter").value;
-
-pekerjaan.filter(p=>
-(p.nama+p.judul).toLowerCase().includes(search) &&
-(filter===""||p.status===filter)
-).forEach((p,i)=>{
-if(p.status==="Aktif") aktif++; else selesai++;
+let a=0,s=0;
+snap.forEach(doc=>{
+const d=doc.data();
+if(d.status==="Aktif")a++; else s++;
 tbody.innerHTML+=`
 <tr>
-<td>${p.nama}</td>
-<td>${p.judul}</td>
-<td>${p.deadline||"-"}</td>
-<td class="prio-${p.prioritas.toLowerCase()}">${p.prioritas}</td>
-<td><span class="status ${p.status==="Aktif"?"aktif":"selesai"}">${p.status}</span></td>
-<td class="actions">
-<button onclick="toggleStatus(${i})">🔄</button>
-<button onclick="hapus(${i})">🗑</button>
+<td>${d.nama}</td>
+<td>${d.judul}</td>
+<td>${d.deadline||"-"}</td>
+<td>${d.prioritas}</td>
+<td><span class="status ${d.status==="Aktif"?"aktif":"selesai"}">${d.status}</span></td>
+<td>
+<button onclick="toggle('${doc.id}','${d.status}')">🔄</button>
+<button onclick="hapus('${doc.id}')">🗑</button>
 </td>
 </tr>`;
 });
-
-totalAktif.innerText=aktif;
-totalSelesai.innerText=selesai;
+aktif.innerText=a; selesai.innerText=s;
+});
 }
 
-function searchInput(){return document.getElementById("search").value}
-
-function openModal(){modal.style.display="flex"}
-window.onclick=e=>{if(e.target===modal)modal.style.display="none"}
-
-function simpanPekerjaan(){
-const data={
+function simpan(){
+db.collection("pekerjaan").add({
 nama:nama.value,
 judul:judul.value,
 deadline:deadline.value,
 prioritas:prioritas.value,
-status:"Aktif"
-};
-if(!data.nama||!data.judul)return;
-pekerjaan.push(data);
-localStorage.setItem("pekerjaan",JSON.stringify(pekerjaan));
+status:"Aktif",
+createdAt:firebase.firestore.FieldValue.serverTimestamp()
+});
 modal.style.display="none";
-render();
 }
 
-function toggleStatus(i){
-pekerjaan[i].status=pekerjaan[i].status==="Aktif"?"Selesai":"Aktif";
-localStorage.setItem("pekerjaan",JSON.stringify(pekerjaan));
-render();
+function toggle(id,status){
+db.collection("pekerjaan").doc(id).update({
+status:status==="Aktif"?"Selesai":"Aktif"
+});
 }
 
-function hapus(i){
+function hapus(id){
 if(confirm("Hapus pekerjaan?")){
-pekerjaan.splice(i,1);
-localStorage.setItem("pekerjaan",JSON.stringify(pekerjaan));
-render();
+db.collection("pekerjaan").doc(id).delete();
 }
 }
 
+function openModal(){modal.style.display="flex"}
+window.onclick=e=>{if(e.target===modal)modal.style.display="none"}
 function toggleDark(){document.body.classList.toggle("dark")}
+
 render();
 </script>
 
