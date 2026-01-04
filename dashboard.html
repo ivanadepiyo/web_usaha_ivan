@@ -6,67 +6,94 @@
 <title>Dashboard | Web Perusahaan</title>
 
 <style>
-*{box-sizing:border-box;font-family:"Segoe UI",Arial}
-:root{
-  --bg:#f0f2f5;
-  --card:#ffffff;
-  --text:#222;
-  --primary:#1e3c72;
-}
-body.dark{
-  --bg:#121212;
-  --card:#1e1e1e;
-  --text:#f5f5f5;
-}
 body{
-  margin:0;background:var(--bg);color:var(--text);
-  min-height:100vh;transition:.3s
+  font-family:"Segoe UI",Arial,sans-serif;
+  margin:0;
+  background:#f0f2f5;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
 }
+
+/* HEADER */
 header{
-  background:var(--primary);color:white;
-  padding:20px;text-align:center;font-size:24px
+  background:#1e3c72;
+  color:white;
+  padding:20px;
+  text-align:center;
+  font-size:24px;
 }
+
+/* CONTAINER */
 .container{
-  max-width:600px;margin:30px auto;
-  background:var(--card);border-radius:12px;
-  padding:20px;box-shadow:0 10px 25px rgba(0,0,0,.15);
-  text-align:center
+  max-width:600px;
+  margin:30px auto;
+  background:white;
+  border-radius:12px;
+  padding:25px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.12);
+  text-align:center;
 }
-.badge{
-  display:inline-block;
-  padding:5px 12px;
-  border-radius:20px;
-  background:#4caf50;
-  color:white;font-size:12px;
-  margin-bottom:10px
-}
+
+/* BUTTON */
 button{
-  display:block;width:80%;
-  margin:12px auto;padding:12px 20px;
-  border:none;border-radius:8px;
-  background:var(--primary);color:white;
-  font-weight:bold;cursor:pointer;font-size:16px
+  display:block;
+  width:85%;
+  margin:12px auto;
+  padding:13px 20px;
+  border:none;
+  border-radius:10px;
+  background:#1e3c72;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:16px;
+  transition:0.2s;
 }
-button:hover{opacity:.9}
-#logoutBtn{background:#d9534f}
-.toggle{cursor:pointer;font-size:20px;margin-bottom:10px}
+button:hover{ background:#15509c; }
+
+#logoutBtn{
+  background:#d9534f;
+}
+#logoutBtn:hover{
+  background:#c9302c;
+}
 
 /* MODAL */
 .modal{
-  display:none;position:fixed;
-  inset:0;background:rgba(0,0,0,.6);
-  justify-content:center;align-items:center
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
 }
 .modal-content{
-  background:white;padding:20px;
-  border-radius:12px;text-align:center;
-  width:300px
+  background:white;
+  padding:22px;
+  border-radius:12px;
+  text-align:center;
+  width:300px;
 }
-body.dark .modal-content{background:#1e1e1e;color:white}
 .modal-content input{
-  width:90%;padding:10px;
-  margin-top:10px;border-radius:6px;
-  border:1px solid #ccc;font-size:16px
+  width:90%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+
+/* FOOTER */
+footer{
+  margin-top:auto;
+  background:#fff;
+  padding:12px;
+  text-align:center;
+  font-size:13px;
+  color:#555;
+  border-top:1px solid #eee;
 }
 </style>
 </head>
@@ -76,16 +103,12 @@ body.dark .modal-content{background:#1e1e1e;color:white}
 <header>Dashboard Web Perusahaan</header>
 
 <div class="container">
-  <div class="toggle" onclick="toggleDark()">🌙</div>
-  <div class="badge" id="roleBadge">Loading...</div>
-  <p id="lastLogin" style="font-size:12px;opacity:.7"></p>
-
-  <h2>Menu Akses</h2>
+  <h2>Menu Akses Admin</h2>
 
   <button id="btnDataDiri">Data Diri</button>
-  <button id="btnPerusahaan">Perusahaan 🔐</button>
-  <button id="btnGaji">Daftar Gaji 🔐</button>
-  <button id="btnPekerjaan">Pekerjaan 🔐</button>
+  <button id="btnPerusahaan">Perusahaan</button>
+  <button id="btnGaji">Daftar Gaji</button>
+  <button id="btnPekerjaan">Pekerjaan</button>
   <button id="btnKalkulator">Kalkulator</button>
   <button id="btnBukuCatatan">Buku Catatan</button>
 
@@ -95,96 +118,84 @@ body.dark .modal-content{background:#1e1e1e;color:white}
 <!-- MODAL KODE -->
 <div id="modalKode" class="modal">
   <div class="modal-content">
-    <h3>🔐 Kode Akses</h3>
-    <input type="password" id="inputKode" placeholder="Masukkan kode">
-    <button id="submitKode">Buka</button>
+    <h3>Masukkan Kode Akses</h3>
+    <input type="password" id="inputKode" placeholder="Kode Akses">
+    <button id="submitKode">Buka Halaman</button>
   </div>
 </div>
 
+<!-- FOOTER LOGIN TERAKHIR -->
+<footer>
+  <span id="lastLogin">Login terakhir: -</span>
+</footer>
+
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-firebase.initializeApp({
-  apiKey:"AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
-  authDomain:"web-usaha-ivan.firebaseapp.com",
-  projectId:"web-usaha-ivan"
-});
-
-const auth=firebase.auth();
-const db=firebase.firestore();
-
-const modal=document.getElementById("modalKode");
-const inputKode=document.getElementById("inputKode");
-let targetPage="";
-
-/* ===== AUTH CHECK ===== */
-auth.onAuthStateChanged(async user=>{
-  if(!user) return location.href="login.html";
-
-  // ambil data user
-  const snap=await db.collection("users").doc(user.uid).get();
-  const d=snap.data()||{};
-  roleBadge.textContent = d.role==="admin" ? "ADMIN" : "USER";
-  roleBadge.style.background = d.role==="admin" ? "#4caf50" : "#777";
-
-  lastLogin.textContent = "Login terakhir: " + new Date().toLocaleString();
-
-  // simpan activity
-  db.collection("activity_logs").add({
-    uid:user.uid,
-    action:"login_dashboard",
-    time:firebase.firestore.FieldValue.serverTimestamp()
-  });
-});
-
-/* ===== DARK MODE ===== */
-function toggleDark(){
-  document.body.classList.toggle("dark");
-  localStorage.setItem("dark",document.body.classList.contains("dark"));
-}
-if(localStorage.getItem("dark")==="true") document.body.classList.add("dark");
-
-/* ===== LOGOUT ===== */
-logoutBtn.onclick=()=>{
-  auth.signOut().then(()=>location.href="login.html");
+const firebaseConfig = {
+  apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
+  authDomain: "web-usaha-ivan.firebaseapp.com",
+  projectId: "web-usaha-ivan",
+  storageBucket: "web-usaha-ivan.appspot.com",
+  messagingSenderId: "588839561784",
+  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
 };
 
-/* ===== PAGE DIRECT ===== */
-btnDataDiri.onclick=()=>location.href="DataDiri.html";
-btnKalkulator.onclick=()=>location.href="kalkulator.html";
-btnBukuCatatan.onclick=()=>location.href="BukuCatatan.html";
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
-/* ===== MODAL ===== */
-function bukaModal(page){
-  targetPage=page;
-  modal.style.display="flex";
-  inputKode.value="";
-  inputKode.focus();
-}
-btnPerusahaan.onclick=()=>bukaModal("Perusahaan.html");
-btnGaji.onclick=()=>bukaModal("Gaji.html");
-btnPekerjaan.onclick=()=>bukaModal("Pekerjaan.html");
+/* CEK LOGIN */
+auth.onAuthStateChanged(user=>{
+  if(!user){
+    window.location.href="login.html";
+    return;
+  }
 
-/* ===== SUBMIT KODE ===== */
-submitKode.onclick=cekKode;
-inputKode.addEventListener("keyup",e=>{
-  if(e.key==="Enter") cekKode();
+  // TAMPILKAN LOGIN TERAKHIR DI BAWAH
+  const lastLogin = new Date(user.metadata.lastSignInTime);
+  document.getElementById("lastLogin").textContent =
+    "Login terakhir: " + lastLogin.toLocaleString("id-ID");
 });
 
-function cekKode(){
-  if(inputKode.value==="1234"){
-    modal.style.display="none";
-    location.href=targetPage;
-  }else{
-    alert("❌ Kode salah");
-  }
+/* LOGOUT */
+document.getElementById("logoutBtn").onclick = ()=>{
+  auth.signOut().then(()=>window.location.href="login.html");
+};
+
+/* HALAMAN TANPA KODE */
+btnDataDiri.onclick = ()=>location.href="DataDiri.html";
+btnKalkulator.onclick = ()=>location.href="kalkulator.html";
+btnBukuCatatan.onclick = ()=>location.href="BukuCatatan.html";
+
+/* MODAL */
+const modal = document.getElementById("modalKode");
+const inputKode = document.getElementById("inputKode");
+let targetPage="";
+
+function bukaModal(page){
+  targetPage = page;
+  inputKode.value="";
+  modal.style.display="flex";
+  inputKode.focus();
 }
 
-/* ===== CLOSE MODAL ===== */
-window.onclick=e=>{
-  if(e.target===modal) modal.style.display="none";
+btnPerusahaan.onclick = ()=>bukaModal("Perusahaan.html");
+btnGaji.onclick = ()=>bukaModal("Gaji.html");
+btnPekerjaan.onclick = ()=>bukaModal("Pekerjaan.html");
+
+submitKode.onclick = ()=>{
+  if(inputKode.value === "1234"){
+    location.href = targetPage;
+  }else{
+    alert("Kode akses salah!");
+  }
+  modal.style.display="none";
+};
+
+window.onclick = e=>{
+  if(e.target === modal) modal.style.display="none";
 };
 </script>
 
