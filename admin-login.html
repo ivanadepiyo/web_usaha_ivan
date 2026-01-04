@@ -45,12 +45,6 @@ input {
   color:#666;
   user-select:none;
   display:none;
-  transition: opacity .15s ease, transform .15s ease;
-}
-
-.toggle-password:active {
-  transform:translateY(-50%) scale(0.85);
-  opacity:0.7;
 }
 
 button {
@@ -100,7 +94,6 @@ a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-/* ================= FIREBASE ================= */
 firebase.initializeApp({
   apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
   authDomain: "web-usaha-ivan.firebaseapp.com",
@@ -110,24 +103,23 @@ firebase.initializeApp({
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-/* ================= ELEMENT ================= */
 const passwordInput = document.getElementById("password");
 const togglePass = document.getElementById("togglePass");
 const loginBtn = document.getElementById("loginAdminBtn");
 const msg = document.getElementById("msg");
 
-/* 👁️ SHOW ICON ONLY IF PASSWORD FILLED */
+/* tampilkan ikon hanya jika ada isi */
 passwordInput.addEventListener("input", () => {
   togglePass.style.display = passwordInput.value ? "block" : "none";
 });
 
-/* 👁️ TOGGLE PASSWORD */
+/* toggle password */
 togglePass.addEventListener("click", () => {
   passwordInput.type =
     passwordInput.type === "password" ? "text" : "password";
 });
 
-/* ================= LOGIN ADMIN ================= */
+/* login admin */
 loginBtn.addEventListener("click", async () => {
   msg.textContent = "";
 
@@ -146,15 +138,14 @@ loginBtn.addEventListener("click", async () => {
     const cred = await auth.signInWithEmailAndPassword(email, password);
     const user = cred.user;
 
-    const adminSnap = await db.collection("admins").doc(user.uid).get();
-    if (!adminSnap.exists) {
+    const adminDoc = await db.collection("admins").doc(user.uid).get();
+    if (!adminDoc.exists) {
       await auth.signOut();
       msg.textContent = "Akses ditolak: bukan admin!";
       throw new Error();
     }
 
     window.location.href = "dashboard-admin.html";
-
   } catch {
     loginBtn.disabled = false;
     loginBtn.textContent = "Masuk";
