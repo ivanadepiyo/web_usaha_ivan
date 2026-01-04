@@ -4,107 +4,189 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard | Web Perusahaan</title>
-<style>
-body { font-family:"Segoe UI",Arial,sans-serif; margin:0; background:#f0f2f5; min-height:100vh; }
-header { background:#1e3c72; color:white; padding:20px; text-align:center; font-size:24px; }
-.container { max-width:600px; margin:30px auto; background:white; border-radius:10px; padding:20px; box-shadow:0 10px 20px rgba(0,0,0,0.1); text-align:center; }
-button { display:block; width:80%; margin:12px auto; padding:12px 20px; border:none; border-radius:8px; background:#1e3c72; color:white; font-weight:bold; cursor:pointer; font-size:16px; }
-button:hover { background:#15509c; }
-#logoutBtn { background:#d9534f; }
-#logoutBtn:hover { background:#c9302c; }
 
-/* Modal Kode Akses */
-.modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); justify-content:center; align-items:center; }
-.modal-content { background:white; padding:20px; border-radius:10px; text-align:center; width:300px; }
-.modal-content input { width:80%; padding:10px; margin-top:10px; border-radius:6px; border:1px solid #ccc; font-size:16px; }
-.modal-content button { margin-top:15px; }
+<style>
+*{box-sizing:border-box;font-family:"Segoe UI",Arial}
+:root{
+  --bg:#f0f2f5;
+  --card:#ffffff;
+  --text:#222;
+  --primary:#1e3c72;
+}
+body.dark{
+  --bg:#121212;
+  --card:#1e1e1e;
+  --text:#f5f5f5;
+}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  min-height:100vh;transition:.3s
+}
+header{
+  background:var(--primary);color:white;
+  padding:20px;text-align:center;font-size:24px
+}
+.container{
+  max-width:600px;margin:30px auto;
+  background:var(--card);border-radius:12px;
+  padding:20px;box-shadow:0 10px 25px rgba(0,0,0,.15);
+  text-align:center
+}
+.badge{
+  display:inline-block;
+  padding:5px 12px;
+  border-radius:20px;
+  background:#4caf50;
+  color:white;font-size:12px;
+  margin-bottom:10px
+}
+button{
+  display:block;width:80%;
+  margin:12px auto;padding:12px 20px;
+  border:none;border-radius:8px;
+  background:var(--primary);color:white;
+  font-weight:bold;cursor:pointer;font-size:16px
+}
+button:hover{opacity:.9}
+#logoutBtn{background:#d9534f}
+.toggle{cursor:pointer;font-size:20px;margin-bottom:10px}
+
+/* MODAL */
+.modal{
+  display:none;position:fixed;
+  inset:0;background:rgba(0,0,0,.6);
+  justify-content:center;align-items:center
+}
+.modal-content{
+  background:white;padding:20px;
+  border-radius:12px;text-align:center;
+  width:300px
+}
+body.dark .modal-content{background:#1e1e1e;color:white}
+.modal-content input{
+  width:90%;padding:10px;
+  margin-top:10px;border-radius:6px;
+  border:1px solid #ccc;font-size:16px
+}
 </style>
 </head>
+
 <body>
 
 <header>Dashboard Web Perusahaan</header>
+
 <div class="container">
+  <div class="toggle" onclick="toggleDark()">🌙</div>
+  <div class="badge" id="roleBadge">Loading...</div>
+  <p id="lastLogin" style="font-size:12px;opacity:.7"></p>
+
   <h2>Menu Akses</h2>
+
   <button id="btnDataDiri">Data Diri</button>
-  <button id="btnPerusahaan">Perusahaan</button>
-  <button id="btnGaji">Daftar Gaji</button>
-  <button id="btnPekerjaan">Pekerjaan</button>
+  <button id="btnPerusahaan">Perusahaan 🔐</button>
+  <button id="btnGaji">Daftar Gaji 🔐</button>
+  <button id="btnPekerjaan">Pekerjaan 🔐</button>
   <button id="btnKalkulator">Kalkulator</button>
   <button id="btnBukuCatatan">Buku Catatan</button>
+
   <button id="logoutBtn">Logout</button>
 </div>
 
-<!-- Modal Kode Akses -->
+<!-- MODAL KODE -->
 <div id="modalKode" class="modal">
   <div class="modal-content">
-    <h3>Masukkan Kode Akses</h3>
-    <input type="password" id="inputKode" placeholder="Kode Akses">
-    <button id="submitKode">Buka Halaman</button>
+    <h3>🔐 Kode Akses</h3>
+    <input type="password" id="inputKode" placeholder="Masukkan kode">
+    <button id="submitKode">Buka</button>
   </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
-  authDomain: "web-usaha-ivan.firebaseapp.com",
-  projectId: "web-usaha-ivan",
-  storageBucket: "web-usaha-ivan.appspot.com",
-  messagingSenderId: "588839561784",
-  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
+firebase.initializeApp({
+  apiKey:"AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
+  authDomain:"web-usaha-ivan.firebaseapp.com",
+  projectId:"web-usaha-ivan"
+});
+
+const auth=firebase.auth();
+const db=firebase.firestore();
+
+const modal=document.getElementById("modalKode");
+const inputKode=document.getElementById("inputKode");
+let targetPage="";
+
+/* ===== AUTH CHECK ===== */
+auth.onAuthStateChanged(async user=>{
+  if(!user) return location.href="login.html";
+
+  // ambil data user
+  const snap=await db.collection("users").doc(user.uid).get();
+  const d=snap.data()||{};
+  roleBadge.textContent = d.role==="admin" ? "ADMIN" : "USER";
+  roleBadge.style.background = d.role==="admin" ? "#4caf50" : "#777";
+
+  lastLogin.textContent = "Login terakhir: " + new Date().toLocaleString();
+
+  // simpan activity
+  db.collection("activity_logs").add({
+    uid:user.uid,
+    action:"login_dashboard",
+    time:firebase.firestore.FieldValue.serverTimestamp()
+  });
+});
+
+/* ===== DARK MODE ===== */
+function toggleDark(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("dark",document.body.classList.contains("dark"));
+}
+if(localStorage.getItem("dark")==="true") document.body.classList.add("dark");
+
+/* ===== LOGOUT ===== */
+logoutBtn.onclick=()=>{
+  auth.signOut().then(()=>location.href="login.html");
 };
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
 
-// Cek login
-auth.onAuthStateChanged(user=>{
-  if(!user) window.location.href="login.html";
-});
+/* ===== PAGE DIRECT ===== */
+btnDataDiri.onclick=()=>location.href="DataDiri.html";
+btnKalkulator.onclick=()=>location.href="kalkulator.html";
+btnBukuCatatan.onclick=()=>location.href="BukuCatatan.html";
 
-// Logout
-document.getElementById("logoutBtn").addEventListener("click", ()=>{
-  auth.signOut().then(()=>window.location.href="login.html");
-});
-
-// Halaman langsung
-document.getElementById("btnDataDiri").addEventListener("click", ()=>{ window.location.href="DataDiri.html"; });
-document.getElementById("btnKalkulator").addEventListener("click", ()=>{ window.location.href="kalkulator.html"; });
-document.getElementById("btnBukuCatatan").addEventListener("click", ()=>{ window.location.href="BukuCatatan.html"; });
-
-// Modal Kode Akses
-const modal = document.getElementById("modalKode");
-const inputKode = document.getElementById("inputKode");
-const submitKode = document.getElementById("submitKode");
-let targetPage = "";
-
-// Fungsi buka modal
+/* ===== MODAL ===== */
 function bukaModal(page){
-  targetPage = page;
-  inputKode.value = "";
-  modal.style.display = "flex";
+  targetPage=page;
+  modal.style.display="flex";
+  inputKode.value="";
   inputKode.focus();
 }
+btnPerusahaan.onclick=()=>bukaModal("Perusahaan.html");
+btnGaji.onclick=()=>bukaModal("Gaji.html");
+btnPekerjaan.onclick=()=>bukaModal("Pekerjaan.html");
 
-// Tombol dengan kode akses
-document.getElementById("btnPerusahaan").addEventListener("click", ()=>bukaModal("Perusahaan.html"));
-document.getElementById("btnGaji").addEventListener("click", ()=>bukaModal("Gaji.html"));
-document.getElementById("btnPekerjaan").addEventListener("click", ()=>bukaModal("Pekerjaan.html"));
+/* ===== SUBMIT KODE ===== */
+submitKode.onclick=cekKode;
+inputKode.addEventListener("keyup",e=>{
+  if(e.key==="Enter") cekKode();
+});
 
-// Submit kode
-submitKode.addEventListener("click", ()=>{
-  if(inputKode.value === "1234"){
-    window.location.href = targetPage;
-  } else {
-    alert("Kode akses salah!");
+function cekKode(){
+  if(inputKode.value==="1234"){
+    modal.style.display="none";
+    location.href=targetPage;
+  }else{
+    alert("❌ Kode salah");
   }
-  modal.style.display = "none";
-});
+}
 
-// Tutup modal jika klik luar
-window.addEventListener("click", e=>{
-  if(e.target === modal) modal.style.display = "none";
-});
+/* ===== CLOSE MODAL ===== */
+window.onclick=e=>{
+  if(e.target===modal) modal.style.display="none";
+};
 </script>
+
 </body>
 </html>
