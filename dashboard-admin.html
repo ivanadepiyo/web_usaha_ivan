@@ -121,7 +121,7 @@ auth.onAuthStateChanged(async user => {
     return location.href = "login-admin.html";
   }
 
-  loadUsers(); // load data user setelah validasi admin
+  loadUsers();
 });
 
 /* ================= LOAD USERS ================= */
@@ -193,9 +193,9 @@ function logAction(action, target) {
 /* ================= LOGOUT ================= */
 const logoutBtn = document.getElementById("logoutBtn");
 logoutBtn.addEventListener("click", async () => {
+  logoutBtn.disabled = true;
+  logoutBtn.textContent = "Keluar...";
   try {
-    logoutBtn.disabled = true;
-    logoutBtn.textContent = "Keluar...";
     await auth.signOut();
     location.href = "login-admin.html";
   } catch (err) {
