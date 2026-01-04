@@ -1,132 +1,243 @@
-
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BukuCatatan</title>
+<title>Buku Catatan</title>
+
+<!-- Firebase -->
+<script src="firebase.js"></script>
+<script src="auth.js"></script>
 
 <style>
-body {
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(120deg, #6a11cb, #2575fc);
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
+:root{
+  --bg:#f0f2f5;
+  --card:#fff;
+  --text:#333;
+  --primary:#1e3c72;
+}
+body.dark{
+  --bg:#121212;
+  --card:#1e1e1e;
+  --text:#eee;
+  --primary:#4f83ff;
 }
 
-.container {
-    width: 500px;
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    margin-top: 30px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+*{box-sizing:border-box;font-family:"Segoe UI",Arial,sans-serif}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
 }
 
-h2 {
-    text-align: center;
+/* HEADER */
+header{
+  background:var(--primary);
+  color:#fff;
+  padding:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header h1{margin:0;font-size:20px}
+header button{
+  background:#fff;
+  color:var(--primary);
+  border:none;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
 }
 
-textarea {
-    width: 95%;
-    height: 120px;
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #aaa;
-    font-size: 16px;
-    outline: none;
+/* LAYOUT */
+.container{
+  max-width:900px;
+  margin:20px auto;
+  padding:0 15px;
+}
+.card{
+  background:var(--card);
+  border-radius:14px;
+  padding:20px;
+  box-shadow:0 8px 18px rgba(0,0,0,.1);
+  margin-bottom:20px;
 }
 
-button {
-    width: 100%;
-    margin-top: 10px;
-    padding: 12px;
-    background: #2575fc;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.3s;
+/* INPUT */
+textarea,input{
+  width:100%;
+  padding:12px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  background:var(--card);
+  color:var(--text);
+}
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+button{
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  font-weight:600;
+  cursor:pointer;
+}
+.btn{
+  background:var(--primary);
+  color:#fff;
+}
+.btn-gray{
+  background:#607d8b;
+  color:#fff;
 }
 
-button:hover {
-    background: #1a5fd4;
+/* NOTES */
+.note{
+  border-left:4px solid var(--primary);
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:15px;
+  position:relative;
+}
+.note-time{
+  font-size:12px;
+  opacity:.7;
+  margin-bottom:6px;
+}
+.note-actions{
+  position:absolute;
+  top:10px;
+  right:10px;
+  display:flex;
+  gap:6px;
+}
+.note-actions button{
+  font-size:12px;
+  padding:4px 6px;
 }
 
-.note {
-    background: #f3f3f3;
-    padding: 80px;
-    margin-top: 1px;
-    border-radius: 1px;
-    position: relative;
-}
-
-.delete-btn {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    background: red;
-    color: white;
-    border: none;
-    padding: 5px 8px;
-    border-radius: 5px;
-    cursor: pointer;
+/* MOBILE */
+@media(max-width:600px){
+  .actions{flex-direction:column}
+  header{flex-direction:column;gap:10px}
 }
 </style>
 </head>
 
 <body>
 
+<header>
+  <h1>Buku Catatan</h1>
+  <div>
+    <button onclick="toggleDark()">🌙</button>
+    <button onclick="location.href='dashboard.html'">⬅</button>
+  </div>
+</header>
+
 <div class="container">
-    <h2>Buku Catatan</h2>
 
-    <textarea id="inputCatatan" placeholder="Tulis catatan di sini..."></textarea>
-    <button onclick="tambahCatatan()">Tambah Catatan</button>
+  <!-- INPUT -->
+  <div class="card">
+    <textarea id="isiCatatan" placeholder="Tulis catatan..."></textarea>
+    <div class="actions">
+      <button class="btn" onclick="tambah()">Tambah</button>
+      <input id="search" placeholder="Cari catatan..." oninput="render()">
+    </div>
+  </div>
 
-    <div id="daftarCatatan"></div>
+  <!-- LIST -->
+  <div class="card">
+    <h3>Catatan Saya</h3>
+    <div id="list"></div>
+  </div>
+
 </div>
 
 <script>
-let catatan = JSON.parse(localStorage.getItem("catatan")) || [];
+let userId=null
+let notes=[]
+let editId=null
+const db=firebase.firestore()
 
-function tampilkanCatatan() {
-    const daftar = document.getElementById("daftarCatatan");
-    daftar.innerHTML = "";
-
-    catatan.forEach((isi, index) => {
-        daftar.innerHTML += `
-            <div class="note">
-                ${isi}
-                <button class="delete-btn" onclick="hapusCatatan(${index})">X</button>
-            </div>
-        `;
-    });
+// DARK MODE
+if(localStorage.dark==="1")document.body.classList.add("dark")
+function toggleDark(){
+  document.body.classList.toggle("dark")
+  localStorage.dark=document.body.classList.contains("dark")?"1":"0"
 }
 
-function tambahCatatan() {
-    const input = document.getElementById("inputCatatan").value;
+// AUTH
+firebase.auth().onAuthStateChanged(u=>{
+  if(!u) location.href="login.html"
+  userId=u.uid
+  load()
+})
 
-    if (input.trim() === "") return alert("Catatan tidak boleh kosong!");
-
-    catatan.push(input);
-    localStorage.setItem("catatan", JSON.stringify(catatan));
-
-    document.getElementById("inputCatatan").value = "";
-    tampilkanCatatan();
+// LOAD
+async function load(){
+  const snap=await db.collection("catatan")
+    .where("uid","==",userId)
+    .orderBy("time","desc").get()
+  notes=snap.docs.map(d=>({id:d.id,...d.data()}))
+  render()
 }
 
-function hapusCatatan(i) {
-    catatan.splice(i, 1);
-    localStorage.setItem("catatan", JSON.stringify(catatan));
-    tampilkanCatatan();
+// RENDER
+function render(){
+  const q=document.getElementById("search").value.toLowerCase()
+  const list=document.getElementById("list")
+  list.innerHTML=""
+
+  notes.filter(n=>n.text.toLowerCase().includes(q))
+  .forEach(n=>{
+    list.innerHTML+=`
+      <div class="note">
+        <div class="note-time">${new Date(n.time).toLocaleString()}</div>
+        <div>${n.text}</div>
+        <div class="note-actions">
+          <button onclick="edit('${n.id}','${n.text.replace(/'/g,"")}')">✏️</button>
+          <button onclick="hapus('${n.id}')">🗑️</button>
+        </div>
+      </div>`
+  })
 }
 
-// Tampilkan saat halaman dibuka
-tampilkanCatatan();
+// ADD / UPDATE
+async function tambah(){
+  const text=document.getElementById("isiCatatan").value.trim()
+  if(!text)return alert("Catatan kosong")
+
+  if(editId){
+    await db.collection("catatan").doc(editId).update({text})
+    editId=null
+  }else{
+    await db.collection("catatan").add({
+      uid:userId,
+      text,
+      time:Date.now()
+    })
+  }
+  document.getElementById("isiCatatan").value=""
+  load()
+}
+
+function edit(id,text){
+  editId=id
+  document.getElementById("isiCatatan").value=text
+}
+
+// DELETE
+async function hapus(id){
+  if(confirm("Hapus catatan?")){
+    await db.collection("catatan").doc(id).delete()
+    load()
+  }
+}
 </script>
 
 </body>
 </html>
-
