@@ -2,25 +2,205 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Gaji</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manajemen Gaji</title>
+
+<!-- ================= FIREBASE SDK ================= -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<!-- ================= EXPORT EXCEL ================= -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <style>
-body { font-family:"Segoe UI",Arial,sans-serif; margin:0; background:#f0f2f5; min-height:100vh; }
-header { background:#1e3c72; color:white; padding:20px; text-align:center; font-size:24px; }
-.container { max-width:800px; margin:30px auto; background:white; border-radius:10px; padding:20px; box-shadow:0 10px 20px rgba(0,0,0,0.1); text-align:center; }
-h2 { color:#1e3c72; margin-bottom:20px; }
-.content { font-size:16px; color:#333; line-height:1.5; }
-button { display:block; margin:20px auto 0; padding:12px 20px; border:none; border-radius:8px; background:#1e3c72; color:white; font-weight:bold; cursor:pointer; }
-button:hover { background:#15509c; }
+:root{
+  --bg:#f0f2f5;
+  --card:#ffffff;
+  --text:#222;
+  --primary:#1e3c72;
+}
+body.dark{
+  --bg:#121212;
+  --card:#1e1e1e;
+  --text:#f5f5f5;
+}
+*{box-sizing:border-box;font-family:"Segoe UI",Arial}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  transition:.3s;
+}
+header{
+  background:var(--primary);
+  color:white;
+  padding:20px;
+  text-align:center;
+  font-size:24px;
+}
+.container{
+  max-width:1100px;
+  margin:20px auto;
+  padding:15px;
+}
+.card{
+  background:var(--card);
+  border-radius:15px;
+  padding:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+}
+button{
+  padding:10px 15px;
+  border:none;
+  border-radius:8px;
+  background:var(--primary);
+  color:white;
+  cursor:pointer;
+}
+button:hover{opacity:.9}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+th,td{
+  padding:12px;
+  border-bottom:1px solid #ccc;
+  text-align:left;
+}
+th{background:rgba(0,0,0,.05)}
+.toggle{cursor:pointer;font-size:20px;margin-right:10px}
+
+/* ===== MODAL KODE ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.modal-box{
+  background:white;
+  padding:25px;
+  border-radius:12px;
+  width:320px;
+  text-align:center;
+}
+.modal-box input{
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+}
+.hidden{display:none}
 </style>
 </head>
+
 <body>
-<header>Daftar Gaji</header>
-<div class="container">
-<h2>Informasi Gaji</h2>
-<div class="content">
-  <p>Halaman daftar gaji karyawan. Hanya bisa diakses setelah memasukkan kode di dashboard.</p>
+
+<!-- ========== MODAL VALIDASI KODE ========== -->
+<div class="modal" id="kodeModal">
+  <div class="modal-box">
+    <h3>🔐 Akses Data Gaji</h3>
+    <input type="password" id="kodeInput" placeholder="Masukkan kode gaji">
+    <button onclick="cekKode()">Masuk</button>
+  </div>
 </div>
-<button onclick="window.location.href='dashboard.html'">Kembali ke Dashboard</button>
+
+<header>Daftar Gaji Karyawan</header>
+
+<div class="container hidden" id="app">
+  <div class="card">
+    <div class="top">
+      <h2>Data Gaji</h2>
+      <div>
+        <span class="toggle" onclick="toggleDark()">🌙</span>
+        <button onclick="exportExcel()">📥 Excel</button>
+      </div>
+    </div>
+
+    <table id="tabelGaji">
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Jabatan</th>
+          <th>Gaji</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <button style="margin-top:20px" onclick="location.href='dashboard.html'">
+      ⬅ Kembali ke Dashboard
+    </button>
+  </div>
 </div>
+
+<script>
+/* ================= FIREBASE CONFIG ================= */
+firebase.initializeApp({
+  apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
+  authDomain: "web-usaha-ivan.firebaseapp.com",
+  projectId: "web-usaha-ivan",
+  storageBucket: "web-usaha-ivan.appspot.com",
+  messagingSenderId: "588839561784",
+  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
+});
+
+const db = firebase.firestore();
+
+/* ================= KODE AKSES ================= */
+const KODE_GAJI = "GAJI-IVAN-2025";
+
+function cekKode(){
+  if(kodeInput.value === KODE_GAJI){
+    kodeModal.classList.add("hidden");
+    app.classList.remove("hidden");
+    loadGaji();
+  }else{
+    alert("❌ Kode gaji salah");
+  }
+}
+
+/* ================= LOAD DATA REALTIME ================= */
+function loadGaji(){
+  db.collection("gaji").onSnapshot(snapshot=>{
+    const tbody = document.querySelector("#tabelGaji tbody");
+    tbody.innerHTML = "";
+    snapshot.forEach(doc=>{
+      const d = doc.data();
+      tbody.innerHTML += `
+        <tr>
+          <td>${d.nama}</td>
+          <td>${d.jabatan}</td>
+          <td>Rp ${Number(d.gaji).toLocaleString("id-ID")}</td>
+        </tr>
+      `;
+    });
+  });
+}
+
+/* ================= DARK MODE ================= */
+function toggleDark(){
+  document.body.classList.toggle("dark");
+}
+
+/* ================= EXPORT EXCEL ================= */
+function exportExcel(){
+  const wb = XLSX.utils.table_to_book(
+    document.getElementById("tabelGaji"),
+    {sheet:"Gaji"}
+  );
+  XLSX.writeFile(wb,"Data_Gaji.xlsx");
+}
+</script>
+
 </body>
 </html>
