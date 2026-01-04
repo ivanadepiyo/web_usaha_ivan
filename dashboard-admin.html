@@ -36,7 +36,7 @@ button:hover { background:#c9302c; }
 
 <body>
 
-<header>Dashboard Admin</header>
+<header>dashboard admin</header>
 
 <div class="container">
   <h2>Daftar Semua User Terdaftar</h2>
@@ -83,7 +83,7 @@ const table = document.getElementById("userTable");
 /* ================= PROTEKSI ADMIN ================= */
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
-    window.location.href = "login-admin.html";
+    window.location.href = "admin-login.html";
     return;
   }
 
@@ -92,7 +92,7 @@ auth.onAuthStateChanged(async (user) => {
 
     if (!adminSnap.exists) {
       await auth.signOut();
-      window.location.href = "login-admin.html";
+      window.location.href = "admin-login.html";
       return;
     }
 
@@ -101,7 +101,7 @@ auth.onAuthStateChanged(async (user) => {
   } catch (err) {
     alert("Terjadi kesalahan: " + err.message);
     await auth.signOut();
-    window.location.href = "login-admin.html";
+    window.location.href = "admin-login.html";
   }
 });
 
@@ -135,7 +135,7 @@ async function loadUsers() {
 /* ================= LOGOUT ================= */
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await auth.signOut();
-  window.location.href = "login-admin.html";
+  window.location.href = "admin-login.html";
 });
 </script>
 
