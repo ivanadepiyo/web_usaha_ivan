@@ -6,21 +6,72 @@
 <style>
 * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
 
-body.page-login.auth { margin:0; min-height:100vh; background: linear-gradient(135deg, #1e3c72, #2a5298); display:flex; justify-content:center; align-items:center; }
+body.page-login.auth {
+  margin:0; min-height:100vh;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  display:flex; justify-content:center; align-items:center;
+}
 
-.card { background:#fff; width:100%; max-width:350px; 
-padding:30px; border-radius:14px; box-shadow:0 20px 40px 
-rgba(0,0,0,0.2); text-align:center; }
+.card {
+  background:#fff; width:100%; max-width:350px;
+  padding:30px; border-radius:14px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.2);
+  text-align:center;
+}
+
 .card h1 { margin-bottom:30px; color:#1e3c72; }
 
 .input-group { position:relative; margin-bottom:14px; text-align:left; }
-input { width:100%; padding:12px 14px; border-radius:8px;
-border:1px solid #ccc; font-size:12px; }
-input:focus { outline:none; border-color:#2a5298; box-shadow:0 0 0 2px rgba(42,82,152,0.2); }
+
+input {
+  width:100%;
+  padding:12px 40px 12px 14px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:12px;
+}
+
+input:focus {
+  outline:none;
+  border-color:#2a5298;
+  box-shadow:0 0 0 2px rgba(42,82,152,0.2);
+}
 
 .note { font-size:10px; color:#555; margin-top:4px; }
 
-button {  margin-top:-20px; width:90%; padding:8px; background:#1e3c72; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; }
+#togglePass {
+  position:absolute;
+  right:12px;
+  top:38px;
+  cursor:pointer;
+  font-size:14px;
+  user-select:none;
+  transition: transform .15s ease, opacity .15s ease;
+}
+
+#togglePass:active {
+  transform: scale(0.85);
+  opacity: 0.7;
+}
+
+button {
+  margin-top:-20px;
+  width:90%;
+  padding:8px;
+  background:#1e3c72;
+  color:white;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:disabled {
+  opacity:0.7;
+  cursor:not-allowed;
+}
+
 button:hover { background:#2a5298; }
 
 .links { margin-top:8px; font-size:12px; }
@@ -36,16 +87,15 @@ button:hover { background:#2a5298; }
   <h1>Login</h1>
 
   <div class="input-group">
-<div class="note">Masukkan email terdaftar</div>
+    <div class="note">Masukkan email terdaftar</div>
     <input type="email" id="email" placeholder="Email">
   </div>
 
   <div class="input-group">
-  <div class="note">Password akun Anda</div>
-  <input type="password" id="password" placeholder="Password">
-  <span id="togglePass" style="position:absolute; right:12px; top:38px; cursor:pointer; font-size:14px; user-select:none;"></span>
-</div>
-
+    <div class="note">Password akun Anda</div>
+    <input type="password" id="password" placeholder="Password">
+    <span id="togglePass">👁️</span>
+  </div>
 
   <a href="lupa-password.html">Lupa Password?</a><br><br>
 
@@ -62,28 +112,51 @@ button:hover { background:#2a5298; }
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-// Firebase config
-const firebaseConfig = {
+/* ================= FIREBASE ================= */
+firebase.initializeApp({
   apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
   authDomain: "web-usaha-ivan.firebaseapp.com",
-  projectId: "web-usaha-ivan",
-  storageBucket: "web-usaha-ivan.appspot.com",
-  messagingSenderId: "588839561784",
-  appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
-};
-firebase.initializeApp(firebaseConfig);
+  projectId: "web-usaha-ivan"
+});
+
 const auth = firebase.auth();
 
-// ELEMENTS
+/* ================= ELEMENT ================= */
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const loginBtn = document.getElementById("loginBtn");
 const msg = document.getElementById("msg");
+const togglePass = document.getElementById("togglePass");
 
-// LOGIN LOGIC
+let hideTimer = null;
+
+/* 👁️ TOGGLE PASSWORD (SMOOTH + AUTO HIDE) */
+togglePass.addEventListener("click", () => {
+  togglePass.style.opacity = "0";
+
+  setTimeout(() => {
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+      togglePass.textContent = "🙈";
+
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => {
+        passwordInput.type = "password";
+        togglePass.textContent = "👁️";
+      }, 3000);
+
+    } else {
+      passwordInput.type = "password";
+      togglePass.textContent = "👁️";
+    }
+
+    togglePass.style.opacity = "1";
+  }, 120);
+});
+
+/* ================= LOGIN ================= */
 loginBtn.addEventListener("click", async () => {
   msg.textContent = "";
 
@@ -95,32 +168,20 @@ loginBtn.addEventListener("click", async () => {
     return;
   }
 
-const togglePass = document.getElementById("togglePass");
-togglePass.addEventListener("click", () => {
-  if(passwordInput.type === "password"){
-    passwordInput.type = "text";
-    togglePass.textContent = "🙈"; // ikon berubah saat terlihat
-  } else {
-    passwordInput.type = "password";
-    togglePass.textContent = "👁️"; // ikon mata kembali
-  }
-});
+  loginBtn.disabled = true;
+  loginBtn.textContent = "Memproses...";
 
   try {
-    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-    const user = userCredential.user;
-
-    if (!user.emailVerified) {
+    const cred = await auth.signInWithEmailAndPassword(email, password);
+    if (!cred.user.emailVerified) {
       msg.textContent = "Silahkan verifikasi email terlebih dahulu!";
       await auth.signOut();
-      return;
+      throw new Error();
     }
-
-    // login sukses → redirect ke dashboard
     window.location.href = "dashboard.html";
-
-  } catch (err) {
-    msg.textContent = err.message;
+  } catch {
+    loginBtn.disabled = false;
+    loginBtn.textContent = "Masuk";
   }
 });
 </script>
