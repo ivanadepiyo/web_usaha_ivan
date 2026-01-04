@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Login Admin | Web Perusahaan</title>
+<title>admin login| Web Perusahaan</title>
 
 <style>
 * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
@@ -50,7 +50,7 @@ a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
   </div>
 
   <!-- PENTING: id ini khusus admin -->
-  <button id="loginAdminBtn">Login Admin</button>
+  <button id="loginAdminBtn">admin login</button>
 
   <a href="lupa-password.html">Lupa Password?</a>
   <p id="msg"></p>
@@ -79,7 +79,7 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 /* ================= LOGIN ADMIN ================= */
-document.getElementById("loginAdminBtn").addEventListener("click", async () => {
+document.getElementById("admin loginBtn").addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const msg = document.getElementById("msg");
