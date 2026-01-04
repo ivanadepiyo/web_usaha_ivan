@@ -19,10 +19,7 @@ body.page-login.auth {
 }
 .card h2 { margin-bottom:20px; color:#1e3c72; }
 
-.input-group {
-  margin-bottom:14px;
-  position:relative;
-}
+.input-group { margin-bottom:14px; position:relative; }
 
 input {
   width:100%;
@@ -36,9 +33,9 @@ input {
   right:12px;
   top:50%;
   transform:translateY(-50%);
-  cursor:pointer;
   width:22px;
   height:22px;
+  cursor:pointer;
   display:none;
   opacity:.65;
   transition:.15s;
@@ -52,6 +49,11 @@ button {
   border:none; border-radius:8px;
   font-size:16px; font-weight:bold;
   cursor:pointer;
+}
+
+button:disabled {
+  opacity:.7;
+  cursor:not-allowed;
 }
 
 a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
@@ -71,7 +73,7 @@ a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
   <div class="input-group">
     <input id="password" type="password" placeholder="Password">
 
-    <!-- IKON MATA SVG -->
+    <!-- SVG EYE ICON -->
     <svg id="togglePass" class="toggle-password" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2">
       <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/>
       <circle cx="12" cy="12" r="3"/>
@@ -99,29 +101,64 @@ firebase.initializeApp({
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const togglePass = document.getElementById("togglePass");
+const loginBtn = document.getElementById("loginAdminBtn");
+const msg = document.getElementById("msg");
 
 let hideTimer = null;
 
-/* tampilkan ikon jika ada isi */
+/* tampilkan ikon hanya jika ada input */
 passwordInput.addEventListener("input", () => {
   togglePass.style.display = passwordInput.value ? "block" : "none";
 });
 
-/* toggle + auto hide */
+/* toggle + auto hide 3 detik */
 togglePass.addEventListener("click", () => {
   clearTimeout(hideTimer);
 
   if (passwordInput.type === "password") {
     passwordInput.type = "text";
-
     hideTimer = setTimeout(() => {
       passwordInput.type = "password";
     }, 3000);
-
   } else {
     passwordInput.type = "password";
+  }
+});
+
+/* LOGIN ADMIN */
+loginBtn.addEventListener("click", async () => {
+  msg.textContent = "";
+
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+
+  if (!email || !password) {
+    msg.textContent = "Email dan password wajib diisi!";
+    return;
+  }
+
+  loginBtn.disabled = true;
+  loginBtn.textContent = "Memproses...";
+
+  try {
+    const cred = await auth.signInWithEmailAndPassword(email, password);
+    const uid = cred.user.uid;
+
+    const adminSnap = await db.collection("admins").doc(uid).get();
+    if (!adminSnap.exists) {
+      await auth.signOut();
+      throw new Error("Akses ditolak: bukan admin!");
+    }
+
+    window.location.href = "dashboard-admin.html";
+
+  } catch (err) {
+    msg.textContent = err.message;
+    loginBtn.disabled = false;
+    loginBtn.textContent = "Masuk";
   }
 });
 </script>
