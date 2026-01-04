@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>perusahaan perikanan | Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Firebase & Auth -->
+  <script src="firebase.js"></script>
+  <script src="auth.js" defer></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f6f8;
+      color: #333;
+    }
+
+    header {
+      background: #1e3c72;
+      color: #fff;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .btn {
+      background: #ff9800;
+      border: none;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn.secondary {
+      background: #607d8b;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #1e3c72;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 13px;
+      color: #777;
+      padding: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Perusahaan Peternakan</h1>
+  <button class="btn secondary" onclick="window.location.href='Perusahaan.html'">
+    ⬅ Kembali
+  </button>
+</header>
+
+<div class="container">
+
+  <!-- Informasi Umum -->
+  <div class="card">
+    <h2>Informasi Budi Daya Perikanan</h2>
+
+    <div class="form-group">
+      <label>Nama Budi Daya Perikanan</label>
+      <input type="text" placeholder="Contoh: Peternakan Sumber Rejeki">
+    </div>
+
+    <div class="form-group">
+      <label>Jenis ikan </label>
+      <select>
+        <option value="">-- Pilih Jenis --</option>
+        <option>Lele</option>
+        <option>Koi</option>
+        <option>Lainnya</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Jumlah Ternak</label>
+      <input type="number" placeholder="Masukkan jumlah ternak">
+    </div>
+
+    <div class="form-group">
+      <label>Lokasi Budi Daya</label>
+      <input type="text" placeholder="Alamat / Desa / Kecamatan">
+    </div>
+  </div>
+
+  <!-- Produksi -->
+  <div class="card">
+    <h2>Produksi & Catatan</h2>
+
+    <div class="form-group">
+      <label>Hasil Produksi</label>
+      <input type="text" placeholder="Contoh: lele ">
+    </div>
+
+    <div class="form-group">
+      <label>Catatan Tambahan</label>
+      <textarea rows="4" placeholder="Catatan penting tentang Budi Daya Perikanan"></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn">💾 Simpan Data</button>
+      <button class="btn secondary" type="reset">↺ Reset</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  © 2026 Web Perusahaan | Modul Budi Daya Perikanan
+</footer>
