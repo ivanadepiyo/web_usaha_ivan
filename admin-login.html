@@ -6,25 +6,21 @@
 
 <style>
 * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
-
 body.page-login.auth {
   margin:0; min-height:100vh;
   background: linear-gradient(135deg, #1e3c72, #2a5298);
   display:flex; justify-content:center; align-items:center;
 }
-
 .card {
   background:#fff; width:100%; max-width:380px;
   padding:30px; border-radius:14px;
   box-shadow:0 20px 40px rgba(0,0,0,0.2);
   text-align:center;
 }
-
 .card h2 { margin-bottom:20px; color:#1e3c72; }
 
 .input-group {
   margin-bottom:14px;
-  text-align:left;
   position:relative;
 }
 
@@ -41,11 +37,14 @@ input {
   top:50%;
   transform:translateY(-50%);
   cursor:pointer;
-  font-size:16px;
-  color:#666;
-  user-select:none;
+  width:22px;
+  height:22px;
   display:none;
+  opacity:.65;
+  transition:.15s;
 }
+
+.toggle-password:hover { opacity:1; }
 
 button {
   width:100%; padding:12px;
@@ -55,15 +54,7 @@ button {
   cursor:pointer;
 }
 
-button:disabled {
-  opacity:0.7;
-  cursor:not-allowed;
-}
-
-button:hover { background:#2a5298; }
-
 a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
-
 #msg { margin-top:10px; color:red; font-size:14px; }
 </style>
 </head>
@@ -79,7 +70,12 @@ a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
 
   <div class="input-group">
     <input id="password" type="password" placeholder="Password">
-    <span id="togglePass" class="toggle-password">👁️</span>
+
+    <!-- IKON MATA SVG -->
+    <svg id="togglePass" class="toggle-password" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2">
+      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
   </div>
 
   <button id="loginAdminBtn">Masuk</button>
@@ -105,50 +101,27 @@ const db = firebase.firestore();
 
 const passwordInput = document.getElementById("password");
 const togglePass = document.getElementById("togglePass");
-const loginBtn = document.getElementById("loginAdminBtn");
-const msg = document.getElementById("msg");
 
-/* tampilkan ikon hanya jika ada isi */
+let hideTimer = null;
+
+/* tampilkan ikon jika ada isi */
 passwordInput.addEventListener("input", () => {
   togglePass.style.display = passwordInput.value ? "block" : "none";
 });
 
-/* toggle password */
+/* toggle + auto hide */
 togglePass.addEventListener("click", () => {
-  passwordInput.type =
-    passwordInput.type === "password" ? "text" : "password";
-});
+  clearTimeout(hideTimer);
 
-/* login admin */
-loginBtn.addEventListener("click", async () => {
-  msg.textContent = "";
+  if (passwordInput.type === "password") {
+    passwordInput.type = "text";
 
-  const email = document.getElementById("email").value.trim();
-  const password = passwordInput.value;
+    hideTimer = setTimeout(() => {
+      passwordInput.type = "password";
+    }, 3000);
 
-  if (!email || !password) {
-    msg.textContent = "Email dan password wajib diisi!";
-    return;
-  }
-
-  loginBtn.disabled = true;
-  loginBtn.textContent = "Memproses...";
-
-  try {
-    const cred = await auth.signInWithEmailAndPassword(email, password);
-    const user = cred.user;
-
-    const adminDoc = await db.collection("admins").doc(user.uid).get();
-    if (!adminDoc.exists) {
-      await auth.signOut();
-      msg.textContent = "Akses ditolak: bukan admin!";
-      throw new Error();
-    }
-
-    window.location.href = "dashboard-admin.html";
-  } catch {
-    loginBtn.disabled = false;
-    loginBtn.textContent = "Masuk";
+  } else {
+    passwordInput.type = "password";
   }
 });
 </script>
