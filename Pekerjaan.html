@@ -2,25 +2,203 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Pekerjaan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manajemen Pekerjaan</title>
+
 <style>
-body { font-family:"Segoe UI",Arial,sans-serif; margin:0; background:#f0f2f5; min-height:100vh; }
-header { background:#1e3c72; color:white; padding:20px; text-align:center; font-size:24px; }
-.container { max-width:800px; margin:30px auto; background:white; border-radius:10px; padding:20px; box-shadow:0 10px 20px rgba(0,0,0,0.1); text-align:center; }
-h2 { color:#1e3c72; margin-bottom:20px; }
-.content { font-size:16px; color:#333; line-height:1.5; }
-button { display:block; margin:20px auto 0; padding:12px 20px; border:none; border-radius:8px; background:#1e3c72; color:white; font-weight:bold; cursor:pointer; }
-button:hover { background:#15509c; }
+:root{
+  --bg:#f0f2f5;
+  --card:#ffffff;
+  --text:#222;
+  --primary:#1e3c72;
+  --muted:#777;
+}
+body.dark{
+  --bg:#121212;
+  --card:#1e1e1e;
+  --text:#f5f5f5;
+  --muted:#aaa;
+}
+*{box-sizing:border-box;font-family:"Segoe UI",Arial}
+body{margin:0;background:var(--bg);color:var(--text);transition:.3s}
+header{background:var(--primary);color:white;padding:20px;text-align:center;font-size:24px}
+.container{max-width:1100px;margin:20px auto;padding:15px}
+.card{background:var(--card);border-radius:15px;padding:20px;box-shadow:0 10px 25px rgba(0,0,0,.15)}
+.top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+input,select{padding:10px;border-radius:8px;border:1px solid #ccc}
+button{padding:10px 14px;border:none;border-radius:8px;background:var(--primary);color:white;cursor:pointer}
+button:hover{opacity:.9}
+.toggle{cursor:pointer;font-size:20px}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin:15px 0}
+.stat{background:rgba(0,0,0,.05);padding:15px;border-radius:12px;text-align:center}
+.stat h3{margin:5px 0}
+
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{padding:12px;border-bottom:1px solid #ccc}
+th{background:rgba(0,0,0,.05)}
+
+.status{padding:5px 10px;border-radius:20px;font-size:12px;color:white}
+.aktif{background:#4caf50}
+.selesai{background:#777}
+
+.prio-tinggi{color:#e53935;font-weight:bold}
+.prio-sedang{color:#f9a825}
+.prio-rendah{color:#43a047}
+
+.actions button{margin-right:5px}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center}
+.modal-box{background:var(--card);padding:25px;border-radius:15px;width:320px}
+.modal-box h3{text-align:center;margin-top:0}
+.modal-box input,.modal-box select{width:100%;margin-bottom:10px}
+
+.footer-btn{margin-top:20px;text-align:center}
 </style>
 </head>
+
 <body>
-<header>Pekerjaan</header>
+
+<header>Manajemen Pekerjaan</header>
+
 <div class="container">
-<h2>Informasi Pekerjaan</h2>
-<div class="content">
-  <p>Halaman pekerjaan karyawan. Hanya bisa diakses setelah memasukkan kode di dashboard.</p>
+<div class="card">
+
+<div class="top">
+<h2>📋 Data Pekerjaan</h2>
+<div>
+<span class="toggle" onclick="toggleDark()">🌙</span>
+<button onclick="openModal()">➕ Pekerjaan</button>
 </div>
-<button onclick="window.location.href='dashboard.html'">Kembali ke Dashboard</button>
 </div>
+
+<div class="stats">
+<div class="stat">
+<h3 id="totalAktif">0</h3>
+<span>Aktif</span>
+</div>
+<div class="stat">
+<h3 id="totalSelesai">0</h3>
+<span>Selesai</span>
+</div>
+</div>
+
+<div class="top">
+<input id="search" placeholder="Cari..." onkeyup="render()">
+<select id="filter" onchange="render()">
+<option value="">Semua Status</option>
+<option value="Aktif">Aktif</option>
+<option value="Selesai">Selesai</option>
+</select>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Nama</th>
+<th>Pekerjaan</th>
+<th>Deadline</th>
+<th>Prioritas</th>
+<th>Status</th>
+<th>Aksi</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+
+<div class="footer-btn">
+<button onclick="location.href='dashboard.html'">⬅ Kembali ke Dashboard</button>
+</div>
+
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+<div class="modal-box">
+<h3>Tambah Pekerjaan</h3>
+<input id="nama" placeholder="Nama karyawan">
+<input id="judul" placeholder="Pekerjaan">
+<input type="date" id="deadline">
+<select id="prioritas">
+<option value="Rendah">Rendah</option>
+<option value="Sedang">Sedang</option>
+<option value="Tinggi">Tinggi</option>
+</select>
+<button onclick="simpanPekerjaan()">Simpan</button>
+</div>
+</div>
+
+<script>
+let pekerjaan = JSON.parse(localStorage.getItem("pekerjaan")) || [];
+
+function render(){
+const tbody=document.getElementById("tbody");
+tbody.innerHTML="";
+let aktif=0, selesai=0;
+const search=searchInput().toLowerCase();
+const filter=document.getElementById("filter").value;
+
+pekerjaan.filter(p=>
+(p.nama+p.judul).toLowerCase().includes(search) &&
+(filter===""||p.status===filter)
+).forEach((p,i)=>{
+if(p.status==="Aktif") aktif++; else selesai++;
+tbody.innerHTML+=`
+<tr>
+<td>${p.nama}</td>
+<td>${p.judul}</td>
+<td>${p.deadline||"-"}</td>
+<td class="prio-${p.prioritas.toLowerCase()}">${p.prioritas}</td>
+<td><span class="status ${p.status==="Aktif"?"aktif":"selesai"}">${p.status}</span></td>
+<td class="actions">
+<button onclick="toggleStatus(${i})">🔄</button>
+<button onclick="hapus(${i})">🗑</button>
+</td>
+</tr>`;
+});
+
+totalAktif.innerText=aktif;
+totalSelesai.innerText=selesai;
+}
+
+function searchInput(){return document.getElementById("search").value}
+
+function openModal(){modal.style.display="flex"}
+window.onclick=e=>{if(e.target===modal)modal.style.display="none"}
+
+function simpanPekerjaan(){
+const data={
+nama:nama.value,
+judul:judul.value,
+deadline:deadline.value,
+prioritas:prioritas.value,
+status:"Aktif"
+};
+if(!data.nama||!data.judul)return;
+pekerjaan.push(data);
+localStorage.setItem("pekerjaan",JSON.stringify(pekerjaan));
+modal.style.display="none";
+render();
+}
+
+function toggleStatus(i){
+pekerjaan[i].status=pekerjaan[i].status==="Aktif"?"Selesai":"Aktif";
+localStorage.setItem("pekerjaan",JSON.stringify(pekerjaan));
+render();
+}
+
+function hapus(i){
+if(confirm("Hapus pekerjaan?")){
+pekerjaan.splice(i,1);
+localStorage.setItem("pekerjaan",JSON.stringify(pekerjaan));
+render();
+}
+}
+
+function toggleDark(){document.body.classList.toggle("dark")}
+render();
+</script>
+
 </body>
 </html>
