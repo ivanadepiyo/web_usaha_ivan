@@ -232,13 +232,19 @@ loginBtn.addEventListener("click", async () => {
 
   try {
     const cred = await auth.signInWithEmailAndPassword(email, password);
+
     if (!cred.user.emailVerified) {
       msg.textContent = "Silahkan verifikasi email terlebih dahulu!";
       await auth.signOut();
-      throw new Error();
+      throw new Error("Email belum diverifikasi");
     }
+
     window.location.href = "dashboard.html";
-  } catch {
+
+  } catch (err) {
+    msg.textContent = err.message || "Email atau password salah!";
+  } finally {
+    /* 🔥 PENTING: tombol selalu kembali ke normal */
     loginBtn.disabled = false;
     loginBtn.textContent = "Masuk";
   }
