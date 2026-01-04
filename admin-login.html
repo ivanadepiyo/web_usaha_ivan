@@ -60,7 +60,7 @@ a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
 <body class="page-login auth">
 
 <div class="card">
-  <h2>admin login</h2>
+  <h2>Login Admin</h2>
 
   <div class="input-group">
     <input id="email" type="email" placeholder="Email">
@@ -68,10 +68,10 @@ a { display:block; margin-top:10px; color:#2a5298; text-decoration:none; }
 
   <div class="input-group">
     <input id="password" type="password" placeholder="Password">
-    <span class="toggle-password" onclick="togglePassword()"></span>
+    <span class="toggle-password" onclick="togglePassword()">👁️</span>
   </div>
 
-  <button id="MasukBtn">admin login</button>
+  <button id="loginAdminBtn">admin login</button>
 
   <a href="lupa-password.html">Lupa Password?</a>
   <p id="msg"></p>
@@ -99,14 +99,14 @@ if (!firebase.apps.length) {
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-/* TOGGLE PASSWORD (FITUR BARU, AMAN) */
+/* 👁️ TOGGLE PASSWORD (FITUR BARU, AMAN) */
 function togglePassword() {
   const p = document.getElementById("password");
   p.type = p.type === "password" ? "text" : "password";
 }
 
 /* ================= LOGIN ADMIN ================= */
-document.getElementById("adminloginBtn").addEventListener("click", async () => {
+document.getElementById("loginAdminBtn").addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const msg = document.getElementById("msg");
