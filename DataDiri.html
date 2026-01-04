@@ -2,67 +2,235 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Data Diri</title>
+
 <style>
-body { font-family:"Segoe UI",Arial,sans-serif; margin:0; background:#f0f2f5; min-height:100vh; }
-header { background:#1e3c72; color:white; padding:20px; text-align:center; font-size:24px; }
-.container { max-width:800px; margin:30px auto; background:white; border-radius:10px; padding:20px; box-shadow:0 10px 20px rgba(0,0,0,0.1); }
-h2 { text-align:center; color:#1e3c72; margin-bottom:20px; }
-.data-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee; }
-.data-label { font-weight:bold; color:#555; }
-.data-value { color:#333; }
-button { display:block; margin:20px auto 0; padding:12px 20px; border:none; border-radius:8px; background:#1e3c72; color:white; font-weight:bold; cursor:pointer; }
-button:hover { background:#15509c; }
-@media(max-width:600px){ .data-row{flex-direction:column;align-items:flex-start;} .data-value{margin-top:5px;} }
+:root{
+  --bg:#f0f2f5;
+  --card:#ffffff;
+  --text:#222;
+  --primary:#1e3c72;
+  --muted:#777;
+}
+body.dark{
+  --bg:#121212;
+  --card:#1e1e1e;
+  --text:#f5f5f5;
+  --muted:#aaa;
+}
+*{box-sizing:border-box;font-family:"Segoe UI",Arial}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  transition:.3s;
+  min-height:100vh;
+}
+header{
+  background:var(--primary);
+  color:white;
+  padding:20px;
+  text-align:center;
+  font-size:24px;
+}
+.container{
+  max-width:850px;
+  margin:30px auto;
+  background:var(--card);
+  border-radius:15px;
+  padding:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.avatar{
+  text-align:center;
+  margin-bottom:15px;
+}
+.avatar img{
+  width:110px;
+  height:110px;
+  border-radius:50%;
+  object-fit:cover;
+  border:4px solid var(--primary);
+}
+input{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  margin-top:5px;
+}
+.row{
+  margin-bottom:15px;
+}
+label{
+  font-weight:bold;
+  color:var(--muted);
+}
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-top:20px;
+}
+button{
+  padding:10px 15px;
+  border:none;
+  border-radius:8px;
+  background:var(--primary);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+button:hover{opacity:.9}
+.toggle{cursor:pointer;font-size:20px}
+@media(max-width:600px){
+  .top{flex-direction:column;gap:10px}
+}
 </style>
 </head>
+
 <body>
+
 <header>Data Diri</header>
-<div class="container">
-<h2>Informasi Data Diri</h2>
 
-<div class="data-row"><div class="data-label">Nama:</div><div class="data-value" id="userNama"></div></div>
-<div class="data-row"><div class="data-label">Email:</div><div class="data-value" id="userEmail"></div></div>
-<div class="data-row"><div class="data-label">Nomor Telepon:</div><div class="data-value" id="userTelp"></div></div>
-<div class="data-row"><div class="data-label">Alamat:</div><div class="data-value" id="userAlamat"></div></div>
+<div class="container" id="card">
+  <div class="top">
+    <h2>👤 Informasi Pribadi</h2>
+    <span class="toggle" onclick="toggleDark()">🌙</span>
+  </div>
 
-<button onclick="window.location.href='dashboard.html'">Kembali ke Dashboard</button>
+  <div class="avatar">
+    <img id="foto" src="https://i.imgur.com/6VBx3io.png">
+    <input type="file" accept="image/*" onchange="uploadFoto(this.files[0])">
+  </div>
+
+  <div class="row">
+    <label>Nama</label>
+    <input id="nama">
+  </div>
+
+  <div class="row">
+    <label>Email</label>
+    <input id="email" disabled>
+  </div>
+
+  <div class="row">
+    <label>Nomor Telepon</label>
+    <input id="telp">
+  </div>
+
+  <div class="row">
+    <label>Alamat</label>
+    <input id="alamat">
+  </div>
+
+  <div class="actions">
+    <button onclick="simpan()">💾 Simpan</button>
+    <button onclick="exportPDF()">📄 PDF</button>
+    <button onclick="exportExcel()">📊 Excel</button>
+    <button onclick="location.href='dashboard.html'">⬅ Dashboard</button>
+  </div>
 </div>
 
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+<!-- EXPORT -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
 <script>
-const firebaseConfig = {
+firebase.initializeApp({
   apiKey: "AIzaSyBjDHapatmMS4C2EDFXxp_WQXVhb0UCZZg",
   authDomain: "web-usaha-ivan.firebaseapp.com",
   projectId: "web-usaha-ivan",
   storageBucket: "web-usaha-ivan.appspot.com",
   messagingSenderId: "588839561784",
   appId: "1:588839561784:web:4accd7d9316a5a0ec5d4cd"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-const userNama = document.getElementById("userNama");
-const userEmail = document.getElementById("userEmail");
-const userTelp = document.getElementById("userTelp");
-const userAlamat = document.getElementById("userAlamat");
-
-auth.onAuthStateChanged(async user=>{
-  if(!user){ window.location.href="login.html"; return; }
-  try{
-    const doc = await db.collection("users").doc(user.uid).get();
-    if(doc.exists){
-      const data = doc.data();
-      userNama.textContent = data.nama || "-";
-      userEmail.textContent = data.email || "-";
-      userTelp.textContent = data.telp || "-";
-      userAlamat.textContent = data.alamat || "-";
-    }
-  }catch(err){ alert("Gagal mengambil data: "+err.message); }
 });
+
+const auth=firebase.auth();
+const db=firebase.firestore();
+const storage=firebase.storage();
+let uid="";
+
+const nama=document.getElementById("nama");
+const email=document.getElementById("email");
+const telp=document.getElementById("telp");
+const alamat=document.getElementById("alamat");
+const foto=document.getElementById("foto");
+
+/* DARK MODE */
+if(localStorage.getItem("dark")==="1") document.body.classList.add("dark");
+function toggleDark(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("dark",document.body.classList.contains("dark")?"1":"0");
+}
+
+/* AUTH */
+auth.onAuthStateChanged(async user=>{
+  if(!user){ location.href="login.html"; return; }
+  uid=user.uid;
+  const doc=await db.collection("users").doc(uid).get();
+  if(doc.exists){
+    const d=doc.data();
+    nama.value=d.nama||"";
+    email.value=d.email||user.email;
+    telp.value=d.telp||"";
+    alamat.value=d.alamat||"";
+    foto.src=d.photoURL||foto.src;
+  }
+});
+
+/* SIMPAN */
+function simpan(){
+  db.collection("users").doc(uid).set({
+    nama:nama.value,
+    email:email.value,
+    telp:telp.value,
+    alamat:alamat.value,
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+  },{merge:true});
+  alert("Data tersimpan ✅");
+}
+
+/* UPLOAD FOTO */
+async function uploadFoto(file){
+  if(!file) return;
+  const ref=storage.ref("avatars/"+uid+".jpg");
+  await ref.put(file);
+  const url=await ref.getDownloadURL();
+  foto.src=url;
+  await db.collection("users").doc(uid).update({photoURL:url});
+}
+
+/* EXPORT */
+function exportPDF(){
+  html2pdf().from(document.getElementById("card")).save("data-diri.pdf");
+}
+function exportExcel(){
+  const ws=XLSX.utils.json_to_sheet([{
+    Nama:nama.value,
+    Email:email.value,
+    Telepon:telp.value,
+    Alamat:alamat.value
+  }]);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"DataDiri");
+  XLSX.writeFile(wb,"data-diri.xlsx");
+}
 </script>
+
 </body>
 </html>
