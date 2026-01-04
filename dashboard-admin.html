@@ -108,10 +108,9 @@ firebase.initializeApp({
 const auth = firebase.auth();
 const db = firebase.firestore();
 const table = document.getElementById("userTable");
-
 let currentAdminUID = null;
 
-/* ================= AUTH ================= */
+/* ================= CEK USER LOGIN ================= */
 auth.onAuthStateChanged(async user => {
   if (!user) return location.href = "login-admin.html";
 
@@ -121,7 +120,8 @@ auth.onAuthStateChanged(async user => {
     await auth.signOut();
     return location.href = "login-admin.html";
   }
-  loadUsers();
+
+  loadUsers(); // load data user setelah validasi admin
 });
 
 /* ================= LOAD USERS ================= */
@@ -191,10 +191,19 @@ function logAction(action, target) {
 }
 
 /* ================= LOGOUT ================= */
-document.getElementById("logoutBtn").onclick = async () => {
-  await auth.signOut();
-  location.href = "login-admin.html";
-};
+const logoutBtn = document.getElementById("logoutBtn");
+logoutBtn.addEventListener("click", async () => {
+  try {
+    logoutBtn.disabled = true;           // 🔒 mencegah klik ganda
+    logoutBtn.textContent = "Keluar...";
+    await auth.signOut();
+    location.href = "login-admin.html";
+  } catch (err) {
+    alert("Gagal logout: " + err.message);
+    logoutBtn.disabled = false;
+    logoutBtn.textContent = "Logout";
+  }
+});
 </script>
 
 </body>
