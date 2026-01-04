@@ -194,7 +194,7 @@ function logAction(action, target) {
 const logoutBtn = document.getElementById("logoutBtn");
 logoutBtn.addEventListener("click", async () => {
   try {
-    logoutBtn.disabled = true;           // 🔒 mencegah klik ganda
+    logoutBtn.disabled = true;
     logoutBtn.textContent = "Keluar...";
     await auth.signOut();
     location.href = "login-admin.html";
