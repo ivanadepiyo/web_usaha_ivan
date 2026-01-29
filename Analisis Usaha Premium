@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Analisis Usaha Premium</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #eef2f5;
+    padding: 20px;
+}
+.container {
+    max-width: 1000px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+}
+h1 { text-align: center; }
+h2 { color: #2c7be5; margin-top: 25px; }
+label { margin-top: 10px; display: block; }
+input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+}
+button {
+    margin-top: 20px;
+    padding: 14px;
+    width: 100%;
+    background: #2c7be5;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+}
+.result {
+    background: #f1f5f9;
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+}
+.status {
+    font-size: 18px;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 6px;
+    text-align: center;
+}
+canvas {
+    margin-top: 20px;
+    background: #fff;
+    border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h1>📊 Analisis Usaha Premium</h1>
+
+<h2>1. Modal</h2>
+<label>Investasi Awal (Rp)</label>
+<input type="number" id="investasi">
+
+<h2>2. Biaya</h2>
+<label>Biaya Tetap / Bulan (Rp)</label>
+<input type="number" id="biayaTetap">
+
+<label>Biaya Variabel per Unit (Rp)</label>
+<input type="number" id="biayaVariabel">
+
+<h2>3. Penjualan</h2>
+<label>Jumlah Produksi (Unit)</label>
+<input type="number" id="jumlah">
+
+<label>Harga Jual per Unit (Rp)</label>
+<input type="number" id="harga">
+
+<h2>4. Target (Opsional)</h2>
+<label>Target Laba (Rp)</label>
+<input type="number" id="targetLaba">
+
+<button onclick="hitungPremium()">Hitung Premium</button>
+
+<div class="result" id="output"></div>
+
+<canvas id="grafik" width="900" height="300"></canvas>
+</div>
+
+<script>
+function hitungPremium() {
+    let investasi = +investasi.value;
+    let biayaTetap = +biayaTetap.value;
+    let biayaVariabel = +biayaVariabel.value;
+    let jumlah = +jumlah.value;
+    let harga = +harga.value;
+    let target = +targetLaba.value;
+
+    let totalVariabel = biayaVariabel * jumlah;
+    let totalBiaya = biayaTetap + totalVariabel;
+    let penjualan = harga * jumlah;
+    let labaBersih = penjualan - totalBiaya;
+    let hpp = totalBiaya / jumlah;
+
+    // BEP
+    let bepUnit = biayaTetap / (harga - biayaVariabel);
+    let bepRupiah = bepUnit * harga;
+
+    // Margin
+    let marginUnit = harga - hpp;
+    let marginPersen = (marginUnit / harga) * 100;
+
+    // Target laba
+    let unitTarget = target > 0
+        ? (biayaTetap + target) / (harga - biayaVariabel)
+        : 0;
+
+    // Status
+    let status = labaBersih > 0 ? "🟢 USAHA UNTUNG"
+                : labaBersih === 0 ? "🟡 IMPAS"
+                : "🔴 USAHA RUGI";
+
+    output.innerHTML = `
+    <h2>📈 Hasil Analisis</h2>
+    <p>HPP / Unit: Rp ${hpp.toLocaleString()}</p>
+    <p>Total Penjualan: Rp ${penjualan.toLocaleString()}</p>
+    <p>Total Biaya: Rp ${totalBiaya.toLocaleString()}</p>
+    <p>Laba Bersih: Rp ${labaBersih.toLocaleString()}</p>
+
+    <h2>📌 Break Even Point</h2>
+    <p>BEP Unit: ${Math.ceil(bepUnit)} unit</p>
+    <p>BEP Rupiah: Rp ${bepRupiah.toLocaleString()}</p>
+
+    <h2>💰 Margin</h2>
+    <p>Margin / Unit: Rp ${marginUnit.toLocaleString()}</p>
+    <p>Margin (%): ${marginPersen.toFixed(2)}%</p>
+
+    ${target > 0 ? `<h2>🎯 Target Laba</h2>
+    <p>Unit yang harus dijual: ${Math.ceil(unitTarget)} unit</p>` : ""}
+
+    <div class="status">${status}</div>
+    `;
+
+    gambarGrafik(penjualan, totalBiaya);
+}
+
+function gambarGrafik(penjualan, biaya) {
+    let c = grafik.getContext("2d");
+    c.clearRect(0,0,900,300);
+
+    let max = Math.max(penjualan, biaya);
+    let skala = 200 / max;
+
+    c.fillStyle = "#2c7be5";
+    c.fillRect(200, 250 - penjualan * skala, 150, penjualan * skala);
+    c.fillText("Penjualan", 215, 270);
+
+    c.fillStyle = "#e5533d";
+    c.fillRect(500, 250 - biaya * skala, 150, biaya * skala);
+    c.fillText("Biaya", 535, 270);
+}
+</script>
+</body>
+</html>
