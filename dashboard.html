@@ -6,54 +6,97 @@
 <title>Dashboard | Web Perusahaan</title>
 
 <style>
-body{
-  font-family:"Segoe UI",Arial,sans-serif;
-  margin:0;
-  background:#f0f2f5;
-  min-height:100vh;
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
 }
 
 /* HEADER */
-header{
-  background:#1e3c72;
-  color:white;
-  padding:20px;
-  text-align:center;
-  font-size:24px;
+.header {
+    background: linear-gradient(135deg, #4facfe, #00c6ff);
+    height: 120px;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    padding: 20px;
+    color: white;
+    position: relative;
 }
 
-/* CONTAINER */
-.container{
-  max-width:600px;
-  margin:30px auto 90px;
-  background:white;
-  border-radius:10px;
-  padding:20px;
-  box-shadow:0 10px 20px rgba(0,0,0,0.1);
-  text-align:center;
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 0px;
 }
 
-/* BUTTON */
-button{
-  display:block;
-  width:80%;
-  margin:12px auto;
-  padding:12px 20px;
-  border:none;
-  border-radius:8px;
-  background:#1e3c72;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-  font-size:16px;
+.profile img {
+    width: 50px;
+    border-radius: 50%;
 }
-button:hover{ background:#15509c; }
 
-#logoutBtn{
-  background:#d9534f;
+.profile span {
+    font-size: 16px;
 }
-#logoutBtn:hover{
-  background:#c9302c;
+
+/* CARD CONTAINER */
+.container {
+    background: #eaeaea;
+    margin: 50px 15px 20px;
+    padding: 20px;
+    border-radius: 25px;
+}
+
+/* GRID MENU */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.icon {
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin: 0;
+    font-size: 12px;
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+}
+
+.bottom-nav div {
+    text-align: center;
+    font-size: 14px;
+    color: gray;
+}
+
+.active {
+    color: #4facfe;
 }
 
 /* MODAL */
@@ -66,6 +109,7 @@ button:hover{ background:#15509c; }
   align-items:center;
   z-index:999;
 }
+
 .modal-content{
   background:white;
   padding:20px;
@@ -94,24 +138,65 @@ button:hover{ background:#15509c; }
   font-size:13px;
   color:#555;
 }
+
 </style>
 </head>
 
 <body>
 
-<header>Dashboard Web Perusahaan</header>
+<div class="header">
+    <div class="profile">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+        <span>e-Report</span>
+ </div>
+</div>
 
 <div class="container">
-  <h2>Menu Akses</h2>
+    <div class="grid">
+     
+        <div class="card">
+	<card id="btnDataDiri">
+            <div class="icon">🤵</div>
+            </p>Data Diri</p>
+        </div>
 
-  <button id="btnDataDiri">Data Diri</button>
-  <button id="btnPerusahaan">Perusahaan</button>
-  <button id="btnGaji">Daftar Gaji</button>
-  <button id="btnPekerjaan">Pekerjaan</button>
-  <button id="btnKalkulator">Kalkulator</button>
-  <button id="btnBukuCatatan">Buku Catatan</button>
+        <div class="card">
+	<card id="btnPerusahaan">
+            <div class="icon">🏢</div>
+            </p>Perusahaan</p>
+        </div>
 
-  <button id="logoutBtn">Logout</button>
+        <div class="card">
+	<card id="btnGaji">
+            <div class="icon">💰</div>
+            </p>Daftar Gaji</p>
+        </div>
+
+        <div class="card">
+	<card id="btnPekerjaan">
+            <div class="icon">👷‍♂️</div>
+            </p>Pekerjaan</p>
+        </div>
+
+        <div class="card">
+	<card id="btnKalkulator">
+            <div class="icon">🔢</div>
+            </p>Kalkulator</p>
+        </div>
+
+        <div class="card">
+	<card id="btnBukuCatatan">
+            <div class="icon">📗</div>
+            </p>Buku Catatan</p>
+        </div>
+
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <div class="active">🏠<br>Home</div>
+    <div>🔊<br id="logoutBtn">Logout</div>
+    <div>⚙️<br>Setting</div>
 </div>
 
 <!-- MODAL -->
