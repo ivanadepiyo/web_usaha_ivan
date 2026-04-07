@@ -3,227 +3,543 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kalkulator</title>
+<title>Kalkulator Modern</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  font-family:"Segoe UI",Arial,sans-serif;
+* {
+    transition: all 0.3s ease;
 }
-body{
-  margin:0;
-  min-height:100vh;
-  background:#f0f2f5;
-}
-
-/* HEADER */
-header{
-  background:#1e3c72;
-  color:#fff;
-  padding:18px;
-  text-align:center;
-  font-size:22px;
-  font-weight:bold;
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(120deg, #2980b9, #6dd5fa);
+    margin: 0;
+    height: 100vh;
 }
 
-/* LAYOUT */
-.container{
-  max-width:1100px;
-  margin:30px auto;
-  display:flex;
-  gap:20px;
-  padding:0 15px;
+/* Container */
+.container {
+    display: flex;
+    gap: 20px;
 }
 
-/* CARD */
-.card{
-  background:#fff;
-  border-radius:12px;
-  padding:20px;
-  box-shadow:0 8px 18px rgba(0,0,0,0.1);
+/* Kalkulator */
+.kalkulator {
+    width: 300px;
+    background: #1e1e1e;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.5);
+    position: relative;
 }
 
-/* KALKULATOR */
-.kalkulator{
-  width:340px;
-}
-.layar{
-  width:100%;
-  height:60px;
-  font-size:26px;
-  text-align:right;
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  margin-bottom:15px;
+/* Layar */
+.layar {
+    width: 95%;
+    height: 60px;
+    font-size: 26px;
+    text-align: right;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+     background: #fff;
+    margin-bottom: 10px;
 }
 
-.tombol{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:10px;
-}
-button{
-  height:42px;
-  border:none;
-  border-radius:8px;
-  background:#e3e7ed;
-  color:#333;
-  font-size:14px;
-  font-weight:600;
-  cursor:pointer;
-}
-button:hover{background:#d6dce6}
-
-.operator{
-  background:#1e3c72;
-  color:#fff;
-}
-.operator:hover{background:#15509c}
-
-.clear{
-  background:#d32f2f;
-  color:#fff;
-}
-.clear:hover{background:#b71c1c}
-
-.hasil{
-  grid-column:span 5;
-  background:#4caf50;
-  color:#fff;
-}
-.hasil:hover{background:#43a047}
-
-/* HISTORY */
-.history{
-  flex:1;
-}
-.history h3{
-  margin-top:0;
-  color:#1e3c72;
-  text-align:center;
-}
-#history{
-  font-size:14px;
-  line-height:1.6;
-  color:#333;
+/* Grid tombol */
+.tombol {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
 }
 
-/* FOOTER BUTTON */
-.back{
-  margin-top:20px;
-  width:100%;
-  background:#607d8b;
-  color:#fff;
+button {
+    height: 45px;
+    font-size: 14px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #333;
+    color: white;
 }
-.back:hover{background:#4b6670}
+
+button:hover { background: #555; }
+
+.operator { background: #ff9500; }
+.clear { background: #d32f2f; }
+.hasil { grid-column: span 5; background: #4caf50; }
+
+/* History */
+#history {
+    flex: 1;
+    overflow-y: auto;
+    margin: 10px 0;
+}
+
+.jam {
+    text-align: center;
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: #888;
+}
+
+.history-container {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    top: -300px; /* disembunyikan di atas */
+    left: 0;
+    width: 98.5%;
+    height: 250px;
+    background: white;
+    padding: 15px;
+    border-radius: 0 0 15px 15px;
+    overflow-y: auto;
+    transition: 0.4s ease;
+    z-index: 999;
+pointer-events: auto;
+}
+
+.drag-bar {
+    width: 50px;
+    height: 5px;
+    background: #ccc;
+    margin: 0 auto 10px;
+    border-radius: 5px;
+	cursor: pointer;
+}
+
+/* saat aktif */
+.history-container.show {
+    top: 0;
+}
+
+.history-item {
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+/* Option */
+.option-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+transform: translateY(20px);
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+.option-panel {
+    position: absolute;
+    top: 10px;
+    right: 120px;
+
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    backdrop-filter: blur(10px);
+
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: 0.3s;
+       z-index: 1000;
+    pointer-events: none;
+}
+
+.option-panel.show {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* DARK MODE GLOBAL */
+body.dark {
+    background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
+}
+
+/* kalkulator */
+.dark .kalkulator {
+    background: #121212;
+    box-shadow: 0 0 25px rgba(0,0,0,0.8);
+}
+
+/* layar */
+.dark .layar {
+    background: #1e1e1e;
+    color: #00ffcc;
+	text-shadow: 0 0 5px #00ffcc;
+}
+
+/* tombol */
+.dark button {
+    background: #2a2a2a;
+    color: #fff;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+}
+
+.dark button:hover {
+    background: #3a3a3a;
+}
+
+.dark .clear {
+    background: #b71c1c;
+}
+
+/* operator */
+.dark .operator {
+    box-shadow: 0 0 8px rgba(255,149,0,0.6);
+}
+
+/* tombol hasil */
+.dark .hasil {
+    box-shadow: 0 0 10px rgba(0,200,83,0.6);
+}
+
+/* history */
+.dark .history-container {
+    background: #1a1a1a;
+    color: white;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.7);
+}
+
+.dark .history-item {
+    border-bottom: 1px solid #333;
+}
+
+/* option panel */
+.dark .option-panel {
+    background: rgba(30,30,30,0.9);
+    border: 1px solid #333;
+}
+
+/* drag bar */
+.dark .drag-bar {
+    background: #555;
+}
+
+/* Dark mode */
+.dark .jam {
+    color: #00ffcc;
+    text-shadow: 0 0 5px #00ffcc;
+}
+
+button[onclick="hapusRiwayat()"] {
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px;
+    background: #d32f2f;
+    color: white;
+    border-radius: 8px;
+}
+
+button[onclick="hapusRiwayat()"]:hover {
+    background: #b71c1c;
+}
+
 </style>
 </head>
 
 <body>
 
-<header>Kalkulator</header>
-
 <div class="container">
 
-  <!-- KALKULATOR -->
-  <div class="card kalkulator">
-    <input id="layar" class="layar" disabled>
+<div class="kalkulator">
+<div id="jam" class="jam"></div>
+<input id="layar" class="layar" disabled>
 
-    <div class="tombol">
-      <button class="clear" onclick="clearAll()">C</button>
-      <button onclick="backspace()">⌫</button>
-      <button onclick="clearHistory()">Hapus Riwayat</button>
-      <button onclick="toggleSign()">±</button>
-      <button onclick="percent()">%</button>
+<div class="tombol">
 
-      <button onclick="sqrt()">√</button>
-      <button class="operator" onclick="add('/')">/</button>
-      <button onclick="add('7')">7</button>
-      <button onclick="add('8')">8</button>
-      <button onclick="add('9')">9</button>
+<button class="clear" onclick="hapus()">C</button>
+<button onclick="hapusSatu()">⌫</button>
+<button onclick="tambah('√')">√</button>
+<button onclick="tambah('±')">±</button>
+<button onclick="tambah('%')">%</button>
 
-      <button onclick="square()">x²</button>
-      <button class="operator" onclick="add('*')">*</button>
-      <button onclick="add('4')">4</button>
-      <button onclick="add('5')">5</button>
-      <button onclick="add('6')">6</button>
+<button onclick="tambah('Math.log(')">ln</button>
+<button onclick="tambah('Math.sin(')">sin</button>
+<button onclick="tambah('Math.cos(')">cos</button>
+<button onclick="tambah('Math.tan(')">tan</button>
+<button onclick="tambah('Math.log10(')">log</button>
 
-      <button onclick="cube()">x³</button>
-      <button class="operator" onclick="add('-')">-</button>
-      <button onclick="add('1')">1</button>
-      <button onclick="add('2')">2</button>
-      <button onclick="add('3')">3</button>
+<button onclick="tambah('7')">7</button>
+<button onclick="tambah('8')">8</button>
+<button onclick="tambah('9')">9</button>
+<button class="operator" onclick="tambah('+')">+</button>
+<button onclick="addValue('Math.PI')">π</button>
 
-      <button onclick="add('(')">(</button>
-      <button class="operator" onclick="add('+')">+</button>
-      <button onclick="add('0')">0</button>
-      <button onclick="add('.')">.</button>
-      <button onclick="add(')')">)</button>
+<button onclick="tambah('4')">4</button>
+<button onclick="tambah('5')">5</button>
+<button onclick="tambah('6')">6</button>
+<button class="operator" onclick="tambah('-')">-</button>
+<button onclick="factorial()">x!</button>
 
-      <button class="hasil" onclick="calculate()">=</button>
+<button onclick="tambah('1')">1</button>
+<button onclick="tambah('2')">2</button>
+<button onclick="tambah('3')">3</button>
+<button class="operator" onclick="tambah('/')">÷</button>
+<button onclick="tambah('^')">^</button>
 
-      <button onclick="trig('sin')">sin</button>
-      <button onclick="trig('cos')">cos</button>
-      <button onclick="trig('tan')">tan</button>
-      <button onclick="log10()">log</button>
-      <button onclick="ln()">ln</button>
-    </div>
+<button onclick="tambah('(')">(</button>
+<button onclick="tambah('0')">0</button>
+<button onclick="tambah(')')">)</button>
+<button class="operator" onclick="tambah('*')">×</button>
+<button onclick="tambah('.')">.</button>
 
-    <button class="back" onclick="window.location.href='dashboard.html'">
-      ⬅ Kembali ke Dashboard
-    </button>
-  </div>
+<button class="hasil" onclick="hitung()">=</button>
 
-  <!-- HISTORY -->
-  <div class="card history">
-    <h3>Riwayat Perhitungan</h3>
-    <div id="history"></div>
-  </div>
+</div>
+</div>
 
+<!-- HISTORY -->
+<div class="history-container">
+<h3>Riwayat</h3>
+<div class="drag-bar"></div>
+<div id="history"></div>
+<button onclick="hapusRiwayat()">Hapus Riwayat</button>
+</div>
+
+<button class="option-btn" onclick="toggleOptions()">🛠️</button>
+
+<div id="optionPanel" class="option-panel">
+<button onclick="toggleDarkMode()">Dark Mode</button>
+</div>
 </div>
 
 <script>
-let layar=document.getElementById("layar")
-let history=[]
+let historyData = JSON.parse(localStorage.getItem("history")) || [];
 
-function add(v){layar.value+=v}
-function clearAll(){layar.value=""}
-function backspace(){layar.value=layar.value.slice(0,-1)}
+function tambah(val) {
+    let layar = document.getElementById("layar");
 
-function toggleSign(){if(layar.value) layar.value=eval(layar.value)*-1}
-function percent(){if(layar.value) layar.value=eval(layar.value)/100}
-function sqrt(){if(layar.value) layar.value=Math.sqrt(eval(layar.value))}
-function square(){if(layar.value) layar.value=Math.pow(eval(layar.value),2)}
-function cube(){if(layar.value) layar.value=Math.pow(eval(layar.value),3)}
+  if (val === '±') {
+    let match = layar.value.match(/(\d+\.?\d*)$/);
 
-function trig(t){
-  let v=eval(layar.value)
-  let r=v*Math.PI/180
-  if(t==="sin") layar.value=Math.sin(r)
-  if(t==="cos") layar.value=Math.cos(r)
-  if(t==="tan") layar.value=Math.tan(r)
+    if (match) {
+        let number = match[0];
+        let start = layar.value.slice(0, -number.length);
+
+number = number.replace(/^\(-?|\)$/g, "");
+
+        if (number.startsWith("-")) {
+            number = number.slice(1);
+	
+        } else {
+            number = "-" + number;
+        }
+
+        layar.value = start + "(" + number + ")";
+    }
+
+    return;
+}
 }
 
-function log10(){layar.value=Math.log10(eval(layar.value))}
-function ln(){layar.value=Math.log(eval(layar.value))}
-
-function calculate(){
-  try{
-    let r=eval(layar.value)
-    history.unshift(layar.value+" = "+r)
-    if(history.length>10)history.pop()
-    document.getElementById("history").innerHTML=history.join("<br>")
-    layar.value=r
-  }catch{
-    layar.value="Error"
-  }
+function addValue(val) {
+    document.getElementById("layar").value += val;
 }
 
-function clearHistory(){
-  history=[]
-  document.getElementById("history").innerHTML=""
+function hapus() {
+    document.getElementById("layar").value = "";
 }
+
+function hapusSatu() {
+    let layar = document.getElementById("layar");
+    layar.value = layar.value.slice(0, -1);
+}
+
+function factorial() {
+    let layar = document.getElementById("layar");
+    let num = parseInt(layar.value);
+
+    if (isNaN(num) || num < 0) return;
+
+    let result = 1;
+    for (let i = 1; i <= num; i++) result *= i;
+
+    layar.value = result;
+}
+
+function hapusRiwayat() {
+    if (confirm("Hapus semua riwayat?")) {
+        historyData = [];
+        localStorage.removeItem("history");
+        renderHistory();
+    }
+}
+
+function hitung() {
+    try {
+        let layar = document.getElementById("layar");
+        let exp = layar.value;
+
+	exp = exp.replace(/√(\d+)/g, "Math.sqrt($1)");
+	exp = exp.replace(/√\(/g, "Math.sqrt(");
+        exp = exp.replace(/\^/g, "**");
+        exp = exp.replace(/%/g, "*0.01");
+	exp = exp.replace(/Math.sin\((.*?)\)/g, 	"Math.sin(($1)*Math.PI/180)");
+	exp = exp.replace(/Math.cos\((.*?)\)/g, 	"Math.cos(($1)*Math.PI/180)");
+	exp = exp.replace(/Math.tan\((.*?)\)/g, 	"Math.tan(($1)*Math.PI/180)");
+	exp = exp.replace(/(\d+)!/g, function(_, n) {
+   	let num = parseInt(n);
+    	let result = 1;
+    	for (let i = 1; i <= num; i++) result *= i;
+    	return result;
+});
+	exp = exp.replace(/(\d+(\.\d+)?)([+\-*/])(\d+(\.\d+)?)%/g, function(_, a, _, op, b) {
+  	a = parseFloat(a);
+    	b = parseFloat(b);
+
+    if (op === '+' || op === '-') {
+        return a + op + "(" + (a * b / 100) + ")";
+    } else {
+        return a + op + "(" + (b / 100) + ")";
+    }
+	});
+
+        let hasil = eval(exp);
+
+        layar.value = hasil;
+
+	historyData.push(exp + " = " + hasil);
+        if (historyData.length > 10) historyData.pop();
+
+        localStorage.setItem("history", JSON.stringify(historyData));
+        renderHistory();
+
+    } catch {
+        document.getElementById("layar").value = "Error";
+    }
+}
+
+function toggleOptions() {
+    let panel = document.getElementById("optionPanel");
+
+    // ❗ tutup history kalau option dibuka
+    historyPanel.classList.remove("show");
+    isOpen = false;
+
+    panel.classList.toggle("show");
+}
+
+function toggleDarkMode() {
+    document.body.classList.toggle("dark");
+}
+
+let isOpen = false;
+
+let historyPanel = document.querySelector(".history-container");
+window.addEventListener("wheel", function(e) {
+
+    // ❗ tutup option saat scroll
+    document.getElementById("optionPanel").classList.remove("show");
+
+    if (e.deltaY < -50 && !isOpen) {
+        historyPanel.classList.add("show");
+        isOpen = true;
+    } else if (e.deltaY > 50 && isOpen) {
+        historyPanel.classList.remove("show");
+        isOpen = false;
+    }
+});
+
+function renderHistory() {
+    let historyDiv = document.getElementById("history");
+    historyDiv.innerHTML = "";
+
+    historyData.forEach(item => {
+        let div = document.createElement("div");
+        div.className = "history-item";
+        div.textContent = item;
+        div.onclick = () => {
+            document.getElementById("layar").value = item.split(" = ")[0];
+        };
+        historyDiv.appendChild(div);
+    });
+
+   setTimeout(() => {
+    historyDiv.scrollTop = historyDiv.scrollHeight;
+}, 50);}
+
+document.addEventListener("keydown", function(e) {
+    let layar = document.getElementById("layar");
+
+    // ❌ blok spasi
+    if (e.key === " ") {
+        e.preventDefault();
+        return;
+    }
+
+    // angka & operator
+    if (!isNaN(e.key) && e.key !== " ") {
+        layar.value += e.key;
+    }
+    else if ("+-*/.".includes(e.key)) {
+        layar.value += e.key;
+    }
+
+    // Enter
+    else if (e.key === "Enter") {
+        e.preventDefault();
+        hitung();
+    }
+
+    // Backspace
+    else if (e.key === "Backspace") {
+        hapusSatu();
+    }
+
+    // Escape
+    else if (e.key === "Escape") {
+        hapus();
+    }
+
+    // kurung
+    else if (e.key === "(" || e.key === ")") {
+        layar.value += e.key;
+    }
+
+    // persen
+    else if (e.key === "%") {
+        layar.value += "%";
+    }
+
+    // pangkat
+    else if (e.key === "^") {
+        layar.value += "^";
+    }
+});
+
+function updateJam() {
+    let now = new Date();
+
+    let hari = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+    let bulan = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+
+    let h = hari[now.getDay()];
+    let tgl = now.getDate();
+    let bln = bulan[now.getMonth()];
+    let thn = now.getFullYear();
+
+    let jam = String(now.getHours()).padStart(2, '0');
+    let menit = String(now.getMinutes()).padStart(2, '0');
+    let detik = String(now.getSeconds()).padStart(2, '0');
+
+    let format = `${h}, ${tgl} ${bln} ${thn} | ${jam}:${menit}:${detik}`;
+
+    document.getElementById("jam").textContent = format;
+}
+
+setInterval(updateJam, 1000);
+updateJam();
+
+
 </script>
 
 </body>
